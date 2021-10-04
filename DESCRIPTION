@@ -2,7 +2,12 @@ Package: gompertztrunc
 Type: Package
 Title: gompertztrunc: Tools for estimating 
 Version: 0.1.0
-Author: Casey Breen
+Authors@R: 
+    person(given = "Casey",
+           family = "Breen",
+           role = c("aut", "cre"),
+           email = "caseybreen@berkeley.edu",
+           comment = c(ORCID = "https://orcid.org/0000-0001-9114-981X"))
 Imports: tidyverse, fastDummies, data.table, broom, stringr
 Maintainer: The package maintainer <caseybreen@berkeley.edu>
 Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data.
