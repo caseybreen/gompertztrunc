@@ -13,7 +13,7 @@
 #   Check Package:             'Cmd + Shift + E'
 #   Test Package:              'Cmd + Shift + T'
 
-multicohort_truncated_fe_cov_model_text = "functions {
+multicohort_truncated_fe_cov_model_text <- "functions {
   real get_alpha(real mode, real beta) {
     real alpha = beta/exp(mode*beta);
     return(alpha);
@@ -56,23 +56,28 @@ model {
 }"
 
 
-bayes <- function(df, lower= 1975, upper = 2005){
-
+bayes <- function(df, lower = 1975, upper = 2005) {
   cohorts <- sort(unique(df$byear))
 
-  multicohort_fe_cov_model = stan_model(model_code = multicohort_truncated_fe_cov_model_text,
-                                        model_name='fixed effects gompertz with multiple cohorts, common beta, single covariate')
-  init_multicohort_fe_cov_model <- function () {list(beta=0.08, mode=as.array(rep(75, cohorts)), b=0)}
+  multicohort_fe_cov_model <- stan_model(
+    model_code = multicohort_truncated_fe_cov_model_text,
+    model_name = "fixed effects gompertz with multiple cohorts, common beta, single covariate"
+  )
+  init_multicohort_fe_cov_model <- function() {
+    list(beta = 0.08, mode = as.array(rep(75, cohorts)), b = 0)
+  }
 
   df <- as.data.table(df)
 
-  A = df[, .(y = death_age,
-             u = upper - byear,
-             l = lower - byear,
-             cohort = byear,
-             covar = educ_yrs)]
+  A <- df[, .(
+    y = death_age,
+    u = upper - byear,
+    l = lower - byear,
+    cohort = byear,
+    covar = educ_yrs
+  )]
 
-  At = A[l < y & y < u]
+  At <- A[l < y & y < u]
 
 
   # # drop the endpoints
@@ -86,20 +91,23 @@ bayes <- function(df, lower= 1975, upper = 2005){
   # it because we actually want that to be one higher than the highest observed age after dropping endpoints.
   data_list <- list(
     N = nrow(At),
-    L = At$l ,
+    L = At$l,
     U = At$u,
     cohort_index = At$cohort - min(At$cohort) + 1,
     num_cohorts = cohorts,
     C = At$covar,
-    x = At$y)
+    x = At$y
+  )
 
-  covariate <- sampling(object = multicohort_fe_cov_model,
-                        data = data_list,
-                        init = init_multicohort_fe_cov_model,
-                        chains = 2,
-                        iter   = 3000,
-                        warmup = 200,
-                        cores = 2)
+  covariate <- sampling(
+    object = multicohort_fe_cov_model,
+    data = data_list,
+    init = init_multicohort_fe_cov_model,
+    chains = 2,
+    iter = 3000,
+    warmup = 200,
+    cores = 2
+  )
 
   return(covariate)
 }

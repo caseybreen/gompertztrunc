@@ -4,7 +4,7 @@
 \alias{convert_hazard_ratio_to_le}
 \title{Translate to e65}
 \usage{
-convert_hazard_ratio_to_le(lower, upper, hr)
+convert_hazard_ratio_to_le(lower, upper, hr, M = 80, beta = 0.1)
 }
 \arguments{
 \item{lower}{the bound function}

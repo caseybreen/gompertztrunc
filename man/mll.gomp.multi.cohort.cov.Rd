@@ -4,12 +4,12 @@
 \alias{mll.gomp.multi.cohort.cov}
 \title{Gompertz mle function}
 \usage{
-mll.gomp.multi.cohort.cov(p, A)
+mll.gomp.multi.cohort.cov(p, A, predictors = predictors)
 }
 \arguments{
 \item{p}{the initialization function}
 
-\item{A}{data matrix with covariates y, u, l, and covariates, including cohor}
+\item{A}{data matrix with covariates y, u, l, and covariates, including cohort}
 }
 \value{
 None

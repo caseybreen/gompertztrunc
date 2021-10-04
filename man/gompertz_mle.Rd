@@ -4,7 +4,7 @@
 \alias{gompertz_mle}
 \title{Gompertz mle function}
 \usage{
-gompertz_mle(fml, upper = 2005, lower = 1975, data)
+gompertz_mle(fml, upper = 2005, lower = 1975, data, byear = byear)
 }
 \arguments{
 \item{fml}{the estimation formula}
