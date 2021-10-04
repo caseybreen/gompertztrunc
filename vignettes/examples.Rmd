@@ -1,0 +1,351 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Summary: Use gompertztrun for three CenSoc analyses. 
+
+```{r}
+## library packages
+library(tidyverse)
+library(data.table)
+library(tictoc)
+
+## library new CenSoc package 
+library(gompertztrunc)
+```
+
+The gompertztrunc packages calculates e65  
+
+
+# Three Applications of Method 
+
+We illustrate the 
+
+```{r}
+## read in prelinked CenSoc datasets and filter to "conservative" matches 
+dmf <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/censoc_dmf_v2_linked.csv") %>% 
+   filter(link_abe_exact_conservative == 1)
+```
+
+
+```{r}
+recode_education <- function(df) {
+  df <- df  %>%
+    mutate(educ_yrs = case_when(
+      EDUCD == 2 ~ 0,
+      EDUCD == 14 ~ 1,
+      EDUCD == 15 ~ 2,
+      EDUCD == 16 ~ 3,
+      EDUCD == 17 ~ 4,
+      EDUCD == 22 ~ 5,
+      EDUCD == 23 ~ 6,
+      EDUCD == 25 ~ 7,
+      EDUCD == 26 ~ 8,
+      EDUCD == 30 ~ 9,
+      EDUCD == 40 ~ 10,
+      EDUCD == 50 ~ 11,
+      EDUCD == 60 ~ 12,
+      EDUCD == 70 ~ 13,
+      EDUCD == 80 ~ 14,
+      EDUCD == 90 ~ 15,
+      EDUCD == 100 ~ 16,
+      EDUCD == 110 ~ 16,
+      EDUCD == 111 ~ 17,
+      EDUCD == 112 ~ 17,
+      EDUCD == 113 ~ 17
+    ))
+  return(df)
+}
+
+## recode dmf education variable 
+dmf <- dmf %>% 
+  recode_education() %>% 
+  filter(!is.na(educ_yrs)) %>% 
+  mutate(urban = case_when(
+    URBAN == 1 ~ 0,
+    URBAN == 2 ~ 1
+  )) %>% 
+  mutate(ownhome = case_when(
+    OWNERSHP %in% c(1) ~ 1,
+    TRUE ~ 0
+  )) %>% 
+  mutate(educ_yrs_character_all = as.character(educ_yrs))
+
+dmf_sample <- dmf %>% filter(byear %in% 1905:1914) %>% sample_n(100000) 
+
+example_data <- dmf_sample %>% 
+  mutate(id = row_number()) %>% 
+  select(id, byear, death_age, educ_yrs, urban, ownhome)
+```
+
+## Example 1: Education Staircase 
+
+```{r}
+## restrict to birth cohorts of 1905-1914
+dmf_staircase <- dmf %>% 
+  filter(byear %in% 1905:1914) %>% 
+  mutate(educ_yrs_character = as.character(educ_yrs))
+
+
+## Run-Time: 5 hours. 18398.488 sec elapsed
+tic()
+results_optim <- gompertz_mle(fml = death_age ~ educ_yrs_character, lower = 1975, upper = 2005, data = dmf_staircase)
+toc()
+
+## convert to e65
+gompertz_mle_results <- convert_hazards_to_e65(df = results_optim) %>% 
+  mutate(parameter = prefix_strip(parameter, "educ_yrs_character_")) %>% 
+  mutate(parameter = as.numeric(parameter)) %>% 
+  mutate(method = "Gompertz MLE")
+
+
+linear_model <- tidy(lm(death_age ~ educ_yrs_character, data = dmf_staircase))
+
+linear_model_results <- linear_model %>% 
+  mutate(term = prefix_strip(term, "educ_yrs_character")) %>% 
+  filter(!term %in% c("(Intercept)", "Ownhome")) %>% 
+  mutate(term = as.numeric(term)) %>% 
+  mutate(e65 = estimate,
+         e65_upper = estimate + 2*std.error,
+         e65_lower = estimate - 2*std.error,
+         parameter = term,
+         method = "Regression on age at death")  
+
+
+## results 
+results <- bind_rows(linear_model_results, gompertz_mle_results)
+
+education_plot <- results %>% 
+  ggplot(aes(x = parameter, y = e65, ymin = e65_lower, ymax = e65_upper, color = method)) + 
+  geom_pointrange(position = position_dodge(width = 0.2)) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Years of Schooling",
+       y = "e65",
+       title = "Education and Life Expectancy at Age 65",
+       subtitle = "CenSoc-DMF, Life Expectancy at Age 65") + 
+  theme(legend.position = "bottom") + 
+  scale_x_continuous(breaks=seq(0,17,2))
+
+```
+
+## Example 2: BNI and longevity  
+
+Association (and "effect") of BNI on longevity.  
+
+```{r}
+bni_analysis_file <- fread("/90days/caseybreen/analysis_file_restricted.csv")
+
+
+## include fixed effects by 
+tic()
+bni_baseline_model <- gompertz_mle(fml = death_age ~ bni_std + birth_order, data = bni_analysis_file, lower = 1988, upper = 2005)
+toc()
+
+## include fixed effects by demeaning 
+bni_analysis_file <- bni_analysis_file %>% 
+   mutate(death_age_demean = death_age - ave(death_age, family) + mean(death_age),
+         bni_std_demean = bni_std - ave(bni_std, family) + mean(bni_std)) 
+
+tic()
+bni_sibfe_model <- gompertz_mle(fml = death_age_demean ~ bni_std_demean + birth_order, data = bni_analysis_file, lower = 1988, upper = 2005)
+toc()
+
+
+gompertz_baseline_results <- convert_hazards_to_e65(bni_baseline_model) %>% 
+  mutate(method = "Gompertz MLE",
+         model = "Baseline")
+
+gompertz_sibfe_results <- convert_hazards_to_e65(bni_sibfe_model) %>% 
+  mutate(method = "Gompertz MLE",
+         model = "Sib FE")
+
+## 
+gompertz_results <- bind_rows(gompertz_baseline_results, gompertz_sibfe_results) %>% 
+  filter(parameter != "birth_order")
+  
+
+ols_baseline <- tidy(fixest::feols(death_age ~ bni_std | byear + birth_order, data = bni_analysis_file)) %>%
+  mutate(method = "Regression on Age of Death",
+         model = "Baseline")
+
+ols_sibfe <- tidy(fixest::feols(death_age ~ bni_std | byear + family + birth_order, data = bni_analysis_file)) %>% 
+  mutate(method = "Regression on Age of Death",
+         model = "Sib FE")
+
+ols_regults <- bind_rows(ols_baseline, ols_sibfe) %>% 
+  mutate(e65 = estimate, 
+         e65_lower = estimate - 2 * std.error,
+         e65_upper = estimate + 2 * std.error)
+
+bni_plot <- bind_rows(gompertz_results, ols_regults) %>% 
+  ggplot(aes(x = model, y = e65, color = method, ymin = e65_lower, ymax = e65_upper)) +
+  geom_pointrange(position = position_dodge(width = 0.2)) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  theme(legend.position = "bottom") + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  labs(title = "Association between Black Name Index (BNI) and e65",
+       subtitle = "BUNMD, Birth cohorts of 1915-1925")
+  
+
+```
+
+
+## Example 3: Home Ownership and Longevity 
+
+```{r}
+library(fixest)
+homeownership <- read_csv("/90days/caseybreen/homeownership_sibs.csv")
+
+homeownership_dataset <- homeownership %>% 
+  select(SERIALP, histid_1940) %>% 
+  inner_join(dmf, by = c("histid_1940" = "HISTID")) %>% 
+  mutate(ownership = case_when(
+    OWNERSHP == 1 ~ 1,
+    TRUE ~ 0
+  )) %>% 
+  janitor::clean_names()
+
+## fit models 
+model1 <- feols(death_age ~ ownership | byear,  data = homeownership_dataset)
+model2 <- feols(death_age ~ ownership | byear + urban + occ + race,  data = homeownership_dataset)
+model3 <- feols(death_age ~ ownership | byear + urban + occ + race + serialp,  data = homeownership_dataset)
+
+## home ownership results 
+homeownership_results <- tidy(model1) %>% mutate(model = "Baseline") %>% 
+  bind_rows(tidy(model2) %>% mutate(model = "Baseline + Controls")) %>% 
+  bind_rows(tidy(model3) %>% mutate(model = "Baseline + Controls + Family FE")) %>% 
+  filter(term == "ownership")
+```
+
+
+```{r}
+## include fixed effects by demeaning 
+homeownership_dataset <- homeownership_dataset %>% 
+   mutate(death_age_demean = death_age - ave(death_age, serialp) + mean(death_age),
+         ownership_demean = ownership - ave(ownership, serialp) + mean(ownership)) 
+
+
+tic()
+homeownership1 <- gompertz_mle(death_age ~ ownership, data = homeownership_dataset)
+toc()
+
+
+homeownership_dataset <- homeownership_dataset %>% 
+   mutate(death_age_demean = death_age - ave(death_age,  urban, occ, race) + mean(death_age),
+         ownership_demean = ownership - ave(ownership,  urban, occ, race) + mean(ownership)) 
+
+tic()
+homeownershipf_controls <- gompertz_mle(death_age_demean ~ ownership_demean, data = homeownership_dataset)
+toc()
+
+homeownership_dataset_family <- homeownership_dataset %>% 
+   mutate(death_age_demean = death_age - ave(death_age,  serialp) + mean(death_age),
+         ownership_demean = ownership - ave(ownership,  serialp) + mean(ownership)) 
+
+tic()
+homeownership_sibfe_controls <- gompertz_mle(death_age_demean ~ ownership_demean, data = homeownership_dataset_family)
+toc()
+
+
+homeowner_baseline <- convert_hazards_to_e65(homeownership1) %>% 
+  mutate(method = "Gompertz MLE",
+         model = "Baseline")
+
+homeowner_controls <- convert_hazards_to_e65(homeownershipf_controls) %>% 
+  mutate(method = "Gompertz MLE",
+         model = "Baseline + Controls")
+
+homeowner_sibs <- convert_hazards_to_e65(homeownership_sibfe_controls) %>% 
+  mutate(method = "Gompertz MLE",
+         model = "Baseline + Controls + Family FE")
+
+home_ownership <- bind_rows(homeowner_baseline, homeowner_controls, homeowner_sibs) %>% 
+  bind_rows(homeownership_results %>% 
+  mutate(e65 = estimate,
+         e65_lower = estimate - 1.96*std.error,
+         e65_upper = estimate + 1.96*std.error) %>% 
+  mutate(method = "OLS")) %>% 
+  ggplot(aes(x = model, y = e65, color = method, ymin = e65_lower, ymax = e65_upper)) +
+  geom_pointrange(position = position_dodge(width = 0.2)) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  theme(legend.position = "bottom") + 
+  ylim(0, 0.9) + 
+  labs(title = "Association between Owning a Home and E65",
+       subtitle = "CenSoc-DMF, Birth Cohorts of 1905-1914")
+```
+
+
+```{r}
+numident <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/censoc_numident_v2_linked.csv") %>% 
+   filter(link_abe_exact_conservative == 1)
+```
+
+```{r}
+## recode dmf education variable 
+numident <- numident %>% 
+  recode_education() %>% 
+  filter(!is.na(educ_yrs)) %>% 
+  mutate(urban = case_when(
+    URBAN == 1 ~ 0,
+    URBAN == 2 ~ 1
+  )) %>% 
+  mutate(ownhome = case_when(
+    OWNERSHP %in% c(1) ~ 1,
+    TRUE ~ 0
+  )) %>% 
+  mutate(educ_yrs_character_all = as.character(educ_yrs))
+
+## recode dmf education variable 
+numident_staircase <- numident %>% 
+  filter(sex == 1) %>% 
+  filter(byear %in% 1905:1914) %>% 
+  mutate(educ_yrs_character = as.character(educ_yrs))
+
+```
+
+
+```{r}
+linear_model <- tidy(lm(death_age ~ educ_yrs_character + as.factor(byear), data = numident_staircase))
+linear_model <- tidy(lm(death_age ~ educ_yrs, data = numident_staircase))
+
+linear_model_results <- linear_model %>% 
+  filter(str_detect(term, "educ_yrs_character")) %>% 
+  mutate(term = prefix_strip(term, "educ_yrs_character")) %>% 
+  filter(!term %in% c("(Intercept)", "Ownhome")) %>% 
+  mutate(term = as.numeric(term)) %>% 
+  mutate(e65 = 2 * estimate,
+         e65_upper = 2* estimate + 2*std.error,
+         e65_lower = 2* estimate - 2*std.error,
+         parameter = term,
+         method = "Regression on age at death")  
+
+linear_model_results %>% 
+  ggplot(aes(x = parameter, y = e65, ymin = e65_lower, ymax = e65_upper, color = method)) + 
+  geom_pointrange(position = position_dodge(width = 0.2)) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Years of Schooling",
+       y = "e65",
+       title = "Education and Life Expectancy at Age 65",
+       subtitle = "CenSoc-DMF, Life Expectancy at Age 65") + 
+  theme(legend.position = "bottom") + 
+  scale_x_continuous(breaks=seq(0,17,2))
+
+## Run-Time: 5 hours. 18398.488 sec elapsed
+tic()
+results_optim <- gompertz_mle(fml = death_age ~ educ_yrs_character, lower = 1988, upper = 2005, data = numident_staircase)
+toc()
+
+## convert to e65
+gompertz_mle_results <- convert_hazards_to_e65(df = results_optim) %>% 
+  mutate(parameter = prefix_strip(parameter, "educ_yrs_character_")) %>% 
+  mutate(parameter = as.numeric(parameter)) %>% 
+  mutate(method = "Gompertz MLE")
+```
+
+
+
