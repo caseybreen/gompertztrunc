@@ -6,12 +6,12 @@
 ## parameterize gompertz with M (mode) and beta (slope)
 
 getMode <- function(alpha, beta) {
-  M <- (1 / beta) * log(beta / alpha)
+  M <- -log(alpha/beta)/beta
   return(M)
 }
 
 getAlpha <- function(M, beta) {
-  alpha <- beta / exp(M * beta)
+  alpha = beta* exp(-beta * M)
   return(alpha)
 }
 
