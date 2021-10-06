@@ -12,7 +12,7 @@
 gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
 
   ## data
-  data <- data %>%
+  data_formatted <- data %>%
     dplyr::mutate(byear = as.numeric(as.character(byear))) %>%
     dplyr::select(all.vars(fml), byear) %>%
     dplyr::mutate(
@@ -21,71 +21,61 @@ gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
       l = lower - byear,
       cohort = byear
     ) %>%
-    dplyr::filter(l < y & y < u)
-
-  ## convert characters to dummies
-  if (sum(sapply(data, is.character)) > 0) {
-    columns <- data %>%
-      dplyr::select(where(is.character)) %>%
-      colnames()
-
-    data <- data %>%
-      fastDummies::dummy_cols(
-        remove_selected_columns = T,
-        remove_first_dummy = T,
-        select_columns = columns
-      )
-  }
-
-  ## convert factors to dummies
-  if (sum(sapply(data, is.factor)) > 0) {
-
-    columns <- data %>%
-      dplyr::select(where(is.factor)) %>%
-      colnames()
-
-    data <- data %>%
-      fastDummies::dummy_cols(
-        remove_selected_columns = T,
-        remove_first_dummy = T,
-        select_columns = columns
-      )
-  }
-
-  ## assign predictors
-  predictors <- data %>%
-    dplyr::select(-y, -u, -l, -cohort, -all.vars(fml)[1], -byear) %>%
-    colnames()
+    mutate(intercept = 1) %>%
+    dplyr::filter(l < y & y < u) %>%
+    mutate(y = round(y))
 
   ## get unique cohorts
-  cohorts <- sort(unique(data$cohort))
+  cohorts <- sort(unique(data_formatted$cohort))
 
   ## starting values, just let all the modes be the same ("80"
   M.start <- rep(80, length(cohorts))
   names(M.start) <- paste0("coh", cohorts)
 
-  ## and let slope of gompertz start at .1
-  ## and the effect of 1 year of educ to lower mortality by 10%
-  p.start <- c(
-    "mode" = log(M.start),
-    "beta" = log(.1)
-  )
+  ## get starting parameters
+  p.start <- get.par.start(fml, data_formatted)
 
-  ## note we use "b" in original scale, not logged
-  vec <- rep(0, length(predictors))
-  names(vec) <- predictors
+  model_matrix <- modelr::model_matrix(formula = fml, data = data_formatted) %>%
+    as.matrix()
 
-  p.start <- c(p.start, vec)
+  # ## and let slope of gompertz start at .1
+  # ## and the effect of 1 year of educ to lower mortality by 10%
+  # p.start <- c(
+  #   "mode" = log(M.start),
+  #   "beta" = log(.1)
+  # )
+  #
+  # ## note we use "b" in original scale, not logged
+  # vec <- rep(0, length(predictors))
+  # vec[length(vec)] <- -8.6
+  # names(vec) <- predictors
+  #
+  # p.start <- c(p.start, vec)
 
-  ## run optimizer
-  fit <- optim(
-    par = p.start, fn = mll.gomp.multi.cohort.cov,
-    A = data,
-    predictors = predictors,
-    hessian = TRUE,
-    method = "BFGS",
-    control = list(maxit = 5000)
-  )
+  ##
+  my.control = list(trace = 0,
+                    parscale = c(par.scale = p.start),
+                    maxit = 5000)
+
+
+  fit <- optim(par = p.start,
+               fn = get.negLL,
+               hessian = TRUE,
+               y = data_formatted$y,
+               X = model_matrix,
+               wt = wt,
+               y.left = data_formatted$l[1],
+               y.right = data_formatted$u[1],
+               control = my.control)
+
+  # ## run optimizer
+  # fit <- optim(
+  #   par = p.start, fn = mll.gomp.multi.cohort.cov,
+  #   A = model_matrix,
+  #   predictors = predictors,
+  #   hessian = TRUE,
+  #   control = list(maxit = 5000)
+  # )
 
   ## tidy up optim output
   out <- broom::tidy(fit) %>%
@@ -97,9 +87,6 @@ gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
     dplyr::select(-std.error)
 
-  ## remove globally assigned (<<-) predictors
-  ## TODO find better way of handling this
-  rm(predictors)
 
   out <- out %>%
     dplyr::mutate(across(where(is.numeric), exp))

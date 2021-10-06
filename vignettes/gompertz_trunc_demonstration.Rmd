@@ -1,0 +1,125 @@
+---
+title: "Gompertztrunc Demonstration"
+output: html_notebook
+---
+
+Demonstrate to Josh functionality of the gompertztrunc package 
+
+I think using the package-development framework will help with (1) collaration (2) version control and (3) unit testing (e.g., are we getting same answers every time)
+
+I round death age in these examples (round within our function)
+
+
+## Example 1 
+
+
+```{r}
+myform <- formula(aod ~ temp + isSouth)
+mycoefs_example1 <- c("temp" = +.2, "isSouth" = +.6)
+simulated_data1 <- tgm_simu(n = 10000,
+                 form = myform,
+                 coefs = mycoefs_example1,
+                 dummy = c(F, T),
+                 sigma = c(3, 1),
+                 seed = 13)
+## now we structure into multiple cohorts
+simulated_data1[,byear := 1815] ## multiple birth cohorts
+
+## run basic example 
+results_example1 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, lower = 1888, upper = 1905)
+
+
+## function returns hazard ratios so we will exponeniate 
+results_example1 %>% 
+   dplyr::filter(!stringr::str_detect(parameter, "start")) %>%
+    mutate(value = log(value),
+           lower = log(lower),
+           upper = log(upper)
+           ) %>% 
+  mutate(true_value = mycoefs_example1)
+```
+
+
+
+
+## Example 2 
+
+```{r}
+
+## we simulate without any cohort distinctions
+myform <- formula(aod ~ temp + sex + isSouth + sex:isSouth)
+mycoefs_example2 <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6,
+             "sex:isSouth" = +.3)
+n = 200000
+data <- tgm_simu(n = n,
+                 form = myform,
+                 coefs = mycoefs_example2,
+                 dummy = c(F, T, T, T),
+                 sigma = c(3, 1, 1, 1),
+                 seed = 14)
+## now we structure into multiple cohorts
+byear.vec <- 1815 ## multiple birth cohorts
+dyear.vec <- 1888:1905 ## a limited window of observations
+min.age <- 65 ## only observe those 65+
+
+data[, byear := rep(byear.vec, rep(n/length(byear.vec), length(byear.vec)))]
+## pretend dates of birth within year are uniform
+data[, dob := byear + runif(length(byear))]
+## date of death = date of birth + age of death
+data[, dod := dob + aod]
+
+## y.left for each person
+data[, y.left := min(dyear.vec) - floor(byear)]
+## only 65+
+data[y.left < 65, y.left := 65]
+## y.right for each person
+data[, y.right := max(dyear.vec) - floor(byear)]
+
+## artificially truncate
+data.trunc <- data[y.left <= aod & aod < y.right]
+## check to see if dyear is correct
+data.trunc[, range(floor(dod))]
+## [1] 1888 1905, ok.
+
+```
+
+
+```{r}
+## filter to end points 
+data.trunc <- data.trunc %>% 
+  # mutate(aod = round(aod)) %>% 
+  filter(dod >  1888 & dod < 1905)
+
+results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc, lower = 1888, upper = 1905)
+
+## convert hazard ratios back to parameters 
+results_example2 %>% 
+   dplyr::filter(!stringr::str_detect(parameter, "start")) %>%
+    mutate(value = log(value),
+           lower = log(lower),
+           upper = log(upper),
+           true_value = mycoefs_example2)
+          
+```
+
+
+|parameter   |      value|      lower|      upper| true_value|
+|:-----------|----------:|----------:|----------:|----------:|
+|temp        |  0.1933423|  0.1881967|  0.1984879|        0.2|
+|sex         | -0.4968822| -0.5253444| -0.4684201|       -0.5|
+|isSouth     |  0.5703797|  0.5345985|  0.6061609|        0.6|
+|sex:isSouth |  0.3076365|  0.2606396|  0.3546333|        0.3|
+
+
+## Example 3 
+
+A simple example using a small extract from the CenSoc-DMF (cohort of 1910).
+
+```{r}
+## Example with only one cohort 
+gompertz_mle(fml = death_age ~ educ_yrs, data = censoc_example, lower = 1975, upper = 2005)
+
+## translate to e65 
+gompertztrunc::convert_hazard_ratio_to_le(hr = 0.96, lower = 65, upper = 120, M = 80, beta = 0.08)
+```
+
