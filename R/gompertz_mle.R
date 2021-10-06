@@ -21,9 +21,16 @@ gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
       l = lower - byear,
       cohort = byear
     ) %>%
-    mutate(intercept = 1) %>%
+    dplyr::mutate(intercept = 1) %>% ## create intercept
     dplyr::filter(l < y & y < u) %>%
-    mutate(y = round(y))
+    dplyr::mutate(y = round(y)) ## round
+
+  ## add weights
+
+  if(!is.null(data_formatted$wt))
+    wt = wt
+  if(is.null(data_formatted$wt))
+    wt = 1.0
 
   ## get unique cohorts
   cohorts <- sort(unique(data_formatted$cohort))
@@ -38,21 +45,7 @@ gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
   model_matrix <- modelr::model_matrix(formula = fml, data = data_formatted) %>%
     as.matrix()
 
-  # ## and let slope of gompertz start at .1
-  # ## and the effect of 1 year of educ to lower mortality by 10%
-  # p.start <- c(
-  #   "mode" = log(M.start),
-  #   "beta" = log(.1)
-  # )
-  #
-  # ## note we use "b" in original scale, not logged
-  # vec <- rep(0, length(predictors))
-  # vec[length(vec)] <- -8.6
-  # names(vec) <- predictors
-  #
-  # p.start <- c(p.start, vec)
-
-  ##
+  ## create comtrols
   my.control = list(trace = 0,
                     parscale = c(par.scale = p.start),
                     maxit = 5000)

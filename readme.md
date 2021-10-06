@@ -3,9 +3,7 @@
 
 # gompertztrunc
 
-## About the package
+## About the package – in progress
 
-`gompertztrunc` is a package for R that allows for the estimation of
-hazard ratios from doubly-truncated data.
-
-The main function is the
+`gompertztrunc` is a package for R for estimating Gompertz distributions
+from doubly-truncated data using maximum likelihood estimation.

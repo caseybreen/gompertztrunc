@@ -27,8 +27,7 @@ tgm_simu <- function(n, ## sample size
   ##      B  = vector of coefs
 
   ## 0. Preliminaries
-  library(data.table)
-  source("./gompertz_functions_new.R")
+
 
   coefs <- c("b0" = log(a0), coefs) ## include log(a0) as intercept
 
@@ -98,7 +97,7 @@ tgm_simu <- function(n, ## sample size
   effects <- exp(log.effects)
 
   ## 4. generate  gompertz draws
-  y <- rgompertz(n, shape = beta, rate = effects) ## ages of death
+  y <- flexsurv::rgompertz(n, shape = beta, rate = effects) ## ages of death
   data_with_y = cbind(y, data)
   ## re-label "y" with name used on left hand side of formula
   left.string <- format(form[[2]])
