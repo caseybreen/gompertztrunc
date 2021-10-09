@@ -20,14 +20,15 @@ A few other notes:
 
 (1) I round death age in these examples (round within our function) and still seem to work OK. 
 
-(2)  The function can now handle factors (e.g., formula = death_age ~ as.factor(educ_yrs)) 
+(2) The function can now handle factors (e.g., formula = death_age ~ as.factor(educ_yrs))
+
+(3) CenSoc datasets are available on the demography server under: /data/josh/CenSoc/censoc_data/
 
 
 ```{r}
 library(tidyverse)
 library(data.table)
 library(tictoc)
-library(gompertztrunc)
 ```
 
 
@@ -51,7 +52,8 @@ tic()
 results_example1 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, lower = 1888, upper = 1905)
 toc()
 
-## function returns hazard ratios so we will exponeniate 
+## function returns hazard ratios so we will take log 
+## compare to true value
 results_example1 %>% 
    dplyr::filter(!stringr::str_detect(parameter, "start")) %>%
     mutate(value = log(value),
@@ -125,21 +127,24 @@ results_example2 %>%
 A simple example using a small extract from the CenSoc-DMF (cohort of 1910).
 
 ```{r}
-## Example with only one cohort 
+## Example with only one cohort
+
 tic()
 education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs, data = censoc_example, lower = 1975, upper = 2005)
 toc()
 
-## translate to e65 
-## this is similar to what literature finds (0.3-04)
+## convert hazard ratios into e65 
+## this is similar to what literature finds for education gradient (0.3-04)
 gompertztrunc::convert_hazard_ratio_to_le(hr = 0.96, lower = 55, upper = 120, M = 80, beta = 0.1)
+```
 
+```{r}
 ## seems to work fine for factors, just a little slow 
 education_staircase <- gompertz_mle(fml = death_age ~ as.factor(educ_yrs), data = censoc_example, lower = 1975, upper = 2005)
 
+education_staircase
 ```
 ## Josh's to-do list 
-
 
 
 1:  The formulas I use don't account for factors, instead requiring
@@ -156,16 +161,14 @@ than I do.
 
 3:  Check if weights are being used correctly in likelihood function 
 
-
 4:  check if CI is correct 
 
 - Agree this is important. I think the confidence intervals are probably anti-conservative; the coverage ratio of the 95% intervals is probably closer to 70% (if everything is working well). 
 
 5:  include case where we see death_age as whole numbers, not continuous.
 
-- I think this code works OK with whole numbers. (The examples in my vignette are all whole numbers. 
+- I think this code works OK with whole numbers. (The examples in my vignette are all whole numbers.) 
 
 6:  include way to specify struture of "beta", e.g. different for men and women, or smooth function of cohort or ... 
 
-- Interesting. I don't have much intution about how challenging this would be. 
 

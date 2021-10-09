@@ -1,6 +1,5 @@
 #' Gompertz mle function
 #'
-#' Creates a plot of the crayon colors in \code{\link{brocolors}}
 #'
 #' @param fml the estimation formula
 #' @param A data matrix with covariates y, u, l, and covariates, including cohor
@@ -35,7 +34,7 @@ gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
   ## get unique cohorts
   cohorts <- sort(unique(data_formatted$cohort))
 
-  ## starting values, just let all the modes be the same ("80"
+  ## starting values, just let all the modes be the same ("80")
   M.start <- rep(80, length(cohorts))
   names(M.start) <- paste0("coh", cohorts)
 
@@ -86,4 +85,6 @@ gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
 
   return(out)
 }
+
+
 
