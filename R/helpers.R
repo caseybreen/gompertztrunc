@@ -7,45 +7,39 @@
 
 ## we use flexsurv functions and modify just slightly
 
-bM2a <- function(b, M)
-{
-  a = b* exp(-b * M)
+bM2a <- function(b, M) {
+  a <- b * exp(-b * M)
   a
 }
-ab2M <- function(a, b)
-{
-  M = -log(a/b)/b
+ab2M <- function(a, b) {
+  M <- -log(a / b) / b
   M
 }
 
 library(flexsurv)
 
-pgompertz.M <- function(q, b, M, ...)
-{
-  a = bM2a(b,M)
+pgompertz.M <- function(q, b, M, ...) {
+  a <- bM2a(b, M)
   flexsurv::pgompertz(q, shape = b, rate = a, ...)
 }
 
-dgompertz.M <- function(x, b, M, ...)
-{
-  a = bM2a(b,M)
+dgompertz.M <- function(x, b, M, ...) {
+  a <- bM2a(b, M)
   flexsurv::dgompertz(x, shape = b, rate = a, ...)
 }
 
-rgompertz.M <- function(n, b, M)
-{
-  a = bM2a(b,M)
+rgompertz.M <- function(n, b, M) {
+  a <- bM2a(b, M)
   flexsurv::rgompertz(n, shape = b, rate = a)
 }
 
-hgompertz.M <- function(x, b, M)
-{
-  a = bM2a(b,M)
-  q = x
-  p = flexsurv::pgompertz(q, shape = b, rate = a)
-  l = 1-p
-  d = flexsurv::dgompertz(x, shape = b, rate = a)
-  h = d/l
+hgompertz.M <- function(x, b, M) {
+  a <- bM2a(b, M)
+  q <- x
+  p <- flexsurv::pgompertz(q, shape = b, rate = a)
+  l <- 1 - p
+  d <- flexsurv::dgompertz(x, shape = b, rate = a)
+  h <- d / l
   return(h)
 }
 
@@ -91,5 +85,3 @@ get.trunc.mean.gomp <- function(alpha, beta, l, u) {
   s <- x %in% l:u ## approximate truncation for these cohorts
   sum((dx * x)[s]) / sum(dx[s])
 }
-
-

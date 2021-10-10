@@ -4,7 +4,15 @@
 \alias{gompertz_mle}
 \title{Gompertz mle function}
 \usage{
-gompertz_mle(fml, upper = 2005, lower = 1975, data, byear = byear)
+gompertz_mle(
+  fml,
+  right_trunc = 2005,
+  left_trunc = 1975,
+  data,
+  byear = byear,
+  lower_bound = NULL,
+  upper_bound = NULL
+)
 }
 \arguments{
 \item{fml}{the estimation formula}
@@ -12,8 +20,8 @@ gompertz_mle(fml, upper = 2005, lower = 1975, data, byear = byear)
 \item{A}{data matrix with covariates y, u, l, and covariates, including cohor}
 }
 \value{
-None
+fit
 }
 \description{
-Creates a plot of the crayon colors in \code{\link{brocolors}}
+Gompertz mle function
 }

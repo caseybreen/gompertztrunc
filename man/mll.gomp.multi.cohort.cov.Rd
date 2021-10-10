@@ -15,5 +15,5 @@ mll.gomp.multi.cohort.cov(p, A, predictors = predictors)
 None
 }
 \description{
-Creates a plot of the crayon colors in \code{\link{brocolors}}
+Gompertz mle function
 }

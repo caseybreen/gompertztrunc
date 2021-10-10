@@ -9,110 +9,19 @@
 #'
 #' @export
 
-gompertz_mle <- function(fml, upper = 2005, lower = 1975, data, byear = byear) {
-
-  ## data
-  data_formatted <- data %>%
-    dplyr::mutate(byear = as.numeric(as.character(byear))) %>%
-    dplyr::select(all.vars(fml), byear) %>%
-    dplyr::mutate(
-      y = get(all.vars(fml)[1]),
-      u = upper - byear,
-      l = lower - byear,
-      cohort = byear
-    ) %>%
-    dplyr::mutate(intercept = 1) %>% ## create intercept
-    dplyr::filter(l < y & y < u) %>%
-    dplyr::mutate(y = round(y)) ## round
-
-  ## add weights
-
-  if(!is.null(data_formatted$wt))
-    wt = wt
-  if(is.null(data_formatted$wt))
-    wt = 1.0
-
-  ## get unique cohorts
-  cohorts <- sort(unique(data_formatted$cohort))
-
-  ## starting values, just let all the modes be the same ("80"
-  M.start <- rep(80, length(cohorts))
-  names(M.start) <- paste0("coh", cohorts)
-
-  ## get starting parameters
-  p.start <- get.par.start(fml, data_formatted)
-
-  model_matrix <- modelr::model_matrix(formula = fml, data = data_formatted) %>%
-    as.matrix()
-
-  ## create comtrols
-  my.control = list(trace = 0,
-                    parscale = c(par.scale = p.start),
-                    maxit = 5000)
-
-
-  fit <- optim(par = p.start,
-               fn = get.negLL,
-               hessian = TRUE,
-               y = data_formatted$y,
-               X = model_matrix,
-               wt = wt,
-               y.left = data_formatted$l[1],
-               y.right = data_formatted$u[1],
-               control = my.control)
-
-  # ## run optimizer
-  # fit <- optim(
-  #   par = p.start, fn = mll.gomp.multi.cohort.cov,
-  #   A = model_matrix,
-  #   predictors = predictors,
-  #   hessian = TRUE,
-  #   control = list(maxit = 5000)
-  # )
-
-  ## tidy up optim output
-  out <- broom::tidy(fit) %>%
-    dplyr::mutate(
-      lower = value - 1.96 * std.error,
-      upper = value + 1.96 * std.error
-    ) %>%
-    dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
-    dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
-    dplyr::select(-std.error)
-
-
-  out <- out %>%
-    dplyr::mutate(across(where(is.numeric), exp))
-
-  return(out)
-}
-
-
-#' Gompertz mle function
-#'
-#' Creates a plot of the crayon colors in \code{\link{brocolors}}
-#'
-#' @param fml the estimation formula
-#' @param A data matrix with covariates y, u, l, and covariates, including cohor
-#'
-#' @return None
-#'
-#' @export
-
 ######### get negLL
 
-get.negLL <- function(par, y, X, y.left, y.right, wt = 1)
-{
+get.negLL <- function(par, y, X, y.left, y.right, wt = 1) {
   ## note exp(par) just gets them back to original scale
-  beta = exp(par[1])
-  names(beta) = "b"
-  B = par[2:length(par)] ## vector of parameters, original scale is
+  beta <- exp(par[1])
+  names(beta) <- "b"
+  B <- par[2:length(par)] ## vector of parameters, original scale is
 
   ## in terms of log effect, so no
   ## transformation needed.
-  log.A = X %*% cbind(B) ## add up log effects
-  A = exp(log.A)         ## transform to multiplicative effects
-  M = ab2M(a = A, b = beta) ## vector of M values
+  log.A <- X %*% cbind(B) ## add up log effects
+  A <- exp(log.A) ## transform to multiplicative effects
+  M <- ab2M(a = A, b = beta) ## vector of M values
 
   num <- wt * dgompertz.M(y, b = beta, M = M) ## is use of wt correct???
 
@@ -125,16 +34,15 @@ get.negLL <- function(par, y, X, y.left, y.right, wt = 1)
   denom[denom == 0] <- 10^-0 ## denom gets bigger value for zeros so
   ## num/denom likelihood is very small.
 
-  LL <-  sum( log(num) - log(denom) )
-  negLL = -LL ## optim() minimizes so to maximize likelihood we
+  LL <- sum(log(num) - log(denom))
+  negLL <- -LL ## optim() minimizes so to maximize likelihood we
   ## return negative log-likelihood.
   return(negLL)
 }
 
 ## get parameter start values
 
-get.par.start <- function(fml, data)
-{
+get.par.start <- function(fml, data) {
   ##     da = mydata
   ##     form = formula(y ~ -1 + treat)
   ## we start with lm with intercept
@@ -143,38 +51,39 @@ get.par.start <- function(fml, data)
   ## (Intercept)        treat
   ##      56.004       -1.494
   ## then let m.start be the intercept
-  M.start = coef(m)["(Intercept)"]
+  M.start <- coef(m)["(Intercept)"]
   names(M.start) <- ""
   ## let b.start = 1/10
-  b.start = 1/10
-  a.start = bM2a(b = b.start, M = M.start)
-  b0.start = log(a.start)
+  b.start <- 1 / 10
+  a.start <- bM2a(b = b.start, M = M.start)
+  b0.start <- log(a.start)
   ## then use entropy-based ball park. Say entropy is 0.1
   ## say 1 year of change is 1%, so 1 year is like 10% decrease
   ## -perc*H*e0 = change = -(-.1) * .1 * 100 = +1 year
   coef.vec <- coef(m)[names(coef(m)) != "(Intercept)"]
-  b.vec.start = -1 * coef.vec * .1
+  b.vec.start <- -1 * coef.vec * .1
   ## rename
-  par.start = c(log.b.start = log(b.start), b0.start = b0.start,
-                b.vec.start)
+  par.start <- c(
+    log.b.start = log(b.start), b0.start = b0.start,
+    b.vec.start
+  )
 
   return(par.start)
 }
 
 
 
-get.negLL <- function(par, y, X, y.left, y.right, wt = 1)
-{
+get.negLL <- function(par, y, X, y.left, y.right, wt = 1) {
   ## note exp(par) just gets them back to original scale
-  beta = exp(par[1])
-  names(beta) = "b"
-  B = par[2:length(par)] ## vector of parameters, original scale is
+  beta <- exp(par[1])
+  names(beta) <- "b"
+  B <- par[2:length(par)] ## vector of parameters, original scale is
 
   ## in terms of log effect, so no
   ## transformation needed.
-  log.A = X %*% cbind(B) ## add up log effects
-  A = exp(log.A)         ## transform to multiplicative effects
-  M = ab2M(a = A, b = beta) ## vector of M values
+  log.A <- X %*% cbind(B) ## add up log effects
+  A <- exp(log.A) ## transform to multiplicative effects
+  M <- ab2M(a = A, b = beta) ## vector of M values
 
   num <- wt * dgompertz.M(y, b = beta, M = M) ## is use of wt correct???
 
@@ -187,8 +96,8 @@ get.negLL <- function(par, y, X, y.left, y.right, wt = 1)
   denom[denom == 0] <- 10^-0 ## denom gets bigger value for zeros so
   ## num/denom likelihood is very small.
 
-  LL <-  sum( log(num) - log(denom) )
-  negLL = -LL ## optim() minimizes so to maximize likelihood we
+  LL <- sum(log(num) - log(denom))
+  negLL <- -LL ## optim() minimizes so to maximize likelihood we
   ## return negative log-likelihood.
   return(negLL)
 }
@@ -202,7 +111,7 @@ tgm_simu <- function(n, ## sample size
                      sigma = NULL, ## sd for each var (optional)
                      seed = NULL, ## random seed to duplicate data
                      a0 = 10^-4, ## gompertz "alpha"
-                     beta = 1/10, ## gompertz "beta"
+                     beta = 1 / 10, ## gompertz "beta"
                      verbose = FALSE) ## print internal check
 {
   ## proportional hazards model of form
@@ -223,20 +132,22 @@ tgm_simu <- function(n, ## sample size
   myterms <- terms(form) ## complex object with lots of info from formula
   coef.names.from.formula <- attr(myterms, "term.labels")
   ##
-  if (!identical(names(coefs)[-1], coef.names.from.formula))
-  {
-    stop(c("term labels not correct. should be: ",
-           paste(coef.names.from.formula, collapse = " ")))
+  if (!identical(names(coefs)[-1], coef.names.from.formula)) {
+    stop(c(
+      "term labels not correct. should be: ",
+      paste(coef.names.from.formula, collapse = " ")
+    ))
   }
 
   ## check to see if "dummy" has right number of terms
   ## get names of vars to simulate
   vars.to.sim <- all.vars(form[[3]])
   k <- length(vars.to.sim)
-  if (!is.null(dummy) & length(dummy) != k)
+  if (!is.null(dummy) & length(dummy) != k) {
     print("incorrect length of dummy argument:\n
            should equal number of vars in formula.\n
            E.g., in y ~ x1 + x2 + x1:x2, there are 2 vars")
+  }
 
   ## 1. simulate covariates (e.g., x1, x2, and x3)
 
@@ -244,22 +155,26 @@ tgm_simu <- function(n, ## sample size
   data <- data.frame(matrix(NA, nrow = n, ncol = k))
   names(data) <- vars.to.sim
 
-  if (!is.null(seed))
+  if (!is.null(seed)) {
     set.seed(seed)
+  }
 
   for (i in 1:k)
   {
-    if(is.null(sigma[i]))
-      data[,i] <- rnorm(n, mean = 0, sd = 1) ## standardized
-    if(!is.null(sigma[i]))
-      data[,i] <- rnorm(n, mean = 0, sd = sigma[i]) ## own variance
+    if (is.null(sigma[i])) {
+      data[, i] <- rnorm(n, mean = 0, sd = 1)
+    } ## standardized
+    if (!is.null(sigma[i])) {
+      data[, i] <- rnorm(n, mean = 0, sd = sigma[i])
+    } ## own variance
   }
   ## create dummy vars (for now just random 0,1 coding)
   if (!is.null(dummy)) {
     for (i in 1:k)
     {
-      if (dummy[i] == TRUE)
-        data[,i] <- ifelse(data[,i] > 0, 1, 0)
+      if (dummy[i] == TRUE) {
+        data[, i] <- ifelse(data[, i] > 0, 1, 0)
+      }
     }
   }
 
@@ -280,13 +195,13 @@ tgm_simu <- function(n, ## sample size
 
   ## 3. multiply out to get individual effects
 
-  B = cbind(coefs)
-  log.effects = X %*% B
+  B <- cbind(coefs)
+  log.effects <- X %*% B
   effects <- exp(log.effects)
 
   ## 4. generate  gompertz draws
   y <- flexsurv::rgompertz(n, shape = beta, rate = effects) ## ages of death
-  data_with_y = cbind(y, data)
+  data_with_y <- cbind(y, data)
   ## re-label "y" with name used on left hand side of formula
   left.string <- format(form[[2]])
   colnames(data_with_y)[1] <- left.string
@@ -306,47 +221,48 @@ tgm_simu <- function(n, ## sample size
 
   B.vec <- as.vector(B) ## true coefs as vector
   names(B.vec) <- rownames(B) ## add rownames
-  coef.m.hat = B.vec / (-beta)
-  check.dt = data.table("coef.name" = names(coef(m)),
-                        "coef(m)" = round(coef(m),3),
-                        "coef.m.hat" = round(coef.m.hat, 3),
-                        "b.name" = names(B.vec),
-                        B = round(B.vec,3))
+  coef.m.hat <- B.vec / (-beta)
+  check.dt <- data.table(
+    "coef.name" = names(coef(m)),
+    "coef(m)" = round(coef(m), 3),
+    "coef.m.hat" = round(coef.m.hat, 3),
+    "b.name" = names(B.vec),
+    B = round(B.vec, 3)
+  )
 
-  if(verbose)
+  if (verbose) {
     print(check.dt)
+  }
 
 
-  simu_data = as.data.table(data_with_y)
+  simu_data <- as.data.table(data_with_y)
   return(simu_data)
 }
 
 ############################## tgm()
 
-get.negLL <- function(par, y, X, y.left, y.right, wt = 1)
-{
+get.negLL <- function(par, y, X, y.left, y.right, wt = 1) {
   ## note exp(par) just gets them back to original scale
-  beta = exp(par[1])
-  names(beta) = "b"
-  B = par[2:length(par)] ## vector of parameters, original scale is
+  beta <- exp(par[1])
+  names(beta) <- "b"
+  B <- par[2:length(par)] ## vector of parameters, original scale is
   ## in terms of log effect, so no
   ## transformation needed.
-  log.A = X %*% cbind(B) ## add up log effects
-  A = exp(log.A)         ## transform to multiplicative effects
-  M = ab2M(a = A, b = beta) ## vector of M values
+  log.A <- X %*% cbind(B) ## add up log effects
+  A <- exp(log.A) ## transform to multiplicative effects
+  M <- ab2M(a = A, b = beta) ## vector of M values
   num <- wt * dgompertz.M(y, b = beta, M = M) ## is use of wt correct???
   num[num == 0] <- 10^-10 ## very low likelihood for 0 to avoid log(0)
   denom <- pgompertz.M(y.right, b = beta, M) -
     pgompertz.M(y.left, b = beta, M)
   denom[denom == 0] <- 10^-0 ## denom gets bigger value for zeros so
   ## num/denom likelihood is very small.
-  LL <-  sum( log(num) - log(denom) )
-  negLL = -LL ## optim() minimizes so to maximize likelihood we
+  LL <- sum(log(num) - log(denom))
+  negLL <- -LL ## optim() minimizes so to maximize likelihood we
   ## return negative log-likelihood.
   return(negLL)
 }
-get.par.start <- function(form, da)
-{
+get.par.start <- function(form, da) {
   ##     da = mydata
   ##     form = formula(y ~ -1 + treat)
   ## we start with lm with intercept
@@ -355,62 +271,71 @@ get.par.start <- function(form, da)
   ## (Intercept)        treat
   ##      56.004       -1.494
   ## then let m.start be the intercept
-  M.start = coef(m)["(Intercept)"]
+  M.start <- coef(m)["(Intercept)"]
   names(M.start) <- ""
   ## let b.start = 1/10
-  b.start = 1/10
-  a.start = bM2a(b = b.start, M = M.start)
-  b0.start = log(a.start)
+  b.start <- 1 / 10
+  a.start <- bM2a(b = b.start, M = M.start)
+  b0.start <- log(a.start)
   ## then use entropy-based ball park. Say entropy is 0.1
   ## say 1 year of change is 1%, so 1 year is like 10% decrease
   ## -perc*H*e0 = change = -(-.1) * .1 * 100 = +1 year
   coef.vec <- coef(m)[names(coef(m)) != "(Intercept)"]
-  b.vec.start = -1 * coef.vec * .1
+  b.vec.start <- -1 * coef.vec * .1
   ## rename
-  par.start = c(log.b.start = log(b.start), b0.start = b0.start,
-                b.vec.start)
+  par.start <- c(
+    log.b.start = log(b.start), b0.start = b0.start,
+    b.vec.start
+  )
 
   return(par.start)
 }
 
-tgm <- function(formula, data, wt = NULL)
-{
+tgm <- function(formula, data, wt = NULL) {
   ## autostart with lm
   m <- lm(formula, data)
   print(m)
-  par.start = get.par.start(formula, data)
-  my.control = list(trace = 0,
-                    parscale = c(par.scale = par.start),
-                    maxit = 5000)
+  par.start <- get.par.start(formula, data)
+  my.control <- list(
+    trace = 0,
+    parscale = c(par.scale = par.start),
+    maxit = 5000
+  )
   print("par.start")
-  print(round(par.start,4))
+  print(round(par.start, 4))
   ## assign weights (wt). Note: I'm not sure this is working right.
-  if(!is.null(data$wt))
-    wt = wt
-  if(is.null(data$wt))
-    wt = 1.0
+  if (!is.null(data$wt)) {
+    wt <- wt
+  }
+  if (is.null(data$wt)) {
+    wt <- 1.0
+  }
   ## assign upper and lower age bounds
   ## first, make sure bounds are in data
-  if(!("y.left" %in% names(data)))
+  if (!("y.left" %in% names(data))) {
     stop("Need to define y.left in data")
-  if(!("y.right" %in% names(data)))
+  }
+  if (!("y.right" %in% names(data))) {
     stop("Need to define y.right in data")
+  }
   y.left <- data$y.left
   y.right <- data$y.right
   ##
   Xt <- model.matrix(formula, data = data)
   y.name <- as.character(formula[2]) ## character used for dependent var
   y.val <- data[[y.name]]
-  fit <- optim(par = par.start,
-               fn = get.negLL,
-               hessian = TRUE,
-               y = y.val,
-               X = Xt,
-               wt = wt,
-               y.left = y.left,
-               y.right = y.right,
-               control = my.control)
-  fit$nobs = nrow(Xt) ## add number of obs to fitted object
+  fit <- optim(
+    par = par.start,
+    fn = get.negLL,
+    hessian = TRUE,
+    y = y.val,
+    X = Xt,
+    wt = wt,
+    y.left = y.left,
+    y.right = y.right,
+    control = my.control
+  )
+  fit$nobs <- nrow(Xt) ## add number of obs to fitted object
   print("fit$par")
   print(fit$par)
   return(fit)
@@ -419,9 +344,8 @@ tgm <- function(formula, data, wt = NULL)
 ###################### helper functions #####################3
 
 
-get.se <- function(est.vec, hess, log.vec = rep(TRUE, length(est.vec)))
-{
-  fisher_info = solve(hess)
+get.se <- function(est.vec, hess, log.vec = rep(TRUE, length(est.vec))) {
+  fisher_info <- solve(hess)
   est.sd <- sqrt(diag(fisher_info))
   ## if estimates are not log scale then we have the SE
   ## if they are log scale than we can estimate SE
@@ -431,28 +355,33 @@ get.se <- function(est.vec, hess, log.vec = rep(TRUE, length(est.vec)))
 }
 
 tgm_summary <- function(fit, true.coef.values = NULL,
-                        a0 = 10^-4, beta = 1/10)
-{
+                        a0 = 10^-4, beta = 1 / 10) {
   ## return parameters with 95% confidence intervals and, if using
   ## simulated data, also the original parameter values for comparison
   nobs <- fit$nobs
   par <- fit$par
   hess <- fit$hess
   se.vec <- get.se(par, hess)
-  if(!is.null(true.coef.values))
-    out <- cbind("est" = fit$par,
-                 "lower" = fit$par -2*se.vec,
-                 "upper" = fit$par +2*se.vec,
-                 "true" = c("log(beta)" = log(beta),
-                            "log(a0)" = log(a0), true.coef.values))
-  if(is.null(true.coef.values))
-    out <- cbind("est" = fit$par,
-                 "lower" = fit$par -2*se.vec,
-                 "upper" = fit$par +2*se.vec,
-                 "true" = true.coef.values)
+  if (!is.null(true.coef.values)) {
+    out <- cbind(
+      "est" = fit$par,
+      "lower" = fit$par - 2 * se.vec,
+      "upper" = fit$par + 2 * se.vec,
+      "true" = c(
+        "log(beta)" = log(beta),
+        "log(a0)" = log(a0), true.coef.values
+      )
+    )
+  }
+  if (is.null(true.coef.values)) {
+    out <- cbind(
+      "est" = fit$par,
+      "lower" = fit$par - 2 * se.vec,
+      "upper" = fit$par + 2 * se.vec,
+      "true" = true.coef.values
+    )
+  }
   print(paste("nobs:", nobs))
   print(out)
   return(out)
 }
-
-
