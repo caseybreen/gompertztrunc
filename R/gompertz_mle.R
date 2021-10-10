@@ -9,7 +9,6 @@
 #' @export gompertz_mle
 
 gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL) {
-  usethis::use_pipe()
 
   ## format data
   data_formatted <- data %>%
@@ -17,26 +16,26 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     dplyr::select(all.vars(fml), byear) %>%
     dplyr::mutate(
       y = get(all.vars(fml)[1]),
-      right_trunc = right_trunc - byear,
-      left_trunc = left_trunc - byear,
+      right_trunc_age = right_trunc - byear,
+      left_trunc_age = left_trunc - byear,
       cohort = byear
     )
 
   ## lower bound (e.g., only observe deaths over 65)
-  if (!is.null(lower_bound)) {
+  if (!missing(lower_bound)) {
     data_formatted <- data_formatted %>%
-      mutate(left_trunc = case_when(
-        left_trunc < lower_bound ~ lower_bound,
-        TRUE ~ left_trunc
+      dplyr::mutate(left_trunc_age = case_when(
+        left_trunc_age < lower_bound ~ lower_bound,
+        TRUE ~ left_trunc_age
       ))
   }
 
   ## upper bound (e.g., only observe deaths over 65)
-  if (!is.null(upper_bound)) {
+  if (!missing(upper_bound)) {
     data_formatted <- data_formatted %>%
-      mutate(right_trunc = case_when(
-        right_trunc > upper_bound ~ upper_bound,
-        TRUE ~ right_trunc
+      dplyr::mutate(right_trunc_age = case_when(
+        right_trunc_age > upper_bound ~ upper_bound,
+        TRUE ~ right_trunc_age
       ))
   }
 
@@ -44,13 +43,13 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
   if (sum(data_formatted$y - floor(data_formatted$y)) == 0){
 
     data_formatted <- data_formatted %>%
-      mutate(y = y + 0.5)
+      dplyr::mutate(y = y + 0.5)
 
   }
 
   ## remove endpoints
   data_formatted <- data_formatted %>%
-    filter(y > left_trunc & y < right_trunc)
+    dplyr::filter(y > left_trunc_age & y < right_trunc_age)
 
 
 
@@ -90,8 +89,8 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     y = data_formatted$y,
     X = model_matrix,
     wt = wt,
-    y.left = data_formatted$left_trunc,
-    y.right = data_formatted$right_trunc,
+    y.left = data_formatted$left_trunc_age,
+    y.right = data_formatted$right_trunc_age,
     control = my.control
   )
 
