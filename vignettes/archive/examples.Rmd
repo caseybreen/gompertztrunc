@@ -87,18 +87,25 @@ dmf_staircase <- dmf %>%
   filter(byear %in% 1905:1914) %>% 
   mutate(educ_yrs_character = as.character(educ_yrs))
 
+## education gradient 
+tic()
+results_optim <- gompertz_mle(fml = death_age ~ educ_yrs, left_trunc = 1975, right_trunc = 2005, data = dmf_staircase)
+toc()
+
 
 ## Run-Time: 5 hours. 18398.488 sec elapsed
 tic()
-results_optim <- gompertz_mle(fml = death_age ~ educ_yrs_character, lower = 1975, upper = 2005, data = dmf_staircase)
+results_staircase <- gompertz_mle(fml = death_age ~ educ_yrs_character, left_trunc = 1975, right_trunc = 2005, data = dmf_staircase)
 toc()
 
+results_staircase <- results_staircase %>%
+     dplyr::mutate(across(where(is.numeric), exp))
+
 ## convert to e65
-gompertz_mle_results <- convert_hazards_to_e65(df = results_optim) %>% 
-  mutate(parameter = prefix_strip(parameter, "educ_yrs_character_")) %>% 
+gompertz_mle_results <- convert_hazards_to_e65(df = results_staircase) %>% 
+  mutate(parameter = prefix_strip(parameter, "educ_yrs_character")) %>% 
   mutate(parameter = as.numeric(parameter)) %>% 
   mutate(method = "Gompertz MLE")
-
 
 linear_model <- tidy(lm(death_age ~ educ_yrs_character, data = dmf_staircase))
 
@@ -117,16 +124,18 @@ linear_model_results <- linear_model %>%
 results <- bind_rows(linear_model_results, gompertz_mle_results)
 
 education_plot <- results %>% 
-  ggplot(aes(x = parameter, y = e65, ymin = e65_lower, ymax = e65_upper, color = method)) + 
+  filter(!is.na(parameter)) %>% 
+  ggplot(aes(x = parameter, y = e65, ymin = e65_lower, ymax = e65_upper, color = method)) +
   geom_pointrange(position = position_dodge(width = 0.2)) + 
-  theme_cowplot() + 
+  cowplot::theme_cowplot() + 
   ggsci::scale_color_lancet() + 
   labs(x = "Years of Schooling",
        y = "e65",
        title = "Education and Life Expectancy at Age 65",
        subtitle = "CenSoc-DMF, Life Expectancy at Age 65") + 
   theme(legend.position = "bottom") + 
-  scale_x_continuous(breaks=seq(0,17,2))
+  scale_x_continuous(breaks=seq(0,17,2)) + 
+  ylim(-1, 4)
 
 ```
 
