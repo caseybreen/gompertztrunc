@@ -51,8 +51,6 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
   data_formatted <- data_formatted %>%
     dplyr::filter(y > left_trunc_age & y < right_trunc_age)
 
-
-
   ## add weights
 
   if (!is.null(data_formatted$wt)) {
@@ -103,7 +101,10 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     ) %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
-    dplyr::select(-std.error)
+    dplyr::select(-std.error) %>%
+    mutate(hr = exp(value),
+           hr_lower = exp(lower),
+           hr_upper = exp(upper))
 
   # out <- out %>%
   #   dplyr::mutate(across(where(is.numeric), exp))

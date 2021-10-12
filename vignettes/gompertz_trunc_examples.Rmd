@@ -49,7 +49,7 @@ simulated_data1[,byear := 1815] ## multiple birth cohorts
 
 ## run basic example 
 tic()
-results_example1 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, lower = 1888, upper = 1905)
+results_example1 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, left_trunc = 1888, right_trunc = 1905)
 toc()
 
 ## function returns hazard ratios so we will take log 
@@ -68,17 +68,17 @@ results_example1 %>%
 ```{r}
 ## we simulate without any cohort distinctions
 myform <- formula(aod ~ temp + sex + isSouth + sex:isSouth)
-mycoefs_example2 <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6,
+mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6,
              "sex:isSouth" = +.3)
-n = 200000
+n = 100000
 data <- tgm_simu(n = n,
                  form = myform,
-                 coefs = mycoefs_example2,
+                 coefs = mycoefs,
                  dummy = c(F, T, T, T),
                  sigma = c(3, 1, 1, 1),
                  seed = 14)
 ## now we structure into multiple cohorts
-byear.vec <- 1815 ## multiple birth cohorts
+byear.vec <- 1810:1819 ## multiple birth cohorts
 dyear.vec <- 1888:1905 ## a limited window of observations
 min.age <- 65 ## only observe those 65+
 
@@ -97,28 +97,49 @@ data[, y.right := max(dyear.vec) - floor(byear)]
 
 ## artificially truncate
 data.trunc <- data[y.left <= aod & aod < y.right]
+## check to see if dyear is correct
+data.trunc[, range(floor(dod))]
+## [1] 1888 1905, ok.
+
+## now model
+fit <- tgm(formula = myform, data = data.trunc, wt = NULL)
 
 
+my_summary <- tgm_summary(fit,
+                          true.coef.values = mycoefs)
+## [1] "nobs: 20956"
+print(round(my_summary,2))
+##               est lower upper  true
+## log.b.start -2.30 -2.30 -2.29 -2.30
+## b0.start    -9.23 -9.23 -9.23 -9.21
+## temp         0.20  0.19  0.21  0.20
+## sex         -0.54 -0.56 -0.51 -0.50
+## isSouth      0.52  0.43  0.61  0.60
+## sex:isSouth  0.42  0.31  0.52  0.30
+
+
+##               est lower upper  true
+## log.b.start -2.30 -2.30 -2.29 -2.30
+## b0.start    -9.23 -9.23 -9.23 -9.21
+## temp         0.20  0.19  0.21  0.20
+## sex         -0.54 -0.56 -0.51 -0.50
+## isSouth      0.52  0.43  0.61  0.60
+## sex:isSouth  0.42  0.31  0.52  0.30
 ```
 
 
 ```{r}
 ## filter to end points 
-data.trunc <- data.trunc %>% 
-  # mutate(aod = round(aod)) %>% 
-  filter(dod >  1888 & dod < 1905)
-
+# data.trunc <- data.trunc %>% 
+#   filter(dod >  1888 & dod < 1905)
 tic()
-results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc, lower = 1888, upper = 1905)
+tgm(aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc)
 toc()
 
-## convert hazard ratios back to parameters 
-results_example2 %>% 
-   dplyr::filter(!stringr::str_detect(parameter, "start")) %>%
-    mutate(value = log(value),
-           lower = log(lower),
-           upper = log(upper),
-           true_value = mycoefs_example2)
+tic()
+results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+toc()
+
 
 ```
 
@@ -128,9 +149,8 @@ A simple example using a small extract from the CenSoc-DMF (cohort of 1910).
 
 ```{r}
 ## Example with only one cohort
-
 tic()
-education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs, data = censoc_example, lower = 1975, upper = 2005)
+education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs, data = censoc_example, left_trunc = 1975, right_trunc = 2005)
 toc()
 
 ## convert hazard ratios into e65 
@@ -140,35 +160,25 @@ gompertztrunc::convert_hazard_ratio_to_le(hr = 0.96, lower = 55, upper = 120, M 
 
 ```{r}
 ## seems to work fine for factors, just a little slow 
-education_staircase <- gompertz_mle(fml = death_age ~ as.factor(educ_yrs), data = censoc_example, lower = 1975, upper = 2005)
+education_staircase <- gompertz_mle(fml = death_age ~ as.factor(educ_yrs), data = censoc_example, left_trunc = 1975, right_trunc = 2005)
 
 education_staircase
 ```
-## Josh's to-do list 
+## To-do list 
 
 
-1:  The formulas I use don't account for factors, instead requiring
-all variables to being either continuous or 0/1. I'm sure
-there's a way to make this work more directly and to use factors
-but this requires understanding model.matrix() and such better
-than I do.
-
-- I think this should work now — see example with education "staircase." 
-
-2: apply to real data (e.g., BUNMD) or one of Censoc datasets
+1: apply to real data (e.g., BUNMD) or one of Censoc datasets
 
 - Seems to work okay on very simple DMF dataset. I'm curious how it will work on BUNMD or Numident. 
 
-3:  Check if weights are being used correctly in likelihood function 
+2:  Get function to work with weights 
 
-4:  check if CI is correct 
+3:  check if CI is correct 
 
 - Agree this is important. I think the confidence intervals are probably anti-conservative; the coverage ratio of the 95% intervals is probably closer to 70% (if everything is working well). 
 
-5:  include case where we see death_age as whole numbers, not continuous.
+4:  include case where we see death_age as whole numbers, not continuous.
 
-- I think this code works OK with whole numbers. (The examples in my vignette are all whole numbers.) 
-
-6:  include way to specify struture of "beta", e.g. different for men and women, or smooth function of cohort or ... 
+5:  include way to specify structure of "beta", e.g. different for men and women, or smooth function of cohort or ... 
 
 

@@ -85,3 +85,46 @@ get.trunc.mean.gomp <- function(alpha, beta, l, u) {
   s <- x %in% l:u ## approximate truncation for these cohorts
   sum((dx * x)[s]) / sum(dx[s])
 }
+
+
+get.se <- function(est.vec, hess, log.vec = rep(TRUE, length(est.vec))) {
+  fisher_info <- solve(hess)
+  est.sd <- sqrt(diag(fisher_info))
+  ## if estimates are not log scale then we have the SE
+  ## if they are log scale than we can estimate SE
+  ## as exp(beta)*SD
+  est.se <- exp(est.vec)^(log.vec) * est.sd
+  return(est.se)
+}
+
+tgm_summary <- function(fit, true.coef.values = NULL,
+                        a0 = 10^-4, beta = 1 / 10) {
+  ## return parameters with 95% confidence intervals and, if using
+  ## simulated data, also the original parameter values for comparison
+  nobs <- fit$nobs
+  par <- fit$par
+  hess <- fit$hess
+  se.vec <- get.se(par, hess)
+  if (!is.null(true.coef.values)) {
+    out <- cbind(
+      "est" = fit$par,
+      "lower" = fit$par - 2 * se.vec,
+      "upper" = fit$par + 2 * se.vec,
+      "true" = c(
+        "log(beta)" = log(beta),
+        "log(a0)" = log(a0), true.coef.values
+      )
+    )
+  }
+  if (is.null(true.coef.values)) {
+    out <- cbind(
+      "est" = fit$par,
+      "lower" = fit$par - 2 * se.vec,
+      "upper" = fit$par + 2 * se.vec,
+      "true" = true.coef.values
+    )
+  }
+  print(paste("nobs:", nobs))
+  print(out)
+  return(out)
+}
