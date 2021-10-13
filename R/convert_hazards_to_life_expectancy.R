@@ -13,6 +13,7 @@
 
 
 convert_hazards_to_e65 <- function(df) {
+
    df <- df %>%
     dplyr::filter(!stringr::str_detect(parameter, "mode.coh")) %>%
     dplyr::filter(!stringr::str_detect(parameter, "beta")) %>%

@@ -80,9 +80,10 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     maxit = 5000
   )
 
+  ## get optimization function
   fit <- optim(
     par = p.start,
-    fn = get.negLL,
+    fn = negLL_function,
     hessian = TRUE,
     y = data_formatted$y,
     X = model_matrix,
@@ -98,13 +99,40 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     dplyr::mutate(
       lower = value - 1.96 * std.error,
       upper = value + 1.96 * std.error
-    ) %>%
+    )
+
+  ## calculate mode
+  mode <- fit %>%
+    filter(parameter == "b0.start") %>%
+    mutate(parameter = "gompertz_mode",
+           value = ab2M(exp(value), b = exp(fit$value[1])),
+           lower = ab2M(exp(lower), b = exp(fit$value[1])),
+           upper = ab2M(exp(upper), b = exp(fit$value[1]))) %>%
+    rename(upper = lower, lower = upper)
+
+  ## calculate beta
+  beta <- fit %>%
+    filter(parameter == "log.b.start") %>%
+    mutate(parameter = "gompertz_beta",
+           value = exp(value),
+           lower = exp(lower),
+           upper = exp(upper))
+
+  ## calculate mode
+  fit <- bind_rows(beta, mode) %>%
+    bind_rows(fit %>%
+                filter(!parameter %in% c("b0.start", "log.b.start")))
+
+  fit <- fit %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
     dplyr::select(-std.error) %>%
-    mutate(hr = exp(value),
-           hr_lower = exp(lower),
-           hr_upper = exp(upper))
+    mutate(hr = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(value)),
+           hr_lower = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(lower)),
+           hr_upper = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(upper)))
+
+  fit <- fit %>%
+    select(parameter, coef = value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)
 
   # out <- out %>%
   #   dplyr::mutate(across(where(is.numeric), exp))

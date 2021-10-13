@@ -3,14 +3,14 @@
 #' Creates a plot of the crayon colors in \code{\link{brocolors}}
 #'
 #' @param fml the estimation formula
-#' @param A data matrix with covariates y, u, l, and covariates, including cohor
+#' @param A data matrix witdevh covariates y, u, l, and covariates, including cohor
 #'
 #' @return None
 #'
 #' @export
 
 
-get.negLL <- function(par, y, X, y.left, y.right, wt = 1) {
+negLL_function <- function(par, y, X, y.left, y.right, wt = 1) {
   ## note exp(par) just gets them back to original scale
   beta <- exp(par[1])
   names(beta) <- "b"
@@ -27,7 +27,6 @@ get.negLL <- function(par, y, X, y.left, y.right, wt = 1) {
   #  num <- wt * pgompertz.M(y+1, b = beta, M = M) - pgompertz.M(y, b = beta, M = M) ## is use of wt correct???
 
   num[num == 0] <- 10^-10 ## very low likelihood for 0 to avoid log(0)
-
 
   denom <- pgompertz.M(y.right, b = beta, M) - pgompertz.M(y.left, b = beta, M)
   denom[denom == 0] <- 10^-0 ## denom gets bigger value for zeros so

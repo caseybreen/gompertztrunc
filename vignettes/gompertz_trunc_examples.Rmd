@@ -10,9 +10,9 @@ The `gompertztrunc::gompertz_mle` function takes the following arguments:
 
 - `fml`: = formula (death_age ~ educ_yrs + homeownership)
 
-- `upper`: year of upper truncation 
+- `left_trunc`: year of upper truncation 
 
-- `lower`: year of lower truncation 
+- `right_trunc``: year of lower truncation 
 
 - `data`: dataframe with age of death and covariates 
 
@@ -38,12 +38,14 @@ library(tictoc)
 ## simulate data 
 myform <- formula(aod ~ temp + isSouth)
 mycoefs_example1 <- c("temp" = +.2, "isSouth" = +.6)
+
 simulated_data1 <- tgm_simu(n = 10000,
                  form = myform,
                  coefs = mycoefs_example1,
                  dummy = c(F, T),
                  sigma = c(3, 1),
                  seed = 13)
+
 ## now we structure into multiple cohorts
 simulated_data1[,byear := 1815] ## multiple birth cohorts
 
@@ -52,15 +54,11 @@ tic()
 results_example1 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, left_trunc = 1888, right_trunc = 1905)
 toc()
 
-## function returns hazard ratios so we will take log 
 ## compare to true value
 results_example1 %>% 
-   dplyr::filter(!stringr::str_detect(parameter, "start")) %>%
-    mutate(value = log(value),
-           lower = log(lower),
-           upper = log(upper)
-           ) %>% 
-  mutate(true_value = mycoefs_example1)
+   dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
+  mutate(true_value = mycoefs_example1) %>% 
+  select(parameter, coef, coef_lower, coef_upper, true_value)
 ```
 
 ## Example 2 
@@ -101,9 +99,8 @@ data.trunc <- data[y.left <= aod & aod < y.right]
 data.trunc[, range(floor(dod))]
 ## [1] 1888 1905, ok.
 
-## now model
+## Josh's tgm function (similar to gompertztrunc::gompertz_mle)
 fit <- tgm(formula = myform, data = data.trunc, wt = NULL)
-
 
 my_summary <- tgm_summary(fit,
                           true.coef.values = mycoefs)
@@ -117,31 +114,11 @@ print(round(my_summary,2))
 ## isSouth      0.52  0.43  0.61  0.60
 ## sex:isSouth  0.42  0.31  0.52  0.30
 
-
-##               est lower upper  true
-## log.b.start -2.30 -2.30 -2.29 -2.30
-## b0.start    -9.23 -9.23 -9.23 -9.21
-## temp         0.20  0.19  0.21  0.20
-## sex         -0.54 -0.56 -0.51 -0.50
-## isSouth      0.52  0.43  0.61  0.60
-## sex:isSouth  0.42  0.31  0.52  0.30
-```
-
-
-```{r}
-## filter to end points 
-# data.trunc <- data.trunc %>% 
-#   filter(dod >  1888 & dod < 1905)
-tic()
-tgm(aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc)
-toc()
-
 tic()
 results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
 toc()
-
-
 ```
+
 
 ## Example 3 
 
@@ -154,31 +131,9 @@ education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs, data = censoc_exa
 toc()
 
 ## convert hazard ratios into e65 
-## this is similar to what literature finds for education gradient (0.3-04)
-gompertztrunc::convert_hazard_ratio_to_le(hr = 0.96, lower = 55, upper = 120, M = 80, beta = 0.1)
+## this is similar to what literature finds for education gradient (0.35) 
+## similar answer if we exponentiate 
+gompertztrunc::convert_hazard_ratio_to_le(hr = 0.9637085805, lower = 55, upper = 120, M = 80, beta = 0.1)
 ```
-
-```{r}
-## seems to work fine for factors, just a little slow 
-education_staircase <- gompertz_mle(fml = death_age ~ as.factor(educ_yrs), data = censoc_example, left_trunc = 1975, right_trunc = 2005)
-
-education_staircase
-```
-## To-do list 
-
-
-1: apply to real data (e.g., BUNMD) or one of Censoc datasets
-
-- Seems to work okay on very simple DMF dataset. I'm curious how it will work on BUNMD or Numident. 
-
-2:  Get function to work with weights 
-
-3:  check if CI is correct 
-
-- Agree this is important. I think the confidence intervals are probably anti-conservative; the coverage ratio of the 95% intervals is probably closer to 70% (if everything is working well). 
-
-4:  include case where we see death_age as whole numbers, not continuous.
-
-5:  include way to specify structure of "beta", e.g. different for men and women, or smooth function of cohort or ... 
 
 
