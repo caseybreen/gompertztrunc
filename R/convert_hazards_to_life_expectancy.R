@@ -17,7 +17,6 @@ convert_hazards_to_e65 <- function(df, lower = 65, upper = 120, M = 80, beta = 0
   # Use estimated mode and beta from model, overriding any other input
   if(use_model_estimates) {
     M <-  (df %>% dplyr::filter(stringr::str_detect(parameter, "mode")))$coef
-    # this will only work if there's only one mode
     beta <-  (df %>% dplyr::filter(stringr::str_detect(parameter, "beta")))$coef
   }
 
