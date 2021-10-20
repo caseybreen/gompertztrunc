@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# gompertztrunc
+# gompertztrunc — In Progress
 
 ## About the package – in progress
 
