@@ -5,7 +5,7 @@
 
 ## About the package – in progress
 
-`gompertztrunc` is an `R` package for estimating Gompertz distributions
+`gompertztrunc` is an R package for estimating Gompertz distributions
 from doubly-truncated data using maximum likelihood estimation.
 
 To install the package, use:
