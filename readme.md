@@ -1,12 +1,19 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# gompertztrunc — In Progress
+# gompertztrunc
 
 ## About the package – in progress
 
-`gompertztrunc` is a package for R for estimating Gompertz distributions
+`gompertztrunc` is an `R` package for estimating Gompertz distributions
 from doubly-truncated data using maximum likelihood estimation.
+
+To install the package, use:
+
+``` r
+install.packages("devtools")
+devtools::install_github("caseybreen/gompertztrunc")
+```
 
 ## TODO
 
