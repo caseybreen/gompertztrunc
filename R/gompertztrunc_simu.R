@@ -9,7 +9,7 @@
 #' @export
 
 
-tgm_simu <- function(n, ## sample size
+gompertztrunc_simu <- function(n, ## sample size
                      form, ## formula "death_age ~ sex + educ"
                      coefs, ## "true" values for coefficients
                      dummy = NULL, ## dummy flag for each var (optional)
