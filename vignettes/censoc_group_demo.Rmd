@@ -2,16 +2,8 @@
 title: "Analyzing doubly-truncated mortality data using the gompertztrunc package"
 author: Casey Breen (caseybreen@berkeley.edu)
 output: 
-  rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Analyzing doubly-truncated mortality data using the gompertztrunc package}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-nocite: '@*'
-editor_options: 
-  markdown: 
-    wrap: 72
-    number_sections: true
+  html_document:
+    code_download: true
 ---
 
 ## Introduction 
@@ -20,318 +12,294 @@ The **gompertztrunc** package includes tools for mortality estimation with CenSo
 
 ## Summary of method 
 
-The main function in the package is the `gompertztrunc::gompertz_mle`. It estimates 
+It assumes that the underlying mortality distribution follows a Gompertz distribution: 
 
-The `gompertztrunc::gompertz_mle` function takes the following arguments: 
 
-- `fml`: = formula (for example, death_age ~ educ_yrs + homeownership)
+$$h(x) = \alpha e^{\beta x}$$ 
+where
+
+- $h(x)$ hazard at age x 
+- $\alpha$ is some baseline level of mortality 
+- $\beta$ gives rate of increase of mortality 
+
+The main function in the package is the `gompertztrunc::gompertz_mle`. The `gompertztrunc::gompertz_mle` function takes the following arguments: 
+
+- `fml`: model formula (for example, death_age ~ educ_yrs + homeownership)
 
 - `left_trunc`: year of upper truncation 
 
-- `right_trunc``: year of lower truncation 
+- `right_trunc`: year of lower truncation 
 
 - `data`: data frame with age of death variable and covariates 
 
 
-```{r, silent = T}
-## library packages 
-library(gompertztrunc)
-library(tidyverse)
-library(data.table)
-library(tictoc)
+## Setup 
+
+```{r, warning=FALSE, results='hide',message=FALSE}
+## library packages
+
+library(gompertztrunc)         ## calculate mortality differentials under double-truncation  
+library(tidyverse)             ## data manipulation and visualization  
+library(data.table)            ## fast data manipulation
+library(cowplot)               ## publication-ready themes for ggplot
+library(socviz)                ## helper functions for data visualization (Kieran Healy)  
+library(tictoc)                ## functions for timing r scripts 
+library(broom)                 ## "tidy" model output 
+
+
+## load data 
+sim_data <- sim_data           ## simulated 
+bunmd_demo <- bunmd_demo       ## real 
 ```
 
-
-## Simulate Mortality Data  
+## Case Study I: Simulated Data
 
 ```{r}
-## simulate data 
-myform <- formula(aod ~ temp + isSouth)
-mycoefs_example1 <- c("temp" = +.2, "isSouth" = +.6)
+## true coefficient values (we know bc we simulated them)
+mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6)
 
-## simulate a dist
-simulated_data1 <- gompertztrunc_simu(n = 10000,
-                 form = myform,
-                 coefs = mycoefs_example1,
-                 dummy = c(F, T),
-                 sigma = c(3, 1),
-                 seed = 13)
+## Run gompertz_mle function  
+## return a list 
+simulated_example <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth,
+                                                 left_trunc = 1888,
+                                                 right_trunc = 1905,
+                                                 data = sim_data)
 
-## now we structure into multiple cohorts
-simulated_data1[,byear := 1815] ## multiple birth cohorts
+## starting value for coefficients (from linear regression)
+simulated_example$starting_values
+
+## optim fit object — will help us check whether things fit etc 
+simulated_example$optim_fit
+
+## results in tidy data.frame 
+simulated_example$results
 ```
 
-```{r}
-## run basic example 
-results_example1 <- gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, left_trunc = 1888, right_trunc = 1905)
+### 
 
-## compare to true value
-results_example1 %>% 
+```{r}
+## compare our estimated values to true value 
+## we can only do this because this is simulated (fake) data 
+simulated_example$results %>%
   dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
-  mutate(true_value = mycoefs_example1) %>% 
-  select(parameter, coef, coef_lower, coef_upper, true_value)
+  mutate(true_value = mycoefs) %>%
+  select(parameter, coef, coef_lower, coef_upper, true_value) %>%
+  mutate(ci_capture = case_when(
+    true_value > coef_lower & true_value < coef_upper ~ 1,
+    TRUE ~ 0
+  ))
+
+## convert to e65
+convert_hazards_to_e65(df = simulated_example$results, use_model_estimates = T)
 ```
 
-## Discrete Death Ages 
+## Confidence Interval Coverage Rate 
+
+Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter. 
+
+A 95% confidence interval should in the long run have a coverage ratio of 95%: approximately 95% of the confidence intervals should contain the true value. 
+
+We can assess the coverage ratio of our confidence intervals by simulating new data and seeing how often our confidence intervals contain the true value. 
+
+```{r, eval = F}
+## create list for storing our results 
+confidence_interval <- list()
+
+## rerun our experiment 100 times 
+
+for (i in 1:100) {
+
+  ## we simulate without any cohort distinctions
+  myform <- formula(aod ~ temp + sex + isSouth)
+  mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.5)
+
+  n <- 10000
+
+  data <- gompertztrunc_simu(
+    n = n,
+    form = myform,
+    coefs = mycoefs,
+    dummy = c(F, T, T),
+    sigma = c(3, 1, 1)
+  )
+  ## now we structure into multiple cohorts
+  byear.vec <- 1810:1819 ## multiple birth cohorts
+  dyear.vec <- 1888:1905 ## a limited window of observations
+  min.age <- 65 ## only observe those 65+
+
+  data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
+  ## pretend dates of birth within year are uniform
+  data[, dob := byear + runif(length(byear))]
+  ## date of death = date of birth + age of death
+  data[, dod := dob + aod]
+
+  ## y.left for each person
+  data[, y.left := min(dyear.vec) - floor(byear)]
+  ## only 65+
+  data[y.left < 65, y.left := 65]
+  ## y.right for each person
+  data[, y.right := max(dyear.vec) - floor(byear)]
+
+  ## artificially truncate
+  data.trunc <- data[y.left <= aod & aod < y.right]
+
+  results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+
+  results_example2 <- results_example2 %>%
+    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
+    mutate(true_value = mycoefs) %>%
+    select(parameter, coef, coef_lower, coef_upper, true_value) %>%
+    mutate(ci_capture = case_when(
+      true_value > coef_lower & true_value < coef_upper ~ 1,
+      TRUE ~ 0
+    ))
+  
+  ## print simulation 
+  cat(i, " ")
+
+  results_interaction[[i]] <- results_example2
+}
+
+## put results into on data.frame 
+confidence_interval_coverage <- bind_rows(results_interaction)
+
+## What's the coverage ratio of our confidence intervals? 
+confidence_interval_coverage %>%
+  group_by(parameter) %>%
+  summarize(ci_coverage = mean(ci_capture))
+```
+
+## Case Study II: Real-World Example with BUNMD Data 
 
 ```{r}
-## discrete ages 
-simulated_data1 <- simulated_data1 %>% 
-  mutate(aod = floor(aod))
+## Load example 
+bunmd_demo <- bunmd_demo
 
-results_example1_floor <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, left_trunc = 1888, right_trunc = 1905)
+## how many people?
+count(bunmd_demo)
 
-## compare to true value
-results_example1_floor %>% 
-  dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
-  mutate(true_value = mycoefs_example1) %>% 
-  select(parameter, coef, coef_lower, coef_upper, true_value)
+## how many people per country? 
+bunmd_demo %>%
+  count(bpl_string)
 ```
 
 
+```{r, fig.width = 6, fig.height = 4}
+## distribution of deaths?
+ggplot(data = bunmd_demo) + 
+  geom_histogram(aes(x = death_age),
+                 fill = "grey",
+                 color = "black",
+                 binwidth = 1) + 
+  cowplot::theme_cowplot() + 
+  labs(x = "Age of Death", y = "Count")
 
-## Example 2 
+ggplot(data = bunmd_demo) + 
+  geom_density(aes(x = death_age),
+                 fill = "grey",
+                 color = "black",
+                 binwidth = 1) + 
+  cowplot::theme_cowplot() + 
+  labs(x = "Age of Death", y = "Count") + 
+  facet_wrap(~bpl_string)
+```
+
 
 ```{r}
-## we simulate without any cohort distinctions
-myform <- formula(aod ~ temp + sex + isSouth + sex:isSouth)
-mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6,
-             "sex:isSouth" = +.3)
-n = 30000
-data <- gompertztrunc_simu(n = n,
-                 form = myform,
-                 coefs = mycoefs,
-                 dummy = c(F, T, T, T),
-                 sigma = c(3, 1, 1, 1),
-                 seed = 14)
-## now we structure into multiple cohorts
-byear.vec <- 1810:1819 ## multiple birth cohorts
-dyear.vec <- 1888:1905 ## a limited window of observations
-min.age <- 65 ## only observe those 65+
+model <- lm(death_age ~ bpl_string + as.factor(byear), data = bunmd_demo)
 
-data[, byear := rep(byear.vec, rep(n/length(byear.vec), length(byear.vec)))]
-## pretend dates of birth within year are uniform
-data[, dob := byear + runif(length(byear))]
-## date of death = date of birth + age of death
-data[, dod := dob + aod]
+tidy_model_pooled <- tidy(model) %>%
+  filter(str_detect(term, "bpl_string")) %>%
+  mutate(term = prefix_strip(term, "bpl_string"))
 
-## y.left for each person
-data[, y.left := min(dyear.vec) - floor(byear)]
-## only 65+
-data[y.left < 65, y.left := 65]
-## y.right for each person
-data[, y.right := max(dyear.vec) - floor(byear)]
+lm_results <- tidy_model_pooled %>%
+  mutate(
+    e65 = estimate,
+    e65_lower = estimate - 2 * std.error,
+    e65_upper = estimate + 2 * std.error
+  ) %>%
+  rename(country = term) %>%
+  mutate(method = "Regression on Age of Death")
+```
 
-## artificially truncate
-data.trunc <- data[y.left <= aod & aod < y.right]
-## check to see if dyear is correct
-data.trunc[, range(floor(dod))]
-## [1] 1888 1905, ok.
+```{r}
+## Gompertz Trunc 
+## Use 1988-2005 because we are 
+gompert_mle_results <- gompertz_mle(fml = death_age ~ bpl_string, 
+                                    left_trunc = 1988,
+                                    right_trunc = 2005,
+                                    data = bunmd_demo)
 
-## Josh's tgm function (similar to gompertztrunc::gompertz_mle)
-fit <- tgm(formula = myform, data = data.trunc, wt = NULL)
+mle_results <- convert_hazards_to_e65(gompert_mle_results$results)
 
-my_summary <- tgm_summary(fit,
-                          true.coef.values = mycoefs)
-## [1] "nobs: 20956"
-print(round(my_summary,2))
+mle_results <- mle_results %>% 
+  rename(country = parameter) %>%
+  filter(str_detect(country, "bpl_string")) %>%
+  mutate(country = prefix_strip(country, "bpl_string")) %>%
+  mutate(method = "Gompertz Parametric Estimate")
 
-results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
-
-results_example2
+mle_results
 ```
 
 
-## Example 3 
+```{r, fig.width = 7.2, fig.height = 5}
+## results
+results <- lm_results %>%
+  bind_rows(mle_results)
+
+## calculate adjustment Factor
+adjustment_factor <- lm_results %>%
+  bind_rows(mle_results) %>%
+  select(country, method, e65) %>%
+  pivot_wider(names_from = method, values_from = e65) %>%
+  mutate(adjustment_factor = `Gompertz Parametric Estimate` / `Regression on Age of Death`) %>%
+  summarize(adjustment_factor_mean = round(mean(adjustment_factor), 3)) %>%
+  as.vector()
+
+## Plot results
+lm_results %>%
+  bind_rows(mle_results) %>%
+  ggplot(aes(y = reorder(country, e65), x = e65, xmin = e65_lower, xmax = e65_upper, color = method)) +
+  geom_pointrange(position = position_dodge(width = 0.2), shape = 1) +
+  cowplot::theme_cowplot(font_size = 12) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  labs(
+    x = "e65",
+    y = "country",
+    title = "Foreign-Born Male Ages at Death, BUNMD 1905-1915",
+    subtitle = paste0("Gompertz MLE estimates are ~", adjustment_factor, " times larger than regression on age of death")
+  ) +
+  scale_color_brewer(palette = "Set1") +
+  annotate("text", label = "Native Born Whites", x = 0.1, y = 3, angle = 90, size = 3, color = "black")
+```
+
+
+## Add another covariate 
+
+```{r, fig.width = 8, fig.height = 4}
+## age first application by country
+bunmd_demo %>%
+  ggplot() +
+  geom_density(aes(x = age_first_application),
+    fill = "grey",
+    color = "black"
+  ) +
+  facet_wrap(~bpl_string) + 
+  cowplot::theme_cowplot()
+```
+
+
+## Bonus 
 
 A simple example using a small extract from the CenSoc-DMF (cohort of 1910).
 
 ```{r}
 ## Example with only one cohort
-education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs, data = censoc_example, left_trunc = 1975, right_trunc = 2005)
-
+education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs + urban + ownhome, data = censoc_example, left_trunc = 1975, right_trunc = 2005)
 
 education_gradient
 ```
 
-```{r}
-## convert hazard ratios into e65 
-## similar answer if we exponentiate 
-gompertztrunc::convert_hazard_ratio_to_le(hr = 0.9637085805, lower = 55, upper = 120, M = 80, beta = 0.1)
-```
-
-
-```{r, eval = F}
-results <- list()
-
-for (i in 1:300) {
-  
-  ## simulate data 
-  myform <- formula(aod ~ temp + isSouth)
-  mycoefs_example1 <- c("temp" = +.2, "isSouth" = +.6)
-  
-  simulated_data1 <- tgm_simu(n = 30000,
-                              form = myform,
-                              coefs = mycoefs_example1,
-                              dummy = c(F, T),
-                              sigma = c(3, 1))
-  
-  ## now we structure into multiple cohorts
-  simulated_data1[,byear := 1815] ## multiple birth cohorts
-  
-  ## run basic example 
-  tic()
-  results_example1 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + isSouth, data = simulated_data1, left_trunc = 1888, right_trunc = 1905)
-  toc()
-  
-  ## compare to true value
-  results_example1 <- results_example1 %>% 
-    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
-    mutate(true_value = mycoefs_example1) %>% 
-    select(parameter, coef, coef_lower, coef_upper, true_value) %>% 
-    mutate(capture = case_when(
-      true_value > coef_lower & true_value < coef_upper  ~ 1,
-      TRUE ~ 0
-    ))
-  results[[i]] <- results_example1
-}
-
-test <- bind_rows(results)
-
-test %>% 
-  group_by(parameter) %>% 
-  summarize(mean(capture))
-
-test %>% 
-  ggplot(aes(y = parameter, x = coef)) + 
-  geom_density_ridges( jittered_points = TRUE,
-    position = position_points_jitter(width = 0.05, height = 0),
-    point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0.7) + 
-  cowplot::theme_cowplot()
-```
-
-
-
-```{r, eval = F}
-results_interaction <- list()
-
-for (i in 1:100) {
-  
-  ## we simulate without any cohort distinctions
-  myform <- formula(aod ~ temp + sex + isSouth + sex:isSouth)
-  mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6,
-               "sex:isSouth" = +.3)
-  
-  n <- 30000
-  data <- gompertztrunc_simu(n = n,
-                   form = myform,
-                   coefs = mycoefs,
-                   dummy = c(F, T, T, T),
-                   sigma = c(3, 1, 1, 1))
-  ## now we structure into multiple cohorts
-  byear.vec <- 1810:1819 ## multiple birth cohorts
-  dyear.vec <- 1888:1905 ## a limited window of observations
-  min.age <- 65 ## only observe those 65+
-  
-  data[, byear := rep(byear.vec, rep(n/length(byear.vec), length(byear.vec)))]
-  ## pretend dates of birth within year are uniform
-  data[, dob := byear + runif(length(byear))]
-  ## date of death = date of birth + age of death
-  data[, dod := dob + aod]
-  
-  ## y.left for each person
-  data[, y.left := min(dyear.vec) - floor(byear)]
-  ## only 65+
-  data[y.left < 65, y.left := 65]
-  ## y.right for each person
-  data[, y.right := max(dyear.vec) - floor(byear)]
-  
-  ## artificially truncate
-  data.trunc <- data[y.left <= aod & aod < y.right]
-  
-  tic()
-  results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth + sex:isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
-  toc()
-  
-    results_example2 <- results_example2 %>% 
-    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
-    mutate(true_value = mycoefs) %>% 
-    select(parameter, coef, coef_lower, coef_upper, true_value) %>% 
-    mutate(capture = case_when(
-      true_value > coef_lower & true_value < coef_upper  ~ 1,
-      TRUE ~ 0
-    ))
-  
-  results_interaction[[i]] <- results_example2
-}
-
-tes2 <- bind_rows(results_interaction)
-
-
-tes2 %>% 
-  group_by(parameter) %>% 
-  summarize(mean(capture))
-```
-
-
-```{r, eval = F}
-results_interaction <- list()
-
-for (i in 1:500) {
-  
-  ## we simulate without any cohort distinctions
-  myform <- formula(aod ~ temp + sex + isSouth )
-  mycoefs <- c("temp" = +.08, "sex" = -.15, "isSouth" = +.26)
-  
-  n <- 10000
-  
-  data <- tgm_simu(n = n,
-                   form = myform,
-                   coefs = mycoefs,
-                   dummy = c(F, T, T, T),
-                   sigma = c(3, 1, 1, 1))
-  ## now we structure into multiple cohorts
-  byear.vec <- 1810:1819 ## multiple birth cohorts
-  dyear.vec <- 1888:1905 ## a limited window of observations
-  min.age <- 65 ## only observe those 65+
-  
-  data[, byear := rep(byear.vec, rep(n/length(byear.vec), length(byear.vec)))]
-  ## pretend dates of birth within year are uniform
-  data[, dob := byear + runif(length(byear))]
-  ## date of death = date of birth + age of death
-  data[, dod := dob + aod]
-  
-  ## y.left for each person
-  data[, y.left := min(dyear.vec) - floor(byear)]
-  ## only 65+
-  data[y.left < 65, y.left := 65]
-  ## y.right for each person
-  data[, y.right := max(dyear.vec) - floor(byear)]
-  
-  ## artificially truncate
-  data.trunc <- data[y.left <= aod & aod < y.right]
-  
-  tic()
-  results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
-  toc()
-  
-    results_example2 <- results_example2 %>% 
-    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
-    mutate(true_value = mycoefs) %>% 
-    select(parameter, coef, coef_lower, coef_upper, true_value) %>% 
-    mutate(capture = case_when(
-      true_value > coef_lower & true_value < coef_upper  ~ 1,
-      TRUE ~ 0
-    ))
-  
-  results_interaction[[i]] <- results_example2
-}
-
-tes2 <- bind_rows(results_interaction)
-
-tes2 %>% 
-  group_by(parameter) %>% 
-  summarize(mean(capture))
-```
 
 

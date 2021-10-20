@@ -8,7 +8,7 @@
 #'
 #' @export gompertz_mle
 
-gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL) {
+gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL, maxiter = 10000) {
 
   ## format data
   data_formatted <- data %>%
@@ -41,7 +41,6 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
 
   ## convert data to integers
   if (sum(data_formatted$y - floor(data_formatted$y)) == 0){
-
     data_formatted <- data_formatted %>%
       dplyr::mutate(y = y + 0.5)
 
@@ -60,13 +59,6 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     wt <- 1.0
   }
 
-  ## get unique cohorts
-  cohorts <- sort(unique(data_formatted$cohort))
-
-  ## starting values, just let all the modes be the same ("80")
-  M.start <- rep(80, length(cohorts))
-  names(M.start) <- paste0("coh", cohorts)
-
   ## get starting parameters
   p.start <- get.par.start(fml, data_formatted)
 
@@ -77,11 +69,11 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
   my.control <- list(
     trace = 0,
     parscale = c(par.scale = p.start),
-    maxit = 5000
+    maxit = maxiter
   )
 
   ## get optimization function
-  fit <- optim(
+  optim_fit <- optim(
     par = p.start,
     fn = negLL_function,
     hessian = TRUE,
@@ -93,6 +85,7 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     control = my.control
   )
 
+  fit <- optim_fit
 
   ## tidy up optim output
   fit <- broom::tidy(fit) %>%
@@ -123,6 +116,7 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
     bind_rows(fit %>%
                 filter(!parameter %in% c("b0.start", "log.b.start")))
 
+  ## tidy up fit object
   fit <- fit %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
@@ -131,11 +125,11 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
            hr_lower = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(lower)),
            hr_upper = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(upper)))
 
-  fit <- fit %>%
+  results <- fit %>%
     select(parameter, coef = value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)
 
-  # out <- out %>%
-  #   dplyr::mutate(across(where(is.numeric), exp))
+  ## return all results as a list
+  gompertz_trunc <- list("starting_values" = p.start, "optim_fit" = optim_fit, "results" = results)
 
-  return(fit)
+  return(gompertz_trunc)
 }

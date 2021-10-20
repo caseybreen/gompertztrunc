@@ -11,7 +11,8 @@ gompertz_mle(
   data,
   byear = byear,
   lower_bound = NULL,
-  upper_bound = NULL
+  upper_bound = NULL,
+  maxiter = 10000
 )
 }
 \arguments{

@@ -4,7 +4,14 @@
 \alias{convert_hazards_to_e65}
 \title{Translate to e65}
 \usage{
-convert_hazards_to_e65(df)
+convert_hazards_to_e65(
+  df,
+  lower = 65,
+  upper = 120,
+  M = 80,
+  beta = 0.075,
+  use_model_estimates = F
+)
 }
 \arguments{
 \item{lower}{the bound function}

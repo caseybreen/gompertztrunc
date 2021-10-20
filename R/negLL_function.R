@@ -24,7 +24,7 @@ negLL_function <- function(par, y, X, y.left, y.right, wt = 1) {
 
   num <- wt * dgompertz.M(y, b = beta, M = M) ## is use of wt correct???
 
-  #  num <- wt * pgompertz.M(y+1, b = beta, M = M) - pgompertz.M(y, b = beta, M = M) ## is use of wt correct???
+  #num <- wt * pgompertz.M(y+1, b = beta, M = M) - pgompertz.M(y, b = beta, M = M) ## is use of wt correct???
 
   num[num == 0] <- 10^-10 ## very low likelihood for 0 to avoid log(0)
 

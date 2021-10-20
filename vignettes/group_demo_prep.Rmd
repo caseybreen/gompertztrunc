@@ -1,8 +1,18 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Gompertztrunc Internal Vignette"
+author: Casey Breen (caseybreen@berkeley.edu)
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gompertztrunc Internal Vignette}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+nocite: '@*'
+editor_options: 
+  markdown: 
+    wrap: 72
+    number_sections: true
 ---
-
 
 ```{r}
 library(data.table)
@@ -19,8 +29,6 @@ bunmd <- fread("/data/josh/CenSoc/censoc_data/bunmd_v2/bunmd_v2.csv")
 ## read in IPUMS DDI for IPUMS extract
 ## we already have a ddi on the server for all vars! but can also make a new extract from IPUMS with BPLD var  
 # ddi_extract <- read_ipums_ddi("/data/josh/CenSoc/censoc_data/ipums_1940_extract/fullcount.ddi.xml")
-
-
 
 # ## assign metadata using ipumsr package
 ## only necessary for CenSoc DMF and CenSoc Numident — I already created BUNMD variables 
@@ -124,5 +132,117 @@ lm_results %>%
   scale_color_brewer(palette="Set1") + 
   annotate("text", label = "Native Born Whites", x = 0.1, y = 3, angle = 90, size = 3, color = "black")
 ```
+
+
+```{r}
+## we simulate without any cohort distinctions
+myform <- formula(aod ~ temp + sex + isSouth)
+
+mycoefs <- c(
+  "temp" = +.1, "sex" = -.5, "isSouth" = +.3)
+n <- 30000
+
+data <- gompertztrunc_simu(
+  n = n,
+  form = myform,
+  coefs = mycoefs,
+  dummy = c(F, T, T),
+  sigma = c(3, 1, 1),
+  seed = 14
+)
+
+## now we structure into multiple cohorts
+byear.vec <- 1810:1819 ## multiple birth cohorts
+dyear.vec <- 1888:1905 ## a limited window of observations
+min.age <- 65 ## only observe those 65+
+
+data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
+## pretend dates of birth within year are uniform
+data[, dob := byear + runif(length(byear))]
+## date of death = date of birth + age of death
+data[, dod := dob + aod]
+
+## y.left for each person
+data[, y.left := min(dyear.vec) - floor(byear)]
+## only 65+
+data[y.left < 65, y.left := 65]
+## y.right for each person
+data[, y.right := max(dyear.vec) - floor(byear)]
+
+## artificially truncate
+data.trunc <- data[y.left <= aod & aod < y.right]
+## check to see if dyear is correct
+data.trunc[, range(floor(dod))]
+## [1] 1888 1905, ok.
+
+## Josh's tgm function (similar to gompertztrunc::gompertz_mle)
+fit <- tgm(formula = myform, data = data.trunc, wt = NULL)
+
+my_summary <- tgm_summary(fit,
+  true.coef.values = mycoefs
+)
+## [1] "nobs: 20956"
+print(round(my_summary, 2))
+```
+
+```{r}
+data.trunc %>% 
+  mutate(aod = floor(aod),
+         dyear = floor(dod)) %>% 
+  select(byear, dyear, aod, temp, sex, isSouth)
+
+results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+
+## compare to true values 
+results_example2 %>%
+  dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
+  mutate(true_value = mycoefs) %>%
+  select(parameter, coef, coef_lower, coef_upper, true_value)
+```
+## created simulated dataset 
+```{r}
+## coefficients 
+myform <- formula(aod ~ temp + sex + isSouth)
+mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6)
+
+## number of simulations 
+n <- 30000
+
+data <- gompertztrunc_simu(
+  n = n,
+  form = myform,
+  coefs = mycoefs,
+  dummy = c(F, T, T),
+  sigma = c(3, 1, 1),
+  seed = 0.4886
+)
+## now we structure into multiple cohorts
+byear.vec <- 1810:1819 ## multiple birth cohorts
+dyear.vec <- 1888:1905 ## a limited window of observations
+min.age <- 65 ## only observe those 65+
+data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
+
+## pretend dates of birth within year are uniform
+data[, dob := byear + runif(length(byear))]
+
+## date of death = date of birth + age of death
+data[, dod := dob + aod]
+
+## y.left for each person
+data[, y.left := min(dyear.vec) - floor(byear)]
+
+## only 65+
+data[y.left < 65, y.left := 65]
+
+## y.right for each person
+data[, y.right := max(dyear.vec) - floor(byear)]
+
+## artificially truncate
+data.trunc <- data[y.left <= aod & aod < y.right]
+
+data.trunc <- data.trunc %>% 
+  mutate(aod = floor(aod))
+```
+
 
 
