@@ -2,8 +2,16 @@
 title: "Analyzing doubly-truncated mortality data using the gompertztrunc package"
 author: Casey Breen (caseybreen@berkeley.edu)
 output: 
-  html_document:
-    code_download: true
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analyzing doubly-truncated mortality data using the gompertztrunc package}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+nocite: '@*'
+editor_options: 
+  markdown: 
+    wrap: 72
+    number_sections: true
 ---
 
 ## Introduction 
