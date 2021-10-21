@@ -228,25 +228,28 @@ bunmd_demo %>%
 ```
 
 
-## Bonus 
+## Your Turn  
 
 A simple example using a small extract from the CenSoc-DMF (cohort of 1910).
 
-```{r}
+```{r, eval = F}
 ## Example with only one cohort
-education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs + urban + ownhome, data = censoc_example, left_trunc = 1975, right_trunc = 2005)
+education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs + urban + ownhome, 
+                                   data = censoc_example,
+                                   left_trunc = 1975, 
+                                   right_trunc = 2005)
 
-education_gradient
+education_gradient$results 
 ```
 
 
-## Confidence Interval Coverage Rate 
+## Bonus: Confidence Interval Coverage Rate 
 
 Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter. 
 
 A 95% confidence interval should in the long run have a coverage ratio of 95%. That is, approximately 95% of the confidence intervals should contain the true value. 
 
-We can assess the coverage ratio of our confidence intervals by simulating new data and seeing how often our confidence intervals contain the true value
+We can assess the coverage ratio of our confidence intervals by repeating the following procedure many times: (1) simulate new data; (2) estimating 95% confidence intervals for coefficients; (3) checking whether our confidence intervals contain the true value. 
 
 ```{r, eval = F}
 ## create list for storing our results 

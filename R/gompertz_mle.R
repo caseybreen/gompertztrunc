@@ -96,37 +96,37 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
 
   ## calculate mode
   mode <- fit %>%
-    filter(parameter == "b0.start") %>%
-    mutate(parameter = "gompertz_mode",
+    dplyr::filter(parameter == "b0.start") %>%
+    dplyr::mutate(parameter = "gompertz_mode",
            value = ab2M(exp(value), b = exp(fit$value[1])),
            lower = ab2M(exp(lower), b = exp(fit$value[1])),
            upper = ab2M(exp(upper), b = exp(fit$value[1]))) %>%
-    rename(upper = lower, lower = upper)
+    dplyr::rename(upper = lower, lower = upper)
 
   ## calculate beta
   beta <- fit %>%
-    filter(parameter == "log.b.start") %>%
-    mutate(parameter = "gompertz_beta",
+    dplyr::filter(parameter == "log.b.start") %>%
+    dplyr::mutate(parameter = "gompertz_beta",
            value = exp(value),
            lower = exp(lower),
            upper = exp(upper))
 
   ## calculate mode
-  fit <- bind_rows(beta, mode) %>%
-    bind_rows(fit %>%
-                filter(!parameter %in% c("b0.start", "log.b.start")))
+  fit <- dplyr::bind_rows(beta, mode) %>%
+    dplyr::bind_rows(fit %>%
+                dplyr::filter(!parameter %in% c("b0.start", "log.b.start")))
 
   ## tidy up fit object
   fit <- fit %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
     dplyr::select(-std.error) %>%
-    mutate(hr = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(value)),
-           hr_lower = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(lower)),
-           hr_upper = if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(upper)))
+    dplyr::mutate(hr = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(value)),
+           hr_lower = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(lower)),
+           hr_upper = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(upper)))
 
   results <- fit %>%
-    select(parameter, coef = value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)
+    dplyr::select(parameter, coef = value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)
 
   ## return all results as a list
   gompertz_trunc <- list("starting_values" = p.start, "optim_fit" = optim_fit, "results" = results)
