@@ -108,7 +108,7 @@ gompertztrunc_simu <- function(n, ## sample size
   y <- flexsurv::rgompertz(n, shape = beta, rate = effects) ## ages of death
   data_with_y <- cbind(y, data)
   ## re-label "y" with name used on left hand side of formula
-  left.string <- format(form[[2]])
+  left.string <- deparse(form[[2]])
   colnames(data_with_y)[1] <- left.string
   right.string <- format(form[[3]])
 

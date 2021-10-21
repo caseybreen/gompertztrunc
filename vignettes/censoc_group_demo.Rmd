@@ -244,9 +244,9 @@ education_gradient
 
 Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter. 
 
-A 95% confidence interval should in the long run have a coverage ratio of 95%: approximately 95% of the confidence intervals should contain the true value. 
+A 95% confidence interval should in the long run have a coverage ratio of 95%. That is, approximately 95% of the confidence intervals should contain the true value. 
 
-We can assess the coverage ratio of our confidence intervals by simulating new data and seeing how often our confidence intervals contain the true value. 
+We can assess the coverage ratio of our confidence intervals by simulating new data and seeing how often our confidence intervals contain the true value
 
 ```{r, eval = F}
 ## create list for storing our results 
@@ -290,9 +290,9 @@ for (i in 1:100) {
   ## artificially truncate
   data.trunc <- data[y.left <= aod & aod < y.right]
 
-  results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+  gompertmle <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
 
-  results_example2 <- results_example2 %>%
+  results <- gompertmle$results %>%
     dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
     mutate(true_value = mycoefs) %>%
     select(parameter, coef, coef_lower, coef_upper, true_value) %>%
@@ -304,11 +304,11 @@ for (i in 1:100) {
   ## print simulation 
   cat(i, " ")
 
-  results_interaction[[i]] <- results_example2
+  confidence_interval[[i]] <- results
 }
 
 ## put results into on data.frame 
-confidence_interval_coverage <- bind_rows(results_interaction)
+confidence_interval_coverage <- bind_rows(confidence_interval)
 
 ## What's the coverage ratio of our confidence intervals? 
 confidence_interval_coverage %>%
