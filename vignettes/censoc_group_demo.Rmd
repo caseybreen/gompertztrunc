@@ -83,11 +83,19 @@ bunmd_demo <- bunmd_demo       ## real
 We've loaded in simulated (fake) data. Because we simulated the data, we know the true coefficient values and that the mortality hazards follow a Gompertz distribution. 
 
 ```{r}
-## true coefficient values (we know bc we simulated them)
-mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6)
+## look at simulated data 
+head(sim_data)
 
-## Run gompertz_mle function  
-## return a list 
+## what's observation window? 
+sim_data %>% 
+  summarize(min(dyear), max(dyear)) 
+```
+
+Now let's try running `gompertz_mle` function
+
+```{r}
+## run gompertz_mle function  
+## returns a list 
 simulated_example <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth,
                                                  left_trunc = 1888,
                                                  right_trunc = 1905,
@@ -105,6 +113,9 @@ simulated_example$results
 
 
 ```{r}
+## true coefficient values (we know bc we simulated them)
+mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6)
+
 ## compare our estimated values to true value 
 ## we can only do this because this is simulated (fake) data 
 simulated_example$results %>%
