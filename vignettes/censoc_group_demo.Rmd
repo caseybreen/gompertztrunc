@@ -16,21 +16,27 @@ editor_options:
 
 ## Introduction 
 
-The **gompertztrunc** package includes tools for mortality estimation with CenSoc and other doubly-truncated data. 
+Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. 
 
-## Summary of method 
+The **gompertztrunc** package includes tools for mortality estimation with CenSoc and other doubly-truncated datasets. 
 
-It assumes that the underlying mortality distribution follows a Gompertz distribution: 
+## Summary of Parametric Gompertz Approach 
 
+This method assumes mortality follows a parametric model — Gompertz model — and uses maximum likelihood methods to estimate the underlying. Specifically, the hazard for individual $i$ is given by 
 
-$$h(x) = \alpha e^{\beta x}$$ 
+$$h_i(x | \Theta) = a_0 e^{b_0 x} e^{\Theta Z_i}$$ 
 where
 
-- $h(x)$ hazard at age x 
-- $\alpha$ is some baseline level of mortality 
-- $\beta$ gives rate of increase of mortality 
+- $h(x)$ is the hazard at age $x$ 
+- $a_0$ is some baseline level of mortality 
+- $b_0$ gives rate of increase of mortality 
+- $Z_i$ are the covariates for person $i$ (e.g., years of education, place of birth) 
+- $\Theta$ is the set of coefficients
 
-The main function in the package is the `gompertztrunc::gompertz_mle`. The `gompertztrunc::gompertz_mle` function takes the following arguments: 
+
+The model will estimate the values of $\widehat{a}$, $\widehat{b}$, and $\widehat{\Theta}$. 
+
+The main function in the package is the `gompertztrunc::gompertz_mle` function, which takes the following arguments: 
 
 - `fml`: model formula (for example, death_age ~ educ_yrs + homeownership)
 
@@ -39,7 +45,6 @@ The main function in the package is the `gompertztrunc::gompertz_mle`. The `gomp
 - `right_trunc`: year of lower truncation 
 
 - `data`: data frame with age of death variable and covariates 
-
 
 ## Setup 
 
@@ -101,81 +106,6 @@ simulated_example$results %>%
 convert_hazards_to_e65(df = simulated_example$results, use_model_estimates = T)
 ```
 
-## Confidence Interval Coverage Rate 
-
-Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter. 
-
-A 95% confidence interval should in the long run have a coverage ratio of 95%: approximately 95% of the confidence intervals should contain the true value. 
-
-We can assess the coverage ratio of our confidence intervals by simulating new data and seeing how often our confidence intervals contain the true value. 
-
-```{r, eval = F}
-## create list for storing our results 
-confidence_interval <- list()
-
-## rerun our experiment 100 times 
-
-for (i in 1:100) {
-
-  ## we simulate without any cohort distinctions
-  myform <- formula(aod ~ temp + sex + isSouth)
-  mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.5)
-
-  n <- 10000
-
-  data <- gompertztrunc_simu(
-    n = n,
-    form = myform,
-    coefs = mycoefs,
-    dummy = c(F, T, T),
-    sigma = c(3, 1, 1)
-  )
-  ## now we structure into multiple cohorts
-  byear.vec <- 1810:1819 ## multiple birth cohorts
-  dyear.vec <- 1888:1905 ## a limited window of observations
-  min.age <- 65 ## only observe those 65+
-
-  data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
-  ## pretend dates of birth within year are uniform
-  data[, dob := byear + runif(length(byear))]
-  ## date of death = date of birth + age of death
-  data[, dod := dob + aod]
-
-  ## y.left for each person
-  data[, y.left := min(dyear.vec) - floor(byear)]
-  ## only 65+
-  data[y.left < 65, y.left := 65]
-  ## y.right for each person
-  data[, y.right := max(dyear.vec) - floor(byear)]
-
-  ## artificially truncate
-  data.trunc <- data[y.left <= aod & aod < y.right]
-
-  results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
-
-  results_example2 <- results_example2 %>%
-    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
-    mutate(true_value = mycoefs) %>%
-    select(parameter, coef, coef_lower, coef_upper, true_value) %>%
-    mutate(ci_capture = case_when(
-      true_value > coef_lower & true_value < coef_upper ~ 1,
-      TRUE ~ 0
-    ))
-  
-  ## print simulation 
-  cat(i, " ")
-
-  results_interaction[[i]] <- results_example2
-}
-
-## put results into on data.frame 
-confidence_interval_coverage <- bind_rows(results_interaction)
-
-## What's the coverage ratio of our confidence intervals? 
-confidence_interval_coverage %>%
-  group_by(parameter) %>%
-  summarize(ci_coverage = mean(ci_capture))
-```
 
 ## Case Study II: Real-World Example with BUNMD Data 
 
@@ -307,6 +237,83 @@ A simple example using a small extract from the CenSoc-DMF (cohort of 1910).
 education_gradient <- gompertz_mle(fml = death_age ~ educ_yrs + urban + ownhome, data = censoc_example, left_trunc = 1975, right_trunc = 2005)
 
 education_gradient
+```
+
+
+## Confidence Interval Coverage Rate 
+
+Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter. 
+
+A 95% confidence interval should in the long run have a coverage ratio of 95%: approximately 95% of the confidence intervals should contain the true value. 
+
+We can assess the coverage ratio of our confidence intervals by simulating new data and seeing how often our confidence intervals contain the true value. 
+
+```{r, eval = F}
+## create list for storing our results 
+confidence_interval <- list()
+
+## rerun our experiment 100 times 
+
+for (i in 1:100) {
+
+  ## we simulate without any cohort distinctions
+  myform <- formula(aod ~ temp + sex + isSouth)
+  mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.5)
+
+  n <- 10000
+
+  data <- gompertztrunc_simu(
+    n = n,
+    form = myform,
+    coefs = mycoefs,
+    dummy = c(F, T, T),
+    sigma = c(3, 1, 1)
+  )
+  ## now we structure into multiple cohorts
+  byear.vec <- 1810:1819 ## multiple birth cohorts
+  dyear.vec <- 1888:1905 ## a limited window of observations
+  min.age <- 65 ## only observe those 65+
+
+  data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
+  ## pretend dates of birth within year are uniform
+  data[, dob := byear + runif(length(byear))]
+  ## date of death = date of birth + age of death
+  data[, dod := dob + aod]
+
+  ## y.left for each person
+  data[, y.left := min(dyear.vec) - floor(byear)]
+  ## only 65+
+  data[y.left < 65, y.left := 65]
+  ## y.right for each person
+  data[, y.right := max(dyear.vec) - floor(byear)]
+
+  ## artificially truncate
+  data.trunc <- data[y.left <= aod & aod < y.right]
+
+  results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+
+  results_example2 <- results_example2 %>%
+    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
+    mutate(true_value = mycoefs) %>%
+    select(parameter, coef, coef_lower, coef_upper, true_value) %>%
+    mutate(ci_capture = case_when(
+      true_value > coef_lower & true_value < coef_upper ~ 1,
+      TRUE ~ 0
+    ))
+  
+  ## print simulation 
+  cat(i, " ")
+
+  results_interaction[[i]] <- results_example2
+}
+
+## put results into on data.frame 
+confidence_interval_coverage <- bind_rows(results_interaction)
+
+## What's the coverage ratio of our confidence intervals? 
+confidence_interval_coverage %>%
+  group_by(parameter) %>%
+  summarize(ci_coverage = mean(ci_capture))
 ```
 
 
