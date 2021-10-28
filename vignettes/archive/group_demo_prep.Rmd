@@ -1,0 +1,248 @@
+---
+title: "Gompertztrunc Internal Vignette"
+author: Casey Breen (caseybreen@berkeley.edu)
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gompertztrunc Internal Vignette}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+nocite: '@*'
+editor_options: 
+  markdown: 
+    wrap: 72
+    number_sections: true
+---
+
+```{r}
+library(data.table)
+library(tidyverse)
+library(ipumsr)
+library(broom)
+library(socviz)
+```
+
+
+```{r}
+bunmd <- fread("/data/josh/CenSoc/censoc_data/bunmd_v2/bunmd_v2.csv")
+
+## read in IPUMS DDI for IPUMS extract
+## we already have a ddi on the server for all vars! but can also make a new extract from IPUMS with BPLD var  
+# ddi_extract <- read_ipums_ddi("/data/josh/CenSoc/censoc_data/ipums_1940_extract/fullcount.ddi.xml")
+
+# ## assign metadata using ipumsr package
+## only necessary for CenSoc DMF and CenSoc Numident — I already created BUNMD variables 
+
+# bunmd <- bunmd %>% 
+#   rename(BPLD = bpl)
+
+# bunmd <- ipums_collect(data = bunmd, ddi = ddi_extract, var_attrs = c("val_labels", "var_label", "var_desc"))
+# 
+# ## rename our bpl var to match the IPUMS var BPLD
+# 
+# ## assign metadata using ipumsr package
+# bunmd <- ipums_collect(data = bunmd, ddi = ddi_extract, var_attrs = c("val_labels", "var_label", "var_desc"))
+# 
+# ## create new string variable bpl_string 
+# bunmd <- bunmd %>% 
+#   mutate(bpl_string = as_factor(BPLD))
+```
+
+
+```{r}
+## fix data 
+countries <- bunmd %>% 
+   filter(byear %in% 1905:1915) %>% 
+     filter(dyear %in% 1988:2005) %>% 
+  mutate(bpl_string = case_when(
+    bpl < 15000 & race_last == 1 ~ "Native Born White",
+    bpl < 15000 & race_last == 2 ~ "Native Born Black",
+    TRUE ~ bpl_string 
+  )) %>% 
+  filter(sex == 1 & age_first_application + byear <= 1988) 
+
+example_countries <- countries %>% 
+  filter(bpl_string %in% c("Native Born White", "Mexico", "Italy", "Cuba", "Poland", "England")) %>% 
+  group_by(bpl_string) %>%
+  sample_n(min(n(), 20000)) %>% 
+  mutate(bpl_string = as.factor(bpl_string)) %>% 
+  mutate(bpl_string = relevel(as.factor(bpl_string), ref = "Native Born White")) ## set reference group
+
+example_countries <- example_countries %>% 
+  select(ssn, bpl_string, death_age, byear, dyear, age_first_application)
+
+save(example_countries, file = "../data/bunmd_example.rda")
+```
+
+```{r}
+model <- lm(death_age ~ bpl_string  + as.factor(byear), data = example_countries)
+
+tidy_model_pooled <- tidy(model) %>% 
+  filter(str_detect(term, 'bpl_string')) %>% 
+  mutate(term = prefix_strip(term, "bpl_string"))
+
+lm_results <- tidy_model_pooled %>% 
+  mutate(e65 = estimate,
+         e65_lower = estimate - 2*std.error, 
+         e65_upper = estimate + 2*std.error) %>% 
+  rename(country = term) %>% 
+  mutate(method = "Regression on Age of Death")
+```
+
+```{r}
+gompert_mle_results <- gompertz_mle(fml = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = example_countries)
+
+mle_results <- gompert_mle_results %>% 
+  mutate(e65 = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr, M = 81.9789980	, beta = 0.0978005),
+         e65_lower = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr_lower, M = 81.9789980		, beta = 0.0978005),
+         e65_upper = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr_upper, M = 81.9789980		, beta = 0.0978005)) %>% 
+  rename(country = parameter) %>% 
+  filter(str_detect(country, 'bpl_string')) %>% 
+  mutate(country = prefix_strip(country, "bpl_string")) %>% 
+  mutate(method = "Gompertz Parametric Estimate")
+```
+
+
+```{r}
+## results
+results <-  lm_results %>%
+  bind_rows(mle_results)
+
+## calculate adjustment Factor
+adjustment_factor <- lm_results %>%
+  bind_rows(mle_results) %>% 
+  select(country, method, e65) %>% 
+  pivot_wider(names_from = method, values_from = e65) %>% 
+  mutate(adjustment_factor = `Gompertz Parametric Estimate` / `Regression on Age of Death` ) %>% 
+  summarize(adjustment_factor_mean = round(mean(adjustment_factor), 3)) %>% 
+  as.vector()
+
+## Plot results
+lm_results %>% 
+  bind_rows(mle_results) %>% 
+  ggplot(aes(y = reorder(country, e65), x = e65, xmin = e65_lower, xmax = e65_upper, color = method)) + 
+  geom_pointrange(position = position_dodge(width = 0.2), shape = 1) + 
+  cowplot::theme_cowplot(font_size = 12) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme(legend.position = "bottom", legend.title=element_blank()) + 
+  labs(x = "e65",
+       y = "country",
+       title = "Foreign-Born Male Ages at Death, BUNMD 1905-1915",
+       subtitle = paste0("Gompertz MLE estimates are ~", adjustment_factor, " times larger than regression on age of death")) + 
+  scale_color_brewer(palette="Set1") + 
+  annotate("text", label = "Native Born Whites", x = 0.1, y = 3, angle = 90, size = 3, color = "black")
+```
+
+
+```{r}
+## we simulate without any cohort distinctions
+myform <- formula(aod ~ temp + sex + isSouth)
+
+mycoefs <- c(
+  "temp" = +.1, "sex" = -.5, "isSouth" = +.3)
+n <- 30000
+
+data <- gompertztrunc_simu(
+  n = n,
+  form = myform,
+  coefs = mycoefs,
+  dummy = c(F, T, T),
+  sigma = c(3, 1, 1),
+  seed = 14
+)
+
+## now we structure into multiple cohorts
+byear.vec <- 1810:1819 ## multiple birth cohorts
+dyear.vec <- 1888:1905 ## a limited window of observations
+min.age <- 65 ## only observe those 65+
+
+data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
+## pretend dates of birth within year are uniform
+data[, dob := byear + runif(length(byear))]
+## date of death = date of birth + age of death
+data[, dod := dob + aod]
+
+## y.left for each person
+data[, y.left := min(dyear.vec) - floor(byear)]
+## only 65+
+data[y.left < 65, y.left := 65]
+## y.right for each person
+data[, y.right := max(dyear.vec) - floor(byear)]
+
+## artificially truncate
+data.trunc <- data[y.left <= aod & aod < y.right]
+## check to see if dyear is correct
+data.trunc[, range(floor(dod))]
+## [1] 1888 1905, ok.
+
+## Josh's tgm function (similar to gompertztrunc::gompertz_mle)
+fit <- tgm(formula = myform, data = data.trunc, wt = NULL)
+
+my_summary <- tgm_summary(fit,
+  true.coef.values = mycoefs
+)
+## [1] "nobs: 20956"
+print(round(my_summary, 2))
+```
+
+```{r}
+data.trunc %>% 
+  mutate(aod = floor(aod),
+         dyear = floor(dod)) %>% 
+  select(byear, dyear, aod, temp, sex, isSouth)
+
+results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+
+## compare to true values 
+results_example2 %>%
+  dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
+  mutate(true_value = mycoefs) %>%
+  select(parameter, coef, coef_lower, coef_upper, true_value)
+```
+## created simulated dataset 
+```{r}
+## coefficients 
+myform <- formula(aod ~ temp + sex + isSouth)
+mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6)
+
+## number of simulations 
+n <- 30000
+
+data <- gompertztrunc_simu(
+  n = n,
+  form = myform,
+  coefs = mycoefs,
+  dummy = c(F, T, T),
+  sigma = c(3, 1, 1),
+  seed = 0.4886
+)
+## now we structure into multiple cohorts
+byear.vec <- 1810:1819 ## multiple birth cohorts
+dyear.vec <- 1888:1905 ## a limited window of observations
+min.age <- 65 ## only observe those 65+
+data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
+
+## pretend dates of birth within year are uniform
+data[, dob := byear + runif(length(byear))]
+
+## date of death = date of birth + age of death
+data[, dod := dob + aod]
+
+## y.left for each person
+data[, y.left := min(dyear.vec) - floor(byear)]
+
+## only 65+
+data[y.left < 65, y.left := 65]
+
+## y.right for each person
+data[, y.right := max(dyear.vec) - floor(byear)]
+
+## artificially truncate
+data.trunc <- data[y.left <= aod & aod < y.right]
+
+data.trunc <- data.trunc %>% 
+  mutate(aod = floor(aod))
+```
+
+
+

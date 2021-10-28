@@ -8,7 +8,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "caseybreen@berkeley.edu",
            comment = c(ORCID = "https://orcid.org/0000-0001-9114-981X"))
-Imports: dplyr, fastDummies, data.table, broom, stringr
+Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr
 Maintainer: The package maintainer <caseybreen@berkeley.edu>
 Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data.
 License: What license is it under?

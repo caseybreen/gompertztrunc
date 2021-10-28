@@ -1,12 +1,16 @@
 #' Gompertz mle function
 #'
 #'
-#' @param p the initialization function
+#' @param fml the estimation formula
+#' @param A data matrix with covariates y, u, l, and covariates, including cohor
 #'
 #' @return None
 #'
 #' @export
 
+######### get negLL
+
+## get parameter start values
 
 get.par.start <- function(fml, data) {
   ##     da = mydata

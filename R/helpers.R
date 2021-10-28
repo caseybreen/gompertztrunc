@@ -7,45 +7,39 @@
 
 ## we use flexsurv functions and modify just slightly
 
-bM2a <- function(b, M)
-{
-  a = b* exp(-b * M)
+bM2a <- function(b, M) {
+  a <- b * exp(-b * M)
   a
 }
-ab2M <- function(a, b)
-{
-  M = -log(a/b)/b
+ab2M <- function(a, b) {
+  M <- -log(a / b) / b
   M
 }
 
 library(flexsurv)
 
-pgompertz.M <- function(q, b, M, ...)
-{
-  a = bM2a(b,M)
+pgompertz.M <- function(q, b, M, ...) {
+  a <- bM2a(b, M)
   flexsurv::pgompertz(q, shape = b, rate = a, ...)
 }
 
-dgompertz.M <- function(x, b, M, ...)
-{
-  a = bM2a(b,M)
+dgompertz.M <- function(x, b, M, ...) {
+  a <- bM2a(b, M)
   flexsurv::dgompertz(x, shape = b, rate = a, ...)
 }
 
-rgompertz.M <- function(n, b, M)
-{
-  a = bM2a(b,M)
+rgompertz.M <- function(n, b, M) {
+  a <- bM2a(b, M)
   flexsurv::rgompertz(n, shape = b, rate = a)
 }
 
-hgompertz.M <- function(x, b, M)
-{
-  a = bM2a(b,M)
-  q = x
-  p = flexsurv::pgompertz(q, shape = b, rate = a)
-  l = 1-p
-  d = flexsurv::dgompertz(x, shape = b, rate = a)
-  h = d/l
+hgompertz.M <- function(x, b, M) {
+  a <- bM2a(b, M)
+  q <- x
+  p <- flexsurv::pgompertz(q, shape = b, rate = a)
+  l <- 1 - p
+  d <- flexsurv::dgompertz(x, shape = b, rate = a)
+  h <- d / l
   return(h)
 }
 
@@ -93,3 +87,44 @@ get.trunc.mean.gomp <- function(alpha, beta, l, u) {
 }
 
 
+get.se <- function(est.vec, hess, log.vec = rep(TRUE, length(est.vec))) {
+  fisher_info <- solve(hess)
+  est.sd <- sqrt(diag(fisher_info))
+  ## if estimates are not log scale then we have the SE
+  ## if they are log scale than we can estimate SE
+  ## as exp(beta)*SD
+  est.se <- exp(est.vec)^(log.vec) * est.sd
+  return(est.se)
+}
+
+tgm_summary <- function(fit, true.coef.values = NULL,
+                        a0 = 10^-4, beta = 1 / 10) {
+  ## return parameters with 95% confidence intervals and, if using
+  ## simulated data, also the original parameter values for comparison
+  nobs <- fit$nobs
+  par <- fit$par
+  hess <- fit$hess
+  se.vec <- get.se(par, hess)
+  if (!is.null(true.coef.values)) {
+    out <- cbind(
+      "est" = fit$par,
+      "lower" = fit$par - 2 * se.vec,
+      "upper" = fit$par + 2 * se.vec,
+      "true" = c(
+        "log(beta)" = log(beta),
+        "log(a0)" = log(a0), true.coef.values
+      )
+    )
+  }
+  if (is.null(true.coef.values)) {
+    out <- cbind(
+      "est" = fit$par,
+      "lower" = fit$par - 2 * se.vec,
+      "upper" = fit$par + 2 * se.vec,
+      "true" = true.coef.values
+    )
+  }
+  print(paste("nobs:", nobs))
+  print(out)
+  return(out)
+}
