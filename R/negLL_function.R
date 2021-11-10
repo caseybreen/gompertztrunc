@@ -1,11 +1,15 @@
-#' Gompertz mle function
+#' Gompertz Negative Log Likelihood Function
 #'
-#' Creates a plot of the crayon colors in \code{\link{brocolors}}
+#' Computes negative log likelihood for optimizer
 #'
-#' @param fml the estimation formula
-#' @param A data matrix witdevh covariates y, u, l, and covariates, including cohor
+#' @param par a vector of parameter estimates
+#' @param y a vector of death ages
+#' @param X a model matrix
+#' @param y.left left truncation age
+#' @param y.right right trunction age
+#' @param wt weight
 #'
-#' @return None
+#' @return The negative log likelihood of parameter estimates given observed data
 #'
 #' @export
 

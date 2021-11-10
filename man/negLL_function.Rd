@@ -2,18 +2,26 @@
 % Please edit documentation in R/negLL_function.R
 \name{negLL_function}
 \alias{negLL_function}
-\title{Gompertz mle function}
+\title{Gompertz Negative Log Likelihood Function}
 \usage{
 negLL_function(par, y, X, y.left, y.right, wt = 1)
 }
 \arguments{
-\item{fml}{the estimation formula}
+\item{par}{a vector of parameter estimates}
 
-\item{A}{data matrix witdevh covariates y, u, l, and covariates, including cohor}
+\item{y}{a vector of death ages}
+
+\item{X}{a model matrix}
+
+\item{y.left}{left truncation age}
+
+\item{y.right}{right trunction age}
+
+\item{wt}{weight}
 }
 \value{
-None
+The negative log likelihood of parameter estimates given observed data
 }
 \description{
-Creates a plot of the crayon colors in \code{\link{brocolors}}
+Computes negative log likelihood for optimizer
 }
