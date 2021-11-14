@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert_hazards_to_life_expectancy.R
 \name{convert_hazards_to_e65}
 \alias{convert_hazards_to_e65}
-\title{Translate to e65}
+\title{Convert hazard ratios to life expectancy at age 65}
 \usage{
 convert_hazards_to_e65(
   df,
@@ -14,15 +14,21 @@ convert_hazards_to_e65(
 )
 }
 \arguments{
-\item{lower}{the bound function}
+\item{df}{dataframe of output from MLE estimations}
+
+\item{lower}{lower age bound}
 
 \item{upper}{the initialization function}
 
-\item{b}{the hazard ratio}
+\item{M}{Gompertz parameter modal age at death}
+
+\item{beta}{Gompertz mortality parameter}
+
+\item{use_model_estimates}{use estimates of the Gompertz Parameters from the model, rather than defaults}
 }
 \value{
-None
+A dataframe of hazards ratios and corresponding e65 estimates and confidence intervals
 }
 \description{
-Translate to e65
+Convert hazard ratios to life expectancy at age 65
 }

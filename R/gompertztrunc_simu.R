@@ -1,10 +1,22 @@
-#' Gompertz mle function
+#' Simulate Gompertz death distribution
 #'
 #'
-#' @param fml the estimation formula
-#' @param A data matrix with covariates y, u, l, and covariates, including cohor
 #'
-#' @return None
+#' @param n sample size
+#' @param form estimation formula
+#' @param coefs named vactors of coefficients and corresponding true values
+#' @param dummy vector flags for each coefficient
+#' @param sigma standard deviation for each variable
+#' @param seed random seed to duplicate data
+#' @param a0 Gompertz alpha parameter
+#' @param beta Gompertz beta parameter
+#' @param verbose print internal check if true
+#'
+#' @return data frame of simulated death ages and covariate values
+#'
+#' @examples
+#' gompertztrunc_simu(n=1000, form = death_age ~ sex + edu,
+#' coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(T,F))
 #'
 #' @export
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/gompertztrunc_simu.R
 \name{gompertztrunc_simu}
 \alias{gompertztrunc_simu}
-\title{Gompertz mle function}
+\title{Simulate Gompertz death distribution}
 \usage{
 gompertztrunc_simu(
   n,
@@ -17,13 +17,32 @@ gompertztrunc_simu(
 )
 }
 \arguments{
-\item{fml}{the estimation formula}
+\item{n}{sample size}
 
-\item{A}{data matrix with covariates y, u, l, and covariates, including cohor}
+\item{form}{estimation formula}
+
+\item{coefs}{named vactors of coefficients and corresponding true values}
+
+\item{dummy}{vector flags for each coefficient}
+
+\item{sigma}{standard deviation for each variable}
+
+\item{seed}{random seed to duplicate data}
+
+\item{a0}{Gompertz alpha parameter}
+
+\item{beta}{Gompertz beta parameter}
+
+\item{verbose}{print internal check if true}
 }
 \value{
-None
+data frame of simulated death ages and covariate values
 }
 \description{
-Gompertz mle function
+Simulate Gompertz death distribution
+}
+\examples{
+gompertztrunc_simu(n=1000, form = death_age ~ sex + edu,
+coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(T,F))
+
 }

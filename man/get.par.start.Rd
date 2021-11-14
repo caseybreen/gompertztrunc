@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.par.start.R, R/get_starting_param.R
 \name{get.par.start}
 \alias{get.par.start}
-\title{Gompertz mle function}
+\title{Get starting values for parameters}
 \usage{
 get.par.start(form, da)
 
@@ -11,17 +11,15 @@ get.par.start(form, da)
 \arguments{
 \item{fml}{the estimation formula}
 
-\item{A}{data matrix with covariates y, u, l, and covariates, including cohor}
+\item{data}{data matrix with covariates y, u, l, and covariates, including cohort}
 
 \item{p}{the initialization function}
 }
 \value{
-None
+Named vector of initial parameter estimates
 
 None
 }
 \description{
-Gompertz mle function
-
-Gompertz mle function
+Uses linear modeling to compute initial values for MLE optimizer
 }

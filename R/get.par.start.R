@@ -1,10 +1,12 @@
-#' Gompertz mle function
+#' Get starting values for parameters
+#'
+#' Uses linear modeling to compute initial values for MLE optimizer
 #'
 #'
 #' @param fml the estimation formula
-#' @param A data matrix with covariates y, u, l, and covariates, including cohor
+#' @param data data matrix with covariates y, u, l, and covariates, including cohort
 #'
-#' @return None
+#' @return Named vector of initial parameter estimates
 #'
 #' @export
 
