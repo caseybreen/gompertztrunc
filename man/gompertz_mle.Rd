@@ -2,7 +2,7 @@
 % Please edit documentation in R/gompertz_mle.R
 \name{gompertz_mle}
 \alias{gompertz_mle}
-\title{Gompertz mle function}
+\title{Gompertz MLE function}
 \usage{
 gompertz_mle(
   fml,
@@ -18,11 +18,36 @@ gompertz_mle(
 \arguments{
 \item{fml}{the estimation formula}
 
-\item{A}{data matrix with covariates y, u, l, and covariates, including cohor}
+\item{right_trunc}{right truncation year}
+
+\item{byear}{year of birth}
+
+\item{lower_bound}{lowest age at death (optional)}
+
+\item{upper_bound}{highest age at death (optional)}
+
+\item{maxiter}{maximum number of iterations for optimizer}
+
+\item{left_truc}{left truncation year}
 }
 \value{
-fit
+Returns a named list consisting of the following components:
+\describe{
+  \item{\code{starting_values}}{list of starting values of paramters to be estimated}
+  \item{\code{optim_fit}}{list consisting of:
+  \describe{
+    \item{\code{par}}{parameter initialization}
+    \item{\code{value}}{don't know what this is}
+    \item{\code{counts}}{function and gradient}
+    \item{\code{convergence}}{returns 0 if the model converged}
+    \item{\code{message}}{idk}
+    \item{\code{hessian}}{the Hessian matrix}
+    }
+  }
+  \item{results}{a tibble of estimates and upper/lower bounds}
+}
 }
 \description{
-Gompertz mle function
+Fits a truncated Gompertz distribution with proportional hazards
+to mortality data using maxomum likelihood estimation.
 }

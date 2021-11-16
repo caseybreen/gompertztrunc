@@ -2,20 +2,24 @@
 % Please edit documentation in R/convert_hazard_ratios_to_le.R
 \name{convert_hazard_ratio_to_le}
 \alias{convert_hazard_ratio_to_le}
-\title{Translate to e65}
+\title{Translate hazard ratios to life expectancy at age 65}
 \usage{
 convert_hazard_ratio_to_le(lower, upper, hr, M = 80, beta = 0.1)
 }
 \arguments{
-\item{lower}{the bound function}
+\item{lower}{lower age bound}
 
-\item{upper}{the initialization function}
+\item{upper}{upper age bound}
 
-\item{b}{the hazard ratio}
+\item{hr}{hazards ratio}
+
+\item{M}{Gompertz parameter modal age at death}
+
+\item{beta}{Gompertz mortality parameter}
 }
 \value{
-None
+hazard ratio converted to effect on e65
 }
 \description{
-Translate to e65
+Translate hazard ratios to life expectancy at age 65
 }

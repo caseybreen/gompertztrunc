@@ -1,4 +1,4 @@
-#' Simulate Gompertz death distribution
+#' Simulate Gompertzian death distribution
 #'
 #'
 #'

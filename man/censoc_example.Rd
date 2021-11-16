@@ -5,7 +5,7 @@
 \alias{censoc_example}
 \title{Example CenSoc Data Set}
 \format{
-A data frame with 100000 rows and 6 variables:
+A data frame with 100,000 rows and 6 variables:
 \describe{
   \item{id}{Individual-level identifier}
   \item{byear}{Calender year of birth}

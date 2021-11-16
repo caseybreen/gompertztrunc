@@ -1,14 +1,18 @@
-#' Translate to e65
+#' Translate hazard ratios to life expectancy at age 65
 #'
 #'
-#' @param lower the bound function
-#' @param upper the initialization function
-#' @param b the hazard ratio
+#' @param lower lower age bound
+#' @param upper upper age bound
+#' @param hr hazards ratio
+#' @param M Gompertz parameter modal age at death
+#' @param beta Gompertz mortality parameter
 #'
-#' @return None
+#' @return hazard ratio converted to effect on e65
 #'
 #'
 #' @export
+#'
+
 
 
 convert_hazard_ratio_to_le <- Vectorize(function(lower, upper, hr, M = 80, beta = 0.1) {

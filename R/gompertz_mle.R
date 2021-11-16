@@ -1,10 +1,33 @@
-#' Gompertz mle function
+#' Gompertz MLE function
+#'
+#' Fits a truncated Gompertz distribution with proportional hazards
+#' to mortality data using maximum likelihood estimation.
 #'
 #'
 #' @param fml the estimation formula
-#' @param A data matrix with covariates y, u, l, and covariates, including cohor
+#' @param left_truc left truncation year
+#' @param right_trunc right truncation year
+#' @param byear year of birth
+#' @param lower_bound lowest age at death (optional)
+#' @param upper_bound highest age at death (optional)
+#' @param maxiter maximum number of iterations for optimizer
 #'
-#' @return fit
+#' @return Returns a named list consisting of the following components:
+#' \describe{
+#'   \item{\code{starting_values}}{list of starting values of paramters to be estimated}
+#'   \item{\code{optim_fit}}{list consisting of:
+#'   \describe{
+#'     \item{\code{par}}{parameter initialization}
+#'     \item{\code{value}}{don't know what this is}
+#'     \item{\code{counts}}{function and gradient}
+#'     \item{\code{convergence}}{returns 0 if the model converged}
+#'     \item{\code{message}}{idk}
+#'     \item{\code{hessian}}{the Hessian matrix}
+#'     }
+#'   }
+#'   \item{results}{a table of estimates and upper/lower bounds}
+
+#' }
 #'
 #' @export gompertz_mle
 
