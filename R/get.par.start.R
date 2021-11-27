@@ -3,7 +3,7 @@
 #' Uses linear modeling to compute initial values for MLE optimizer
 #'
 #'
-#' @param fml the estimation formula
+#' @param formula the estimation formula
 #' @param data data matrix with covariates y, u, l, and covariates, including cohort
 #'
 #' @return Named vector of initial parameter estimates
@@ -14,11 +14,11 @@
 
 ## get parameter start values
 
-get.par.start <- function(fml, data) {
+get.par.start <- function(formula, data) {
   ##     da = mydata
-  ##     form = formula(y ~ -1 + treat)
+  ##     formula = formula(y ~ -1 + treat)
   ## we start with lm with intercept
-  newform <- update.formula(fml, . ~ . + 1)
+  newform <- update.formula(formula, . ~ . + 1)
   m <- lm(newform, data)
   ## (Intercept)        treat
   ##      56.004       -1.494

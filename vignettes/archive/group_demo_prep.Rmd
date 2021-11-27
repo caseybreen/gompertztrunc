@@ -90,7 +90,7 @@ lm_results <- tidy_model_pooled %>%
 ```
 
 ```{r}
-gompert_mle_results <- gompertz_mle(fml = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = example_countries)
+gompert_mle_results <- gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = example_countries)
 
 mle_results <- gompert_mle_results %>% 
   mutate(e65 = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr, M = 81.9789980	, beta = 0.0978005),
@@ -144,7 +144,7 @@ n <- 30000
 
 data <- gompertztrunc_simu(
   n = n,
-  form = myform,
+  formula = myform,
   coefs = mycoefs,
   dummy = c(F, T, T),
   sigma = c(3, 1, 1),
@@ -191,7 +191,7 @@ data.trunc %>%
          dyear = floor(dod)) %>% 
   select(byear, dyear, aod, temp, sex, isSouth)
 
-results_example2 <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+results_example2 <- gompertztrunc::gompertz_mle(formula = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
 
 ## compare to true values 
 results_example2 %>%
@@ -210,7 +210,7 @@ n <- 30000
 
 data <- gompertztrunc_simu(
   n = n,
-  form = myform,
+  formula = myform,
   coefs = mycoefs,
   dummy = c(F, T, T),
   sigma = c(3, 1, 1),

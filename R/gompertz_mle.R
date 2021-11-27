@@ -4,7 +4,7 @@
 #' to mortality data using maximum likelihood estimation.
 #'
 #'
-#' @param fml the estimation formula
+#' @param formula the estimation formula
 #' @param left_truc left truncation year
 #' @param right_trunc right truncation year
 #' @param byear year of birth
@@ -31,14 +31,14 @@
 #'
 #' @export gompertz_mle
 
-gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL, maxiter = 10000) {
+gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL, maxiter = 10000) {
 
   ## format data
   data_formatted <- data %>%
     dplyr::mutate(byear = as.numeric(as.character(byear))) %>%
-    dplyr::select(all.vars(fml), byear) %>%
+    dplyr::select(all.vars(formula), byear) %>%
     dplyr::mutate(
-      y = get(all.vars(fml)[1]),
+      y = get(all.vars(formula)[1]),
       right_trunc_age = right_trunc - byear,
       left_trunc_age = left_trunc - byear,
       cohort = byear
@@ -83,9 +83,9 @@ gompertz_mle <- function(fml, right_trunc = 2005, left_trunc = 1975, data, byear
   }
 
   ## get starting parameters
-  p.start <- get.par.start(fml, data_formatted)
+  p.start <- get.par.start(formula, data_formatted)
 
-  model_matrix <- modelr::model_matrix(formula = fml, data = data_formatted) %>%
+  model_matrix <- modelr::model_matrix(formula = formula, data = data_formatted) %>%
     as.matrix()
 
   ## create controls

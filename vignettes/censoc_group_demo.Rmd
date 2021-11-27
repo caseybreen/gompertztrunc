@@ -38,7 +38,7 @@ The model will estimate the values of $\widehat{a}$, $\widehat{b}$, and $\wideha
 
 The main function in the package is the `gompertztrunc::gompertz_mle` function, which takes the following arguments: 
 
-- `fml`: model formula (for example, death_age ~ educ_yrs + homeownership)
+- `formula`: model formula (for example, death_age ~ educ_yrs + homeownership)
 
 - `left_trunc`: year of upper truncation 
 
@@ -96,7 +96,7 @@ Now let's try running `gompertz_mle` function
 ```{r}
 ## run gompertz_mle function  
 ## returns a list 
-simulated_example <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth,
+simulated_example <- gompertztrunc::gompertz_mle(formula = aod ~ temp + as.factor(sex) + isSouth,
                                                  left_trunc = 1888,
                                                  right_trunc = 1905,
                                                  data = sim_data)
@@ -194,7 +194,7 @@ Now, we'll try our new Gompertz MLE parametric approach:
 ```{r}
 ## Gompertz Trunc 
 ## Use 1988-2005 because we are using BUNMD 
-gompert_mle_results <- gompertz_mle(fml = death_age ~ bpl_string, 
+gompert_mle_results <- gompertz_mle(formula = death_age ~ bpl_string, 
                                     left_trunc = 1988,
                                     right_trunc = 2005,
                                     data = bunmd_demo)
@@ -269,7 +269,7 @@ bunmd_demo %>%
 
 ```{r, eval = F}
 ## now add a covariate  
-gompert_mle_results_cov <- gompertz_mle(fml = death_age ~ bpl_string + age_first_application, 
+gompert_mle_results_cov <- gompertz_mle(formula = death_age ~ bpl_string + age_first_application, 
                                     left_trunc = 1988,
                                     right_trunc = 2005,
                                     data = bunmd_demo)
@@ -307,7 +307,7 @@ Fill in the blanks below:
 
 ```{r, eval = F}
 ## Example with only one cohort
-education_gradient <- gompertz_mle(fml = death_age ~ _____, 
+education_gradient <- gompertz_mle(formula = death_age ~ _____, 
                                    data = dmf_demo,
                                    left_trunc = _____ , 
                                    right_trunc = _____ )
@@ -345,7 +345,7 @@ for (i in 1:100) {
 
   data <- gompertztrunc_simu(
     n = n,
-    form = myform,
+    formula = myform,
     coefs = mycoefs,
     dummy = c(F, T, T),
     sigma = c(3, 1, 1)
@@ -371,7 +371,7 @@ for (i in 1:100) {
   ## artificially truncate
   data.trunc <- data[y.left <= aod & aod < y.right]
 
-  gompertmle <- gompertztrunc::gompertz_mle(fml = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
+  gompertmle <- gompertztrunc::gompertz_mle(formula = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
 
   results <- gompertmle$results %>%
     dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%

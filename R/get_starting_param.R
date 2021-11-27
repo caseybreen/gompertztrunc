@@ -1,18 +1,21 @@
-#' Gompertz mle function
+#' Get parameter initial values
+#'
+#' Uses linear regression to set initial values for parameters to be estimated
 #'
 #'
-#' @param p the initialization function
+#' @param formula the estimation formula
+#' @param data data frame including death age, cohort, truncation bounds, and covariates
 #'
-#' @return None
+#' @return Named vector of initial parameter values for optimizer
 #'
 #' @export
 
 
-get.par.start <- function(fml, data) {
+get.par.start <- function(formula, data) {
   ##     da = mydata
-  ##     form = formula(y ~ -1 + treat)
+  ##     formula = formula(y ~ -1 + treat)
   ## we start with lm with intercept
-  newform <- update.formula(fml, . ~ . + 1)
+  newform <- update.formula(formula, . ~ . + 1)
   m <- lm(newform, data)
   ## (Intercept)        treat
   ##      56.004       -1.494

@@ -2,11 +2,11 @@
 % Please edit documentation in R/gompertztrunc_simu.R
 \name{gompertztrunc_simu}
 \alias{gompertztrunc_simu}
-\title{Simulate Gompertz death distribution}
+\title{Simulate Gompertzian death distribution}
 \usage{
 gompertztrunc_simu(
   n,
-  form,
+  formula,
   coefs,
   dummy = NULL,
   sigma = NULL,
@@ -19,7 +19,7 @@ gompertztrunc_simu(
 \arguments{
 \item{n}{sample size}
 
-\item{form}{estimation formula}
+\item{formula}{estimation formula}
 
 \item{coefs}{named vactors of coefficients and corresponding true values}
 
@@ -39,10 +39,10 @@ gompertztrunc_simu(
 data frame of simulated death ages and covariate values
 }
 \description{
-Simulate Gompertz death distribution
+Simulate Gompertzian death distribution
 }
 \examples{
-gompertztrunc_simu(n=1000, form = death_age ~ sex + edu,
+gompertztrunc_simu(n=1000, formula = death_age ~ sex + edu,
 coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(T,F))
 
 }

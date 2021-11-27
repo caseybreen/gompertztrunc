@@ -89,13 +89,13 @@ dmf_staircase <- dmf %>%
 
 ## education gradient 
 tic()
-results_optim <- gompertz_mle(fml = death_age ~ educ_yrs, left_trunc = 1975, right_trunc = 2005, data = dmf_staircase)
+results_optim <- gompertz_mle(formula = death_age ~ educ_yrs, left_trunc = 1975, right_trunc = 2005, data = dmf_staircase)
 toc()
 
 
 ## Run-Time: 5 hours. 18398.488 sec elapsed
 tic()
-results_staircase <- gompertz_mle(fml = death_age ~ educ_yrs_character, left_trunc = 1975, right_trunc = 2005, data = dmf_staircase)
+results_staircase <- gompertz_mle(formula = death_age ~ educ_yrs_character, left_trunc = 1975, right_trunc = 2005, data = dmf_staircase)
 toc()
 
 results_staircase <- results_staircase %>%
@@ -154,7 +154,7 @@ bni_analysis_file <- fread("/90days/caseybreen/analysis_file_restricted.csv")
 
 ## include fixed effects by 
 tic()
-bni_baseline_model <- gompertz_mle(fml = death_age ~ bni_std + birth_order, data = bni_analysis_file, lower = 1988, upper = 2005)
+bni_baseline_model <- gompertz_mle(formula = death_age ~ bni_std + birth_order, data = bni_analysis_file, lower = 1988, upper = 2005)
 toc()
 
 ## include fixed effects by demeaning 
@@ -163,7 +163,7 @@ bni_analysis_file <- bni_analysis_file %>%
          bni_std_demean = bni_std - ave(bni_std, family) + mean(bni_std)) 
 
 tic()
-bni_sibfe_model <- gompertz_mle(fml = death_age_demean ~ bni_std_demean + birth_order, data = bni_analysis_file, lower = 1988, upper = 2005)
+bni_sibfe_model <- gompertz_mle(formula = death_age_demean ~ bni_std_demean + birth_order, data = bni_analysis_file, lower = 1988, upper = 2005)
 toc()
 
 
@@ -351,7 +351,7 @@ linear_model_results %>%
 
 ## Run-Time: 5 hours. 18398.488 sec elapsed
 tic()
-results_optim <- gompertz_mle(fml = death_age ~ educ_yrs_character, lower = 1988, upper = 2005, data = numident_staircase)
+results_optim <- gompertz_mle(formula = death_age ~ educ_yrs_character, lower = 1988, upper = 2005, data = numident_staircase)
 toc()
 
 ## convert to e65

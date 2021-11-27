@@ -7,7 +7,7 @@
 tgm_summary(fit, true.coef.values = NULL, a0 = 10^-4, beta = 1/10)
 }
 \arguments{
-\item{fml}{the estimation formula}
+\item{formula}{the estimation formula}
 
 \item{A}{data matrix with covariates y, u, l, and covariates, including cohor}
 }

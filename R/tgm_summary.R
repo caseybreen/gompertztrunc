@@ -2,7 +2,7 @@
 #'
 #' Creates a plot of the crayon colors in \code{\link{brocolors}}
 #'
-#' @param fml the estimation formula
+#' @param formula the estimation formula
 #' @param A data matrix with covariates y, u, l, and covariates, including cohor
 #'
 #' @return None

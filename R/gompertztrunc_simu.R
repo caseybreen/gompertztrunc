@@ -3,7 +3,7 @@
 #'
 #'
 #' @param n sample size
-#' @param form estimation formula
+#' @param formula estimation formula
 #' @param coefs named vactors of coefficients and corresponding true values
 #' @param dummy vector flags for each coefficient
 #' @param sigma standard deviation for each variable
@@ -15,14 +15,14 @@
 #' @return data frame of simulated death ages and covariate values
 #'
 #' @examples
-#' gompertztrunc_simu(n=1000, form = death_age ~ sex + edu,
+#' gompertztrunc_simu(n=1000, formula = death_age ~ sex + edu,
 #' coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(T,F))
 #'
 #' @export
 
 
 gompertztrunc_simu <- function(n, ## sample size
-                     form, ## formula "death_age ~ sex + educ"
+                     formula, ## formula "death_age ~ sex + educ"
                      coefs, ## "true" values for coefficients
                      dummy = NULL, ## dummy flag for each var (optional)
                      sigma = NULL, ## sd for each var (optional)
@@ -46,7 +46,7 @@ gompertztrunc_simu <- function(n, ## sample size
   coefs <- c("b0" = log(a0), coefs) ## include log(a0) as intercept
 
   ## check to see if right number of coefs with correct labels
-  myterms <- terms(form) ## complex object with lots of info from formula
+  myterms <- terms(formula) ## complex object with lots of info from formula
   coef.names.from.formula <- attr(myterms, "term.labels")
   ##
   if (!identical(names(coefs)[-1], coef.names.from.formula)) {
@@ -58,7 +58,7 @@ gompertztrunc_simu <- function(n, ## sample size
 
   ## check to see if "dummy" has right number of terms
   ## get names of vars to simulate
-  vars.to.sim <- all.vars(form[[3]])
+  vars.to.sim <- all.vars(formula[[3]])
   k <- length(vars.to.sim)
   if (!is.null(dummy) & length(dummy) != k) {
     print("incorrect length of dummy argument:\n
@@ -96,7 +96,7 @@ gompertztrunc_simu <- function(n, ## sample size
   }
 
   ## 2. get design matrix
-  form.without.y <- paste(form[[1]], format(form[[3]]))
+  form.without.y <- paste(formula[[1]], format(formula[[3]]))
   form.without.y <- as.formula(form.without.y)
   mat <- model.matrix(form.without.y, data)
   ## head(mat)
@@ -120,9 +120,9 @@ gompertztrunc_simu <- function(n, ## sample size
   y <- flexsurv::rgompertz(n, shape = beta, rate = effects) ## ages of death
   data_with_y <- cbind(y, data)
   ## re-label "y" with name used on left hand side of formula
-  left.string <- deparse(form[[2]])
+  left.string <- deparse(formula[[2]])
   colnames(data_with_y)[1] <- left.string
-  right.string <- format(form[[3]])
+  right.string <- format(formula[[3]])
 
   ## 5. check with lm using -10*B as entropy approximation
   ## Since data is untruncated, we can use result that
@@ -133,7 +133,7 @@ gompertztrunc_simu <- function(n, ## sample size
   ## From (1), this means life expectancy should go down
   ## by about -0.2/beta \approx -.2 * 10, or about 2 years.
   ## (Note: this approximation will not work for truncated data!)
-  lm.form <- update(form, paste(left.string, " ~ ."))
+  lm.form <- update(formula, paste(left.string, " ~ ."))
   m <- lm(lm.form, data_with_y)
 
   B.vec <- as.vector(B) ## true coefs as vector

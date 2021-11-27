@@ -4,22 +4,22 @@
 \alias{get.par.start}
 \title{Get starting values for parameters}
 \usage{
-get.par.start(form, da)
+get.par.start(formula, da)
 
-get.par.start(form, da)
+get.par.start(formula, da)
 }
 \arguments{
-\item{fml}{the estimation formula}
+\item{formula}{the estimation formula}
 
-\item{data}{data matrix with covariates y, u, l, and covariates, including cohort}
-
-\item{p}{the initialization function}
+\item{data}{data frame including death age, cohort, truncation bounds, and covariates}
 }
 \value{
 Named vector of initial parameter estimates
 
-None
+Named vector of initial parameter values for optimizer
 }
 \description{
 Uses linear modeling to compute initial values for MLE optimizer
+
+Uses linear regression to set initial values for parameters to be estimated
 }

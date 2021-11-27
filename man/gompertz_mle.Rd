@@ -5,7 +5,7 @@
 \title{Gompertz MLE function}
 \usage{
 gompertz_mle(
-  fml,
+  formula,
   right_trunc = 2005,
   left_trunc = 1975,
   data,
@@ -16,7 +16,7 @@ gompertz_mle(
 )
 }
 \arguments{
-\item{fml}{the estimation formula}
+\item{formula}{the estimation formula}
 
 \item{right_trunc}{right truncation year}
 
@@ -44,10 +44,10 @@ Returns a named list consisting of the following components:
     \item{\code{hessian}}{the Hessian matrix}
     }
   }
-  \item{results}{a tibble of estimates and upper/lower bounds}
+  \item{results}{a table of estimates and upper/lower bounds}
 }
 }
 \description{
 Fits a truncated Gompertz distribution with proportional hazards
-to mortality data using maxomum likelihood estimation.
+to mortality data using maximum likelihood estimation.
 }

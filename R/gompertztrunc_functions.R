@@ -21,11 +21,11 @@ get.negLL <- function(par, y, X, y.left, y.right, wt = 1) {
 }
 
 
-get.par.start <- function(form, da) {
+get.par.start <- function(formula, da) {
   ##     da = mydata
-  ##     form = formula(y ~ -1 + treat)
+  ##     formula = formula(y ~ -1 + treat)
   ## we start with lm with intercept
-  newform <- update.formula(form, . ~ . + 1)
+  newform <- update.formula(formula, . ~ . + 1)
   m <- lm(newform, da)
   ## (Intercept)        treat
   ##      56.004       -1.494
