@@ -14,7 +14,7 @@ Description: Functions for estimating hazard ratios and mortality differentials 
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends: 
     R (>= 2.10)
 Suggests: 

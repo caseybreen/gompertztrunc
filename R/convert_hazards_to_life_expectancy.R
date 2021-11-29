@@ -29,9 +29,9 @@ convert_hazards_to_e65 <- function(df, lower = 65, upper = 120, M = 80, beta = 0
     dplyr::filter(!stringr::str_detect(parameter, "mode")) %>%
     dplyr::filter(!stringr::str_detect(parameter, "beta")) %>%
     dplyr::mutate(
-      e65 = convert_hazard_ratio_to_le(hr = hr, lower, upper, M, beta),
-      e65_lower = convert_hazard_ratio_to_le(hr = hr_upper, lower, upper, M, beta),
-      e65_upper = convert_hazard_ratio_to_le(hr = hr_lower, lower, upper, M, beta)
+      e65 = hazard_ratio_to_le(hr = hr, lower, upper, M, beta),
+      e65_lower = hazard_ratio_to_le(hr = hr_upper, lower, upper, M, beta),
+      e65_upper = hazard_ratio_to_le(hr = hr_lower, lower, upper, M, beta)
     )
 
 

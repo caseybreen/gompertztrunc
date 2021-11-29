@@ -1,9 +1,9 @@
-#' Translate hazard ratios to life expectancy at age 65
+#' Translate a single hazard ratio to life expectancy
 #'
 #'
 #' @param lower lower age bound
 #' @param upper upper age bound
-#' @param hr hazards ratio
+#' @param hr hazard ratio
 #' @param M Gompertz parameter modal age at death
 #' @param beta Gompertz mortality parameter
 #'
