@@ -15,7 +15,7 @@
 
 
 
-convert_hazard_ratio_to_le <- Vectorize(function(lower, upper, hr, M = 80, beta = 0.1) {
+hazard_ratio_to_le <- Vectorize(function(lower, upper, hr, M = 80, beta = 0.1) {
 
   ## convert alpha
   my.alpha <- getAlpha(M = M, beta = beta)
