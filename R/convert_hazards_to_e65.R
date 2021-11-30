@@ -1,12 +1,11 @@
 #' Convert hazard ratios to life expectancy at age 65
 #'
 #'
-#' @param df dataframe of output from MLE estimations
+#' @param df dataframe of results given by gompertz_mle() function
 #' @param lower lower age bound
 #' @param upper upper age bound
 #' @param M Gompertz parameter modal age at death
 #' @param beta Gompertz mortality parameter
-#' @param upper the initialization function
 #' @param use_model_estimates use estimates of the Gompertz Parameters from the model, rather than defaults
 #'
 #' @return A dataframe of hazards ratios and corresponding e65 estimates and confidence intervals

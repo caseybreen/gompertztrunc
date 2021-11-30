@@ -31,17 +31,18 @@ gompertz_mle(
 \item{left_truc}{left truncation year}
 }
 \value{
-Returns a named list consisting of the following components:
+Returns a named list consisting of the following components
+(See \code{stats::\link[stats:optim]{optim}} for additional details):
 \describe{
   \item{\code{starting_values}}{list of starting values of paramters to be estimated}
-  \item{\code{optim_fit}}{list consisting of:
+  \item{\code{optim_fit}}{A list consisting of:
   \describe{
-    \item{\code{par}}{parameter initialization}
-    \item{\code{value}}{don't know what this is}
-    \item{\code{counts}}{function and gradient}
+    \item{\code{par}}{best estimation of parameter values}
+    \item{\code{value}}{log likelihood}
+    \item{\code{counts}}{number of calls to funcation and gradient}
     \item{\code{convergence}}{returns 0 if the model converged}
-    \item{\code{message}}{idk}
-    \item{\code{hessian}}{the Hessian matrix}
+    \item{\code{message}}{any other information returned by optimizer}
+    \item{\code{hessian}}{Hessian matrix}
     }
   }
   \item{results}{a table of estimates and upper/lower bounds}

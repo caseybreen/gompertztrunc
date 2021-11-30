@@ -4,16 +4,14 @@
 #'
 #'
 #' @param formula the estimation formula
-#' @param data data matrix with covariates y, u, l, and covariates, including cohort
+#' @param data data matrix with y, u, l, and covariates, including cohort
 #'
 #' @return Named vector of initial parameter estimates
 #'
 #' @export
 
-######### get negLL
 
 ## get parameter start values
-
 get.par.start <- function(formula, data) {
   ##     da = mydata
   ##     formula = formula(y ~ -1 + treat)
