@@ -7,10 +7,13 @@
 
 ## we use flexsurv functions and modify just slightly
 
+# convert gompertz b an M params to a param
 bM2a <- function(b, M) {
   a <- b * exp(-b * M)
   a
 }
+
+# convert gompertz a and b params to M
 ab2M <- function(a, b) {
   M <- -log(a / b) / b
   M
@@ -18,16 +21,19 @@ ab2M <- function(a, b) {
 
 library(flexsurv)
 
+# cdf (-inf, q) of gompertz distribution with modal parameterization
 pgompertz.M <- function(q, b, M, ...) {
   a <- bM2a(b, M)
   flexsurv::pgompertz(q, shape = b, rate = a, ...)
 }
 
+# pdf of gompertz distribution with modal parameterization
 dgompertz.M <- function(x, b, M, ...) {
   a <- bM2a(b, M)
   flexsurv::dgompertz(x, shape = b, rate = a, ...)
 }
 
+# randomly generate n draws from gompertz distribution with modal parameterization
 rgompertz.M <- function(n, b, M) {
   a <- bM2a(b, M)
   flexsurv::rgompertz(n, shape = b, rate = a)
@@ -60,21 +66,8 @@ getAlpha <- function(M, beta) {
   return(alpha)
 }
 
-dgomp_mode <- function(x, M, beta, ...) {
-  alpha <- getAlpha(M, beta)
-  dgompertz(x, shape = beta, rate = alpha, ...)
-}
 
-pgomp_mode <- function(q, M, beta, ...) {
-  alpha <- getAlpha(M, beta)
-  pgompertz(q, shape = beta, rate = alpha, ...)
-}
-
-rgomp_mode <- function(n, M, beta) {
-  alpha <- getAlpha(M, beta)
-  rgompertz(n, shape = beta, rate = alpha)
-}
-
+# computes lifetable hazards for gompertz distribution
 get.trunc.mean.gomp <- function(alpha, beta, l, u) {
   x <- 0:110
   hx <- alpha * exp(beta * x)
@@ -87,44 +80,3 @@ get.trunc.mean.gomp <- function(alpha, beta, l, u) {
 }
 
 
-get.se <- function(est.vec, hess, log.vec = rep(TRUE, length(est.vec))) {
-  fisher_info <- solve(hess)
-  est.sd <- sqrt(diag(fisher_info))
-  ## if estimates are not log scale then we have the SE
-  ## if they are log scale than we can estimate SE
-  ## as exp(beta)*SD
-  est.se <- exp(est.vec)^(log.vec) * est.sd
-  return(est.se)
-}
-
-tgm_summary <- function(fit, true.coef.values = NULL,
-                        a0 = 10^-4, beta = 1 / 10) {
-  ## return parameters with 95% confidence intervals and, if using
-  ## simulated data, also the original parameter values for comparison
-  nobs <- fit$nobs
-  par <- fit$par
-  hess <- fit$hess
-  se.vec <- get.se(par, hess)
-  if (!is.null(true.coef.values)) {
-    out <- cbind(
-      "est" = fit$par,
-      "lower" = fit$par - 2 * se.vec,
-      "upper" = fit$par + 2 * se.vec,
-      "true" = c(
-        "log(beta)" = log(beta),
-        "log(a0)" = log(a0), true.coef.values
-      )
-    )
-  }
-  if (is.null(true.coef.values)) {
-    out <- cbind(
-      "est" = fit$par,
-      "lower" = fit$par - 2 * se.vec,
-      "upper" = fit$par + 2 * se.vec,
-      "true" = true.coef.values
-    )
-  }
-  print(paste("nobs:", nobs))
-  print(out)
-  return(out)
-}
