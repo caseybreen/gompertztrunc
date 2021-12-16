@@ -4,7 +4,7 @@
 \alias{hazard_ratio_to_le}
 \title{Translate a single hazard ratio to life expectancy}
 \usage{
-hazard_ratio_to_le(lower, upper, hr, M = 80, beta = 0.1)
+hazard_ratio_to_le(lower, upper, hr, M = 80, b = 0.1)
 }
 \arguments{
 \item{lower}{lower age bound}
@@ -13,9 +13,9 @@ hazard_ratio_to_le(lower, upper, hr, M = 80, beta = 0.1)
 
 \item{hr}{hazard ratio}
 
-\item{M}{Gompertz parameter modal age at death}
+\item{M}{Gompertz modal age at death parameter}
 
-\item{beta}{Gompertz mortality parameter}
+\item{b}{Gompertz mortality slope parameter}
 }
 \value{
 hazard ratio converted to effect on e65

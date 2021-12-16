@@ -9,7 +9,7 @@
 #' @param sigma standard deviation for each variable
 #' @param seed random seed to duplicate data
 #' @param a0 Gompertz alpha parameter
-#' @param beta Gompertz beta parameter
+#' @param b Gompertz b parameter
 #' @param verbose print internal check if true
 #'
 #' @return data frame of simulated death ages and covariate values
@@ -28,17 +28,17 @@ gompertztrunc_simu <- function(n, ## sample size
                      sigma = NULL, ## sd for each var (optional)
                      seed = NULL, ## random seed to duplicate data
                      a0 = 10^-4, ## gompertz "alpha"
-                     beta = 1 / 10, ## gompertz "beta"
+                     b = 1 / 10, ## gompertz "b"
                      verbose = FALSE) ## print internal check
 {
   ## proportional hazards model of form
 
-  ## h(x) = exp(beta*x) * a0 * exp(b1*x1 + b2*x2 + ...)
-  ##      = exp(beta*x) * exp(b0 + b1*x1 + b2*x2 + ...)
-  ##      = exp( beta * x) * exp(X %*% B)
+  ## h(x) = exp(b*x) * a0 * exp(beta1*x1 + beta2*x2 + ...)
+  ##      = exp(b*x) * exp(beta0 + beta1*x1 + beta2*x2 + ...)
+  ##      = exp( b * x) * exp(X %*% Beta)
   ## with a0 = exp(b0)
   ##      X  = design matrix of vars
-  ##      B  = vector of coefs
+  ##      Beta  = vector of coefs
 
   ## 0. Preliminaries
 
@@ -112,12 +112,12 @@ gompertztrunc_simu <- function(n, ## sample size
 
   ## 3. multiply out to get individual effects
 
-  B <- cbind(coefs)
-  log.effects <- X %*% B
+  Beta <- cbind(coefs)
+  log.effects <- X %*% Beta
   effects <- exp(log.effects)
 
   ## 4. generate  gompertz draws
-  y <- flexsurv::rgompertz(n, shape = beta, rate = effects) ## ages of death
+  y <- flexsurv::rgompertz(n, shape = b, rate = effects) ## ages of death
   data_with_y <- cbind(y, data)
   ## re-label "y" with name used on left hand side of formula
   left.string <- deparse(formula[[2]])
@@ -126,25 +126,25 @@ gompertztrunc_simu <- function(n, ## sample size
 
   ## 5. check with lm using -10*B as entropy approximation
   ## Since data is untruncated, we can use result that
-  ## (1) d e0 / d haz \approx -1/beta
+  ## (1) d e0 / d haz \approx -1/b
   ## A coefficient value of b3 = 0.20, increases hazards by a factor
   ## exp(b3) = exp(.2) \approx 1.2,
   ## which is like increasing hazards (d haz) by +20%.
   ## From (1), this means life expectancy should go down
-  ## by about -0.2/beta \approx -.2 * 10, or about 2 years.
+  ## by about -0.2/b \approx -.2 * 10, or about 2 years.
   ## (Note: this approximation will not work for truncated data!)
   lm.form <- update(formula, paste(left.string, " ~ ."))
   m <- lm(lm.form, data_with_y)
 
-  B.vec <- as.vector(B) ## true coefs as vector
-  names(B.vec) <- rownames(B) ## add rownames
-  coef.m.hat <- B.vec / (-beta)
+  Beta.vec <- as.vector(Beta) ## true coefs as vector
+  names(Beta.vec) <- rownames(Beta) ## add rownames
+  coef.m.hat <- Beta.vec / (-b)
   check.dt <- data.table(
     "coef.name" = names(coef(m)),
     "coef(m)" = round(coef(m), 3),
     "coef.m.hat" = round(coef.m.hat, 3),
-    "b.name" = names(B.vec),
-    B = round(B.vec, 3)
+    "beta.name" = names(Beta.vec),
+    Beta = round(Beta.vec, 3)
   )
 
   if (verbose) {

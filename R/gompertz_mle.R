@@ -127,16 +127,16 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
            upper = ab2M(exp(upper), b = exp(fit$value[1]))) %>%
     dplyr::rename(upper = lower, lower = upper)
 
-  ## calculate beta
-  beta <- fit %>%
+  ## calculate b
+  b <- fit %>%
     dplyr::filter(parameter == "log.b.start") %>%
-    dplyr::mutate(parameter = "gompertz_beta",
+    dplyr::mutate(parameter = "gompertz_b",
            value = exp(value),
            lower = exp(lower),
            upper = exp(upper))
 
   ## calculate mode
-  fit <- dplyr::bind_rows(beta, mode) %>%
+  fit <- dplyr::bind_rows(b, mode) %>%
     dplyr::bind_rows(fit %>%
                 dplyr::filter(!parameter %in% c("b0.start", "log.b.start")))
 
@@ -145,9 +145,9 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
     dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
     dplyr::select(-std.error) %>%
-    dplyr::mutate(hr = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(value)),
-           hr_lower = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(lower)),
-           hr_upper = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_beta"), NA_real_, exp(upper)))
+    dplyr::mutate(hr = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(value)),
+           hr_lower = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(lower)),
+           hr_upper = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(upper)))
 
   results <- fit %>%
     dplyr::select(parameter, coef = value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)

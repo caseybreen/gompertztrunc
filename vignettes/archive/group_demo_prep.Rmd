@@ -93,9 +93,9 @@ lm_results <- tidy_model_pooled %>%
 gompert_mle_results <- gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = example_countries)
 
 mle_results <- gompert_mle_results %>% 
-  mutate(e65 = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr, M = 81.9789980	, beta = 0.0978005),
-         e65_lower = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr_lower, M = 81.9789980		, beta = 0.0978005),
-         e65_upper = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr_upper, M = 81.9789980		, beta = 0.0978005)) %>% 
+  mutate(e65 = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr, M = 81.9789980	, b = 0.0978005),
+         e65_lower = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr_lower, M = 81.9789980		, b = 0.0978005),
+         e65_upper = convert_hazard_ratio_to_le(lower = 65, upper = 120, hr = hr_upper, M = 81.9789980		, b = 0.0978005)) %>% 
   rename(country = parameter) %>% 
   filter(str_detect(country, 'bpl_string')) %>% 
   mutate(country = prefix_strip(country, "bpl_string")) %>% 

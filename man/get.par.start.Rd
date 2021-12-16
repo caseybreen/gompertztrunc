@@ -4,7 +4,7 @@
 \alias{get.par.start}
 \title{Get starting values for parameters}
 \usage{
-get.par.start(formula, da)
+get.par.start(formula, data)
 }
 \arguments{
 \item{formula}{the estimation formula}

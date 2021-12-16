@@ -3,7 +3,7 @@
 #'
 #'
 
-## parameterize gompertz with M (mode) and beta (slope)
+## parameterize gompertz with M (mode) and b (slope)
 
 ## we use flexsurv functions and modify just slightly
 
@@ -68,9 +68,9 @@ getAlpha <- function(M, beta) {
 
 
 # computes lifetable hazards for gompertz distribution
-get.trunc.mean.gomp <- function(alpha, beta, l, u) {
+get.trunc.mean.gomp <- function(alpha, b, l, u) {
   x <- 0:110
-  hx <- alpha * exp(beta * x)
+  hx <- alpha * exp(b * x)
   Hx <- cumsum(hx)
   lx <- c(1, exp(-Hx))
   sum(lx)

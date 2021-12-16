@@ -38,7 +38,7 @@ devtools::install_github("caseybreen/gompertztrunc")
 
 <!-- 5. Check if CI is correct. Casey thinks the confidence intervals are probably anti-conservative, e.g. coverage ratio of the "95% intervals" is probably closer to 70%.  -->
 
-<!-- 6. Include way to specify structure of "beta," e.g. different for men and women, or smooth function of cohort or ... (Later) -->
+<!-- 6. Include way to specify structure of "b," e.g. different for men and women, or smooth function of cohort or ... (Later) -->
 
 <!-- 7. Fixed effects (Later) -->
 

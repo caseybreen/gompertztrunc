@@ -12,7 +12,7 @@ gompertztrunc_simu(
   sigma = NULL,
   seed = NULL,
   a0 = 10^-4,
-  beta = 1/10,
+  b = 1/10,
   verbose = FALSE
 )
 }
@@ -31,7 +31,7 @@ gompertztrunc_simu(
 
 \item{a0}{Gompertz alpha parameter}
 
-\item{beta}{Gompertz beta parameter}
+\item{b}{Gompertz b parameter}
 
 \item{verbose}{print internal check if true}
 }

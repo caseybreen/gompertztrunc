@@ -9,7 +9,7 @@ convert_hazards_to_e65(
   lower = 65,
   upper = 120,
   M = 80,
-  beta = 0.075,
+  b = 0.075,
   use_model_estimates = F
 )
 }
@@ -22,7 +22,7 @@ convert_hazards_to_e65(
 
 \item{M}{Gompertz parameter modal age at death}
 
-\item{beta}{Gompertz mortality parameter}
+\item{b}{Gompertz mortality slope parameter}
 
 \item{use_model_estimates}{use estimates of the Gompertz Parameters from the model, rather than defaults}
 }
