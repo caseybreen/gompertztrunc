@@ -4,7 +4,7 @@
 \alias{negLL_function}
 \title{Gompertz Negative Log Likelihood Function}
 \usage{
-negLL_function(par, y, X, y.left, y.right, wt = 1)
+negLL_function(par, y, X, y.left, y.right, wt)
 }
 \arguments{
 \item{par}{a vector of parameter estimates}

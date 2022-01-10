@@ -12,6 +12,7 @@ gompertz_mle(
   byear = byear,
   lower_bound = NULL,
   upper_bound = NULL,
+  weights = NULL,
   maxiter = 10000
 )
 }
@@ -25,6 +26,8 @@ gompertz_mle(
 \item{lower_bound}{lowest age at death (optional)}
 
 \item{upper_bound}{highest age at death (optional)}
+
+\item{weights}{an optional vector of weights}
 
 \item{maxiter}{maximum number of iterations for optimizer}
 

@@ -10,6 +10,7 @@
 #' @param byear year of birth
 #' @param lower_bound lowest age at death (optional)
 #' @param upper_bound highest age at death (optional)
+#' @param weights an optional vector of weights
 #' @param maxiter maximum number of iterations for optimizer
 #'
 #' @return Returns a named list consisting of the following components
@@ -32,7 +33,8 @@
 #'
 #' @export gompertz_mle
 
-gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL, maxiter = 10000) {
+gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL,
+                         weights = NULL, maxiter = 10000) {
 
   ## format data
   data_formatted <- data %>%
@@ -44,6 +46,21 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
       left_trunc_age = left_trunc - byear,
       cohort = byear
     )
+
+  ## extract weights
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "data", "weights"), names(mf), 0L)
+  mf <- mf[c(1L, m)] # mf[c(1,2,5,6)] # reduces the call to just things specified in m
+  mf$drop.unused.levels <- TRUE # adds argument to call
+  mf[[1L]] <- quote(stats::model.frame) # stats:modelframe
+  mf <- eval(mf, parent.frame())
+  w <- as.vector(model.weights(mf))
+  if(!is.null(w) && !is.numeric(w))
+    stop("'weights' must be a numeric vector")
+  else if(is.null(w))
+    data_formatted <- data_formatted %>% dplyr::mutate(sample_weights = 1)
+  else
+    data_formatted <- cbind(data_formatted, sample_weights = w)
 
   ## lower bound (e.g., only observe deaths over 65)
   if (!missing(lower_bound)) {
@@ -74,15 +91,6 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
   data_formatted <- data_formatted %>%
     dplyr::filter(y > left_trunc_age & y < right_trunc_age)
 
-  ## add weights
-
-  if (!is.null(data_formatted$wt)) {
-    wt <- wt
-  }
-  if (is.null(data_formatted$wt)) {
-    wt <- 1.0
-  }
-
   ## get starting parameters
   p.start <- get.par.start(formula, data_formatted)
 
@@ -103,7 +111,7 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
     hessian = TRUE,
     y = data_formatted$y,
     X = model_matrix,
-    wt = wt,
+    wt = data_formatted$sample_weights,
     y.left = data_formatted$left_trunc_age,
     y.right = data_formatted$right_trunc_age,
     control = my.control
