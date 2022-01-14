@@ -55,12 +55,12 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
   mf[[1L]] <- quote(stats::model.frame) # stats:modelframe
   mf <- eval(mf, parent.frame())
   w <- as.vector(model.weights(mf))
-  if(!is.null(w) && !is.numeric(w))
+  if(!is.null(w) && !is.numeric(w)) {
     stop("'weights' must be a numeric vector")
-  else if(is.null(w))
+  } else if(is.null(w)) {
     data_formatted <- data_formatted %>% dplyr::mutate(sample_weights = 1)
-  else
-    data_formatted <- cbind(data_formatted, sample_weights = w)
+  } else {
+    data_formatted <- cbind(data_formatted, sample_weights = w) }
 
   ## lower bound (e.g., only observe deaths over 65)
   if (!missing(lower_bound)) {

@@ -33,7 +33,6 @@ where
 - $Z_i$ are the covariates for person $i$ (e.g., years of education, place of birth) 
 - $\Theta$ is the set of parameters
 
-
 The model will estimate the values of $\widehat{a}$, $\widehat{b}$, and $\widehat{\Theta}$. 
 
 The main function in the package is the `gompertztrunc::gompertz_mle` function, which takes the following arguments: 

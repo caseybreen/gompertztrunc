@@ -15,6 +15,7 @@
 
 
 negLL_function <- function(par, y, X, y.left, y.right, wt) {
+
   ## note exp(par) just gets them back to original scale
   b <- exp(par[1])
   names(b) <- "b"
@@ -26,7 +27,7 @@ negLL_function <- function(par, y, X, y.left, y.right, wt) {
   A <- exp(log.A) ## transform to multiplicative effects
   M <- ab2M(a = A, b = b) ## vector of M values
 
-  num <- wt * dgompertz.M(y, b = b, M = M) ## is use of wt correct???
+  num <- dgompertz.M(y, b = b, M = M)
   #num <- wt * pgompertz.M(y+1, b = b, M = M) - pgompertz.M(y, b = b, M = M)
 
   num[num == 0] <- 10^-10 ## very low likelihood for 0 to avoid log(0)
@@ -35,7 +36,7 @@ negLL_function <- function(par, y, X, y.left, y.right, wt) {
   denom[denom == 0] <- 10^-10 ## denom gets bigger value for zeros so
   ## num/denom likelihood is very small.
 
-  LL <- sum(log(num) - log(denom))
+  LL <- sum(wt * (log(num) - log(denom))) ## use of weight correct??
   negLL <- -LL ## optim() minimizes so to maximize likelihood we
   ## return negative log-likelihood.
   return(negLL)
