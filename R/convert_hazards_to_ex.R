@@ -15,7 +15,7 @@
 #'
 
 
-convert_hazards_to_e65 <- function(df, lower = 65, upper = 120, M = 80, b = 0.075, use_model_estimates=F) {
+convert_hazards_to_ex <- function(df, lower = 65, upper = 120, M = 80, b = 0.075, use_model_estimates=F) {
 
   # Use estimated mode and b from model, overriding any other input
   if(use_model_estimates) {
