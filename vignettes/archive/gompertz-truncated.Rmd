@@ -58,7 +58,7 @@ toc()
 
 
 ```{r}
-mle_results <- convert_hazards_to_e65(model_results) %>% 
+mle_results <- convert_hazards_to_ex(model_results) %>% 
    mutate(parameter = prefix_strip(parameter, "educ_yrs_factor_")) %>% 
   mutate(parameter = as.numeric(parameter)) %>% 
   mutate(method = "Gompertz MLE")

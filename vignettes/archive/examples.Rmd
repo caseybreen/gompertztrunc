@@ -362,4 +362,3 @@ gompertz_mle_results <- convert_hazards_to_e65(df = results_optim) %>%
 ```
 
 
-

@@ -127,7 +127,7 @@ simulated_example$results %>%
   ))
 
 ## convert to e65
-convert_hazards_to_e65(df = simulated_example$results, use_model_estimates = T)
+convert_hazards_to_ex(df = simulated_example$results, use_model_estimates = T)
 ```
 
 
@@ -200,7 +200,7 @@ gompert_mle_results <- gompertz_mle(formula = death_age ~ bpl_string,
 
 ## convert to e65
 ## use model estimates — but can also set other defaults for Gompertz M and B. 
-mle_results <- convert_hazards_to_e65(gompert_mle_results$results, use_model_estimates = T)
+mle_results <- convert_hazards_to_ex(gompert_mle_results$results, use_model_estimates = T)
 
 ## tidy up results 
 mle_results <- mle_results %>% 
@@ -275,7 +275,7 @@ gompert_mle_results_cov <- gompertz_mle(formula = death_age ~ bpl_string + age_f
 
 ## convert to e65
 ## here, we use model estimates. but can also set other defaults for Gomperz M and B. 
-mle_results <- convert_hazards_to_e65(gompert_mle_results_cov$results, use_model_estimates = T)
+mle_results <- convert_hazards_to_ex(gompert_mle_results_cov$results, use_model_estimates = T)
 ```
 
 
@@ -315,7 +315,7 @@ education_gradient <- gompertz_mle(formula = death_age ~ _____,
 education_gradient$results 
 
 ## look at effect on e65
-convert_hazards_to_e65(education_gradient$results, use_model_estimates = T)
+convert_hazards_to_ex(education_gradient$results, use_model_estimates = T)
 ```
 
 
