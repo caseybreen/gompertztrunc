@@ -2,8 +2,7 @@
 % Please edit documentation in R/convert_hazards_to_ex.R
 \name{convert_hazards_to_ex}
 \alias{convert_hazards_to_ex}
-\title{Convert hazard ratios to differences in remaining life expectancy
-at a given age (defaults to age 65)}
+\title{Convert hazard ratios to life expectancy}
 \usage{
 convert_hazards_to_ex(
   df,

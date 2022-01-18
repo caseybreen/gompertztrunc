@@ -1,3 +1,5 @@
+#' Convert hazard ratios to life expectancy
+#'
 #' Convert hazard ratios to differences in remaining life expectancy
 #' at a given age (defaults to age 65)
 #'
@@ -20,7 +22,6 @@ convert_hazards_to_ex <- function(df, age = 65, upper_age = 120, M = 80, b = 0.0
   # Use estimated mode and b from model, overriding any other input
   if(use_model_estimates) {
     M <-  (df %>% dplyr::filter(stringr::str_detect(parameter, "gompertz_mode")))$coef
-    # this will only work for a single mode
     b <-  (df %>% dplyr::filter(stringr::str_detect(parameter, "gompertz_b")))$coef
   }
 
@@ -28,11 +29,10 @@ convert_hazards_to_ex <- function(df, age = 65, upper_age = 120, M = 80, b = 0.0
     dplyr::filter(!stringr::str_detect(parameter, "gompertz_mode")) %>%
     dplyr::filter(!stringr::str_detect(parameter, "gompertz_b")) %>%
     dplyr::mutate(
-      e65 = hazard_ratio_to_le(hr = hr, lower, upper, M, b),
-      e65_lower = hazard_ratio_to_le(hr = hr_upper, lower, upper, M, b),
-      e65_upper = hazard_ratio_to_le(hr = hr_lower, lower, upper, M, b)
+      "e{age}" := hazard_ratio_to_le(hr = hr, lower = age, upper = upper_age, M, b),
+      "e{age}_lower" := hazard_ratio_to_le(hr = hr_upper, lower = age, upper = upper_age, M, b),
+      "e{age}_upper" := hazard_ratio_to_le(hr = hr_lower, lower = age, upper = upper_age, M, b)
     )
-
 
   return(df)
 }
