@@ -45,7 +45,8 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
       right_trunc_age = right_trunc - byear,
       left_trunc_age = left_trunc - byear,
       cohort = byear
-    )
+    ) %>%
+    droplevels()
 
   ## extract weights
   mf <- match.call(expand.dots = FALSE)
