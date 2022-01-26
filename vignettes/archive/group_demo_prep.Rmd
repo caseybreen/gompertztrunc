@@ -199,6 +199,8 @@ results_example2 %>%
   mutate(true_value = mycoefs) %>%
   select(parameter, coef, coef_lower, coef_upper, true_value)
 ```
+
+
 ## created simulated dataset 
 ```{r}
 ## coefficients 
