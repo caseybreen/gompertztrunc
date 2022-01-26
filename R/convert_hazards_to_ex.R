@@ -25,6 +25,7 @@ convert_hazards_to_ex <- function(df, age = 65, upper_age = 120, M = 80, b = 0.0
     b <-  (df %>% dplyr::filter(stringr::str_detect(parameter, "gompertz_b")))$coef
   }
 
+  # calculate life expectancy
   df <- df %>%
     dplyr::filter(!stringr::str_detect(parameter, "gompertz_mode")) %>%
     dplyr::filter(!stringr::str_detect(parameter, "gompertz_b")) %>%

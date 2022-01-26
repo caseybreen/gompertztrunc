@@ -10,7 +10,6 @@
 #' @return hazard ratio converted to effect on e65
 #'
 #'
-#' @export
 #'
 
 

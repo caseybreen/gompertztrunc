@@ -2,10 +2,6 @@
 
 export("%>%")
 export(convert_hazards_to_ex)
-export(get.par.start)
 export(gompertz_mle)
 export(gompertztrunc_simu)
-export(hazard_ratio_to_le)
-export(mll.gomp.multi.cohort.cov)
-export(negLL_function)
 importFrom(magrittr,"%>%")

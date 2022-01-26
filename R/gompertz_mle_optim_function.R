@@ -6,7 +6,6 @@
 #'
 #' @return None
 #'
-#' @export
 
 
 mll.gomp.multi.cohort.cov <- function(p, ## as many alphas as cohorts, and 1 beta

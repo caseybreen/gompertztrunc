@@ -49,8 +49,6 @@ hgompertz.M <- function(x, b, M) {
   return(h)
 }
 
-
-
 #########
 
 ## Old Gompertz Files
