@@ -48,7 +48,7 @@ The main function in the package is the `gompertztrunc::gompertz_mle` function, 
 
 - `byear`: year of birth 
 
-- `maxiter` maximum number of iteration for [optim](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/optim) function 
+- `maxiter` maximum number of iteration for [optim](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/optim) function  
 
 - `weights` a person-level weight 
 
