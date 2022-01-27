@@ -134,7 +134,7 @@ simulated_example$optim_fit$convergence
 simulated_example$results
 ```
 
-The first column gives the Gompertz $b$ parameter, and the second row gives the Gompertz mode.
+The first column gives the Gompertz $b$ parameter, and the second row gives the Gompertz mode. The next three rows show each covariate's estimated coefficient and associate hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards). 
 
 ```{r}
 ## true coefficient values (we know bc we simulated them)
@@ -151,8 +151,7 @@ simulated_example$results %>%
 
 Many investigators will ultimately report hazard ratios, widely used measures of association. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). In this setting, a hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages. 
 
-
-Translating hazard ratios into difference in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package: 
+Translating hazard ratios into differences in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package: 
 
 ```{r}
 ## translate hazard rates to difference in e65

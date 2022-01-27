@@ -25,7 +25,7 @@ library(choroplethrZip)
 
 ## Mortality by zipcode 
 
-Here, we'll use the Gompertztrunc package to estimate mortality differentials by ZIP code for Cuyahoga county, home of Cleveland. 
+ To illustrate the potential for using the BUNMD and gompertztrunc for small-area mortality estimation, we investigate geographic differences in Ohio's Cuyahoga County, which surrounds the city of Cleveland. Cuyahoga County is noteworthy because of its history of within-county income inequality and racial segregation. 
 
 ```{r}
 bunmd_zip <- bunmd_zip 
@@ -70,7 +70,7 @@ cleveland_plot
 
 ## Wealth 
 
-How well does this map onto ZIP codes? 
+Is this correlated with wealth? Let's try plotting average monthly SS benefits per retiree, a proxy of how wealth a ZIP code is.  
 
 ```{r}
 ## zipbenefits 
