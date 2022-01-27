@@ -70,7 +70,6 @@ library(tidyverse)             ## data manipulation and visualization
 library(data.table)            ## fast data manipulation
 library(cowplot)               ## publication-ready themes for ggplot
 library(socviz)                ## helper functions for data visualization (Kieran Healy)  
-library(tictoc)                ## functions for timing r scripts 
 library(broom)                 ## "tidy" model output 
 
 
