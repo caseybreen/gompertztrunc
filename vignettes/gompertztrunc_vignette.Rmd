@@ -209,7 +209,7 @@ lm_bpl_tidy <- lm_bpl_tidy %>%
   mutate(method = "Regression on Age of Death")
 ```
 
-Now, we'll try our new Gompertz MLE parametric approach: 
+Now we'll perform estimation with the `gompertztrunc` package: 
 
 ```{r}
 ## Gompertz Trunc 
@@ -332,7 +332,7 @@ The Gompertztrunc package can incorporate person-level weights. Weights can help
 
 In this example, we will simulate person-level weights in the CenSoc-DMF dataset. Let's imagine our data was perfectly representative of our population of interest with one exception: people who did not own a home in 1940 and died after the the age of 90 were were only half as likely to be included in our dataset. To adjust for this, we can assign each person who rented in 1940 and died after the age of 90 a weight of 2 and everyone else in the dataset a weight of 1. 
 
-In this hypothetical scenario, do you anticipate the new weights will have a large effect on our estimated association between homeownership and longevity? 
+In this hypothetical scenario, what effect do you anticipate the weights will have on our estimated association between homeownership and longevity? 
 
 ```{r}
 ## Simulate weights 
