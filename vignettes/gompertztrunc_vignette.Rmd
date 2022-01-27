@@ -16,6 +16,10 @@ editor_options:
 
 ## Introduction 
 
+Summary: This vignette gives an overview of the `gompertztrunc` package for mortality estimation and presents three case-studies illustrating the package's functionality. The goal of this vignette is to give users a high-level overview of using the `gompertztrunc` package for mortality estimation including the use of weights, the specification and visualization of models, and limitations of this approach.
+
+## Background 
+
 Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. 
 
 The **gompertztrunc** package includes tools for mortality estimation doubly-truncated datasets without population denominators.  
