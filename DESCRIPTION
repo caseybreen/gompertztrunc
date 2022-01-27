@@ -14,7 +14,7 @@ Authors@R:
     person(given = "Joshua R.",
            family = "Goldstein",
            role = "aut"))
-Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr
+Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr, tidyverse
 Maintainer: The package maintainer <caseybreen@berkeley.edu>
 Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data without population denominator.
 License: What license is it under?
