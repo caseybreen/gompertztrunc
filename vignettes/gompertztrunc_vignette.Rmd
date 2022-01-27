@@ -382,9 +382,6 @@ The \textbf{gompertztrunc} package can be used to estimate mortality differentia
 
 ## Bonus: Confidence Interval Coverage Rate 
 
-
-## Confidence Interval Coverage Rate
-
 Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter.
 
 We can assess the coverage ratio of our confidence intervals by repeating the following procedure many times: (1) simulate new data; (2) estimating 95% confidence intervals for coefficients; (3) checking whether our 95% confidence intervals for a parameter should contain the true parameter value.
