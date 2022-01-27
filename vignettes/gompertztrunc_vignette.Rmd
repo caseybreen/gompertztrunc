@@ -16,7 +16,7 @@ editor_options:
 
 ## Introduction 
 
-Summary: This vignette gives an overview of the `gompertztrunc` package for mortality estimation and presents three case-studies illustrating the package's functionality. The goal of this vignette is to give users a high-level overview of using the `gompertztrunc` package for mortality estimation including the use of weights, the specification and visualization of models, and limitations of this approach.
+Summary: This vignette gives an overview of the `gompertztrunc` package and presents three case-studies illustrating the package's functionality. The goal of this vignette is to give users a high-level overview of using the `gompertztrunc` package for mortality estimation including the use of weights, the specification and visualization of models, and limitations of this approach.
 
 ## Background 
 
@@ -78,13 +78,14 @@ library(broom)                 ## "tidy" model output
 
 
 ## load data 
-sim_data <- sim_data           ## simulated 
-bunmd_demo <- bunmd_demo       ## real 
+sim_data <- sim_data             ## simulated 
+bunmd_demo <- bunmd_demo         ## real 
+censoc_example <- censoc_example ## real 
 ```
 
 ## Case Study I: Simulated Data
 
-In our first case study, we use simulated (fake) data included in the Gompertztrunc package. Because we simulated the data, we know the true coefficient values (we also know that the mortality follows a Gomeprtz ditsribution and our proportional hazards assumption holds). 
+In our first case study, we use simulated (fake) data included in the gompertztrunc package. Because we simulated the data, we know the true coefficient values (we also know that the mortality follows a Gompertz distribution and our proportional hazards assumption holds). 
 
 ```{r}
 ## Look at simulated data 
@@ -110,11 +111,11 @@ simulated_example <- gompertztrunc::gompertz_mle(formula = aod ~ temp + as.facto
 
 The \code{gompertz\_mle} function returns a list which contains three elements:
 
-1. The initial starting parameters for the MLE routine. These starting parameter are found using linear regression on age at death
+1. The initial starting parameters for the MLE routine. These starting parameter are found using OLS regression on age at death
 
 2. The full \code{optim} object, which gives details of the optimization routine (e.g., whether the model converged)
 
-3. A data.frame of containing estimated Gompertz parameters, coefficients, and hazards ratios with 95\% confidence intervals.  
+3. A data.frame of containing results: the estimated Gompertz parameters, coefficients, and hazards ratios with 95\% confidence intervals.  
 
 We recommend always checking the full \code{optim} object to make sure the model has converged. 
 
@@ -148,17 +149,20 @@ simulated_example$results %>%
   select(parameter, coef, coef_lower, coef_upper, true_coef)
 ```
 
-Many investigators will ultimately report hazard ratios. However, translating hazard ratios into difference in life expectancy may help facilitate interpretation and comparison to other studies.  
+Many investigators will ultimately report hazard ratios, widely used measures of association. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). In this setting, a hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages. 
+
+
+Translating hazard ratios into difference in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package: 
 
 ```{r}
 ## translate hazard rates to difference in e65
-convert_hazards_to_ex(simulated_example$results, age = 65) %>% 
+convert_hazards_to_ex(simulated_example$results, age = 65, use_model_estimates = T) %>% 
   select(parameter, e65, e65_lower, e65_upper)
 ```
 
 ## Case Study II: Real-World Example with BUNMD Data 
 
-In our second case study, we look at the mortality advantage for the foreign-born. 
+In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD). 
 
 ```{r}
 ## look at data 
@@ -184,9 +188,9 @@ ggplot(data = bunmd_demo) +
 ```
 
 
-### Linear regression apporach 
+### Linear regression approach 
 
-Let's look at the association between country of origin and longevity. First, we'll try using our old approach (linear regression on age of death). 
+Let's look at the association between country of origin and longevity. First, we'll try using a biased approach (OLS regression on age of death). 
 
 ```{r}
 ## run linear model 
@@ -268,39 +272,11 @@ bpl_results %>%
   annotate("text", label = "Native Born Whites", x = 0.1, y = 3, angle = 90, size = 3, color = "black")
 ```
 
-<!-- ## Add another covariate  -->
-
-<!-- Let's another covariate to the model: age at first Social Security application. Why is this interesting?  -->
-
-<!-- ```{r, fig.width = 8, fig.height = 4} -->
-<!-- ## age first application by country -->
-<!-- bunmd_demo %>% -->
-<!--   ggplot() + -->
-<!--   geom_density(aes(x = age_first_application), -->
-<!--     fill = "grey", -->
-<!--     color = "black" -->
-<!--   ) + -->
-<!--   facet_wrap(~bpl_string) +  -->
-<!--   cowplot::theme_cowplot() -->
-<!-- ``` -->
-
-<!-- ```{r, eval = F} -->
-<!-- ## now add a covariate   -->
-<!-- gompert_mle_results_cov <- gompertz_mle(formula = death_age ~ bpl_string + age_first_application,  -->
-<!--                                     left_trunc = 1988, -->
-<!--                                     right_trunc = 2005, -->
-<!--                                     data = bunmd_demo) -->
-
-
-<!-- ## convert to e65 -->
-<!-- ## here, we use model estimates. but can also set other defaults for Gomperz M and B.  -->
-<!-- mle_results <- convert_hazards_to_ex(gompert_mle_results_cov$results, use_model_estimates = T) -->
-<!-- ``` -->
 
 
 ## Case Study III: Education and longevity
 
-In our third case study, we look at the association between education homeownership.  
+In our third case study, we look at the association between education, homeownership, and longevity. We'll use a demo dataset from the CenSoc-DMF file.   
 
 ```{r}
 ## load in file 
@@ -334,10 +310,13 @@ education_gradient$results
 ## look at effect on e65
 convert_hazards_to_ex(education_gradient$results, use_model_estimates = T)
 ```
-Here, for every additional year of education, the hazard ratio falls by 3.6\%. 
+Here, for every additional year of education, the hazard ratio falls by 3.6\% — which corresponds to an additional 0.26 year increase in e(65). 
+
+
+Do people who own a home live longer than those who rent? 
 
 ```{r, eval = F}
-## Example with only one cohort
+## Association between longevity and homeownership 
 home_ownership <- gompertz_mle(formula = death_age ~ ownhome, 
                                    data = dmf_demo,
                                    left_trunc = 1975 , 
@@ -352,14 +331,11 @@ convert_hazards_to_ex(home_ownership$results, use_model_estimates = T)
 
 ## Person-weights 
 
-The Gompertztrunc package can incorporate person-level weights.The weight for each person corresponds to the estimated number of persons in the target population that person represents. Weights can help adjust for differential representation. 
+The Gompertztrunc package can incorporate person-level weights. Weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive. 
 
-The vector of supplied weights must be long as the data, and all weights must be positive. 
+In this example, we will simulate person-level weights in the CenSoc-DMF dataset. Let's imagine our data was perfectly representative of our population of interest with one exception: people who did not own a home in 1940 and died after the the age of 90 were were only half as likely to be included in our dataset. To adjust for this, we can assign each person who rented in 1940 and died after the age of 90 a weight of 2 and everyone else in the dataset a weight of 1. 
 
-In this example, we will simulate person-level weights. Imagine our data was perfectly representative of our population of interest (men born in 1910 dying in our doubly truncated window of 1975-2005) with one exception: people who rented in 1940 and died after the the age of 90 were were only half as likely to be included in our dataset. To adjust for this, we can assign each person who rented in 1940 and died after the age of 90 a weight of 2 and everyone else in the dataset a weight of 1. 
-
-
-How will the new weights change our substantive conclusions? 
+In this hypothetical scenario, do you anticipate the new weights will have a large effect on our estimated association between homeownership and longevity? 
 
 ```{r}
 ## Simulate weights 
@@ -389,7 +365,7 @@ homeownership_model$results
 ## Looks at weighted results 
 homeownership_model_weighted$results 
 ```
-Using our new weights, we see that owning a home no longer is now associated with *higher* mortality rather than *lower* mortality. This matches our prior, as the we effectively added lots of people dying at very old ages who did not own homes. 
+Using our new weights, we see that owning a home no longer is now associated with *higher* mortality rather than *lower* mortality! This make sense because we upweighted people who didn't own a home and died at the most advanced ages. This is a stylized example designed to highlight how weights *could* change an analysis; generally weights will not have such a dramatic effect on research results. 
 
 
 ## Summary and Limitations 
@@ -403,83 +379,87 @@ The \textbf{gompertztrunc} package can be used to estimate mortality differentia
 
 3. This approach assumes proportional hazards: the survival curves for different strata have hazard functions that are proportional over time. 
 
-<!-- ## Confidence Interval Coverage Rate  -->
 
-<!-- Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter.  -->
+## Bonus: Confidence Interval Coverage Rate 
 
-<!-- We can assess the coverage ratio of our confidence intervals by repeating the following procedure many times: (1) simulate new data; (2) estimating 95% confidence intervals for coefficients; (3) checking whether our 95% confidence intervals for a parameter should contain the true parameter value. -->
 
-<!-- A 95% confidence interval should in the long run have a coverage ratio of 95%. That is, approximately 95% of the confidence intervals should contain the true value.  -->
+## Confidence Interval Coverage Rate
 
-<!-- ```{r, eval = F} -->
-<!-- ## create list for storing our results  -->
-<!-- confidence_interval <- list() -->
+Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter.
 
-<!-- ## rerun our experiment 100 times  -->
+We can assess the coverage ratio of our confidence intervals by repeating the following procedure many times: (1) simulate new data; (2) estimating 95% confidence intervals for coefficients; (3) checking whether our 95% confidence intervals for a parameter should contain the true parameter value.
 
-<!-- for (i in 1:1000) { -->
+A 95% confidence interval should in the long run have a coverage ratio of 95%. That is, approximately 95% of the confidence intervals should contain the true value.
 
-<!--   ## we simulate without any cohort distinctions -->
-<!--   myform <- formula(aod ~ temp + sex + isSouth) -->
-<!--   mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.7) -->
+```{r, eval = F}
+## create list for storing our results
+confidence_interval <- list()
 
-<!--   n <- 10000 -->
+## rerun our experiment 100 times
 
-<!--   data <- gompertztrunc_simu( -->
-<!--     n = n, -->
-<!--     formula = myform, -->
-<!--     coefs = mycoefs, -->
-<!--     dummy = c(F, T, T), -->
-<!--     sigma = c(3, 1, 1) -->
-<!--   ) -->
-<!--   ## now we structure into multiple cohorts -->
-<!--   byear.vec <- 1810:1819 ## multiple birth cohorts -->
-<!--   dyear.vec <- 1888:1905 ## a limited window of observations -->
-<!--   min.age <- 65 ## only observe those 65+ -->
+for (i in 1:100) {
 
-<!--   data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))] -->
+  ## we simulate without any cohort distinctions
+  myform <- formula(aod ~ temp + sex + isSouth)
+  mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.3)
 
-<!--   ## pretend dates of birth within year are uniform -->
-<!--   data[, dob := byear + runif(length(byear))] -->
+  n <- 10000
 
-<!--   ## date of death = date of birth + age of death -->
-<!--   data[, dod := dob + aod] -->
+  data <- gompertztrunc_simu(
+    n = n,
+    formula = myform,
+    coefs = mycoefs,
+    dummy = c(F, T, T),
+    sigma = c(3, 1, 1)
+  )
+  ## now we structure into multiple cohorts
+  byear.vec <- 1810:1819 ## multiple birth cohorts
+  dyear.vec <- 1888:1905 ## a limited window of observations
+  min.age <- 65 ## only observe those 65+
 
-<!--   ## y.left for each person -->
-<!--   data[, y.left := min(dyear.vec) - floor(byear)] -->
-<!--   ## only 65+ -->
-<!--   data[y.left < 65, y.left := 65] -->
-<!--   ## y.right for each person -->
-<!--   data[, y.right := max(dyear.vec) - floor(byear)] -->
+  data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))]
 
-<!--   ## artificially truncate -->
-<!--   data.trunc <- data[y.left <= aod & aod < y.right] -->
+  ## pretend dates of birth within year are uniform
+  data[, dob := byear + runif(length(byear))]
 
-<!--   gompertmle <- gompertztrunc::gompertz_mle(formula = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905) -->
+  ## date of death = date of birth + age of death
+  data[, dod := dob + aod]
 
-<!--   results <- gompertmle$results %>% -->
-<!--     dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>% -->
-<!--     mutate(true_value = mycoefs) %>% -->
-<!--     select(parameter, coef, coef_lower, coef_upper, true_value) %>% -->
-<!--     mutate(ci_capture = case_when( -->
-<!--       true_value > coef_lower & true_value < coef_upper ~ 1, -->
-<!--       TRUE ~ 0 -->
-<!--     )) -->
+  ## y.left for each person
+  data[, y.left := min(dyear.vec) - floor(byear)]
+  ## only 65+
+  data[y.left < 65, y.left := 65]
+  ## y.right for each person
+  data[, y.right := max(dyear.vec) - floor(byear)]
 
-<!--   ## print simulation  -->
-<!--   cat(i, " ") -->
+  ## artificially truncate
+  data.trunc <- data[y.left <= aod & aod < y.right]
 
-<!--   confidence_interval[[i]] <- results -->
-<!-- } -->
+  gompertmle <- gompertztrunc::gompertz_mle(formula = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905)
 
-<!-- ## put results into on data.frame  -->
-<!-- confidence_interval_coverage <- bind_rows(confidence_interval) -->
+  results <- gompertmle$results %>%
+    dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>%
+    mutate(true_value = mycoefs) %>%
+    select(parameter, coef, coef_lower, coef_upper, true_value) %>%
+    mutate(ci_capture = case_when(
+      true_value > coef_lower & true_value < coef_upper ~ 1,
+      TRUE ~ 0
+    ))
 
-<!-- ## What's the coverage ratio of our confidence intervals?  -->
-<!-- confidence_interval_coverage %>% -->
-<!--   group_by(parameter) %>% -->
-<!--   summarize(ci_coverage = mean(ci_capture)) -->
-<!-- ``` -->
+  ## print simulation
+  cat(i, " ")
+
+  confidence_interval[[i]] <- results
+}
+
+## put results into on data.frame
+confidence_interval_coverage <- bind_rows(confidence_interval)
+
+## What's the coverage ratio of our confidence intervals?
+confidence_interval_coverage %>%
+  group_by(parameter) %>%
+  summarize(ci_coverage = mean(ci_capture))
+```
 
 
 

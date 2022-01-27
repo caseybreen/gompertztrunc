@@ -1,0 +1,103 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Summary 
+
+This vignette will walk through the steps of visualizing differentials in e(65) — life expectancy conditional on surviving to age 65 — by ZIP Code using the Berkeley Unified Numident Mortality Database (BUNMD) and the gompertztrunc `R` package. 
+
+Specifically, this vignette will walk through the steps of (1) calculating differentials by ZIP Code and (2) creating a choropleth map in R using the choroplethr package. Choropleths are thematic maps where each geographic region is colored or shaded according to some metric.
+
+```{r}
+## Library packages 
+library(tidyverse)
+library(choroplethr)
+library(broom)
+library(gompertztrunc)
+library(devtools)
+library(sf)
+
+## install zipcode choroplethr package 
+# install_github('arilamstein/choroplethrZip@v1.5.0')
+library(choroplethrZip)
+```
+
+## Mortality by zipcode 
+
+Here, we'll use the Gompertztrunc package to estimate mortality differentials by ZIP code for Cuyahoga county, home of Cleveland. 
+
+```{r}
+bunmd_zip <- bunmd_zip 
+
+bunmd_zip_women <- bunmd_zip %>% 
+  filter(sex == 2)
+
+## gompertz model 
+cuyahoga.model_gompertz <- gompertztrunc::gompertz_mle(death_age ~ zip5 , right_trunc = 2005, left_trunc = 1988,
+                     data = bunmd_zip_women,
+                     weights = ccweight)
+
+gompertz_cuyahoga <- gompertztrunc::convert_hazards_to_ex(cuyahoga.model_gompertz$results)
+
+gompertz_cuyahoga <- gompertz_cuyahoga %>% 
+  mutate(region = substr(parameter, 5, 9)) %>% 
+  mutate(value = e65) %>% 
+  mutate(value = round(value, 1))
+
+## Create choro plot
+ohio_fips <-  39035
+choro = ZipChoropleth$new(rev(gompertz_cuyahoga))
+choro$title = ""
+choro$set_zoom_zip(state_zoom = NULL, county_zoom = ohio_fips, msa_zoom = NULL, zip_zoom = NULL)
+
+## Add on a boundary for cleveland. We will pull this from the Tigris database. 
+
+## Shapefile must be downloaded from 
+shapefile <- cleveland_shapefile
+
+## Plot Cleveland
+cleveland_plot <- choro$render() +
+  theme(text=element_text(size=25)) + 
+   viridis::scale_fill_viridis(discrete = "true", direction = 1, name = "Difference in e65") + #  scale_fill_brewer(name="E65", palette = "Greens", direction = 1, na.value="grey", drop=FALSE) +
+  geom_sf(data = st_union(shapefile),
+       inherit.aes = FALSE, fill = NA, size = 1, color = "Red3") +
+  annotate("label", x=-81.67908, y=41.48074, label="Cleveland", color = "Black", size = 8)
+
+
+cleveland_plot
+```
+
+## Wealth 
+
+How well does this map onto ZIP codes? 
+
+```{r}
+## zipbenefits 
+zipben_cuyahoga <- bunmd_zip %>% 
+  group_by(zip5) %>% 
+  summarize(zip_ben = mean(zip_ben)) %>% 
+  dplyr::select(region = zip5, value = zip_ben) %>% 
+  mutate(value = value * 1000) %>% 
+  distinct() %>% 
+  mutate(region = as.character(region))
+
+ohio_fips <-  39035
+choro = ZipChoropleth$new(rev(zipben_cuyahoga))
+choro$title = ""
+choro$set_zoom_zip(state_zoom = NULL, county_zoom = ohio_fips, msa_zoom = NULL, zip_zoom = NULL)
+
+## Plot Cleveland
+cleveland_plot_zipben <- choro$render() +
+  theme(text=element_text(size=25)) + 
+   viridis::scale_fill_viridis(discrete = "true", direction = 1, name = "Monthly SS Benefits ($)") + #  scale_fill_brewer(name="E65", palette = "Greens", direction = 1, na.value="grey", drop=FALSE) +
+  geom_sf(data = st_union(shapefile),
+       inherit.aes = FALSE, fill = NA, size = 1, color = "Red3") +
+  annotate("label", x=-81.67908, y=41.48074, label="Cleveland", color = "Black", size = 8)
+```
+
+
+```{r}
+plot_grid(cleveland_plot_zipben, cleveland_plot)
+```
+
