@@ -3,14 +3,20 @@ Type: Package
 Title: gompertztrunc: Tools for estimating 
 Version: 0.1.0
 Authors@R: 
-    person(given = "Casey",
+    c(person(given = "Casey",
            family = "Breen",
            role = c("aut", "cre"),
            email = "caseybreen@berkeley.edu",
-           comment = c(ORCID = "https://orcid.org/0000-0001-9114-981X"))
+           comment = c(ORCID = "https://orcid.org/0000-0001-9114-981X")),
+    person(given = "Maria",
+           family = "Osborne",
+           role = "aut"),
+    person(given = "Joshua R.",
+           family = "Goldstein",
+           role = "aut"))
 Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr
 Maintainer: The package maintainer <caseybreen@berkeley.edu>
-Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data.
+Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data without population denominator.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
