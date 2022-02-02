@@ -7,34 +7,39 @@
 #' @param formula the estimation formula
 #' @param left_truc left truncation year
 #' @param right_trunc right truncation year
+#' @param data a data frame containing variables in the model
 #' @param byear year of birth
-#' @param lower_bound lowest age at death (optional)
-#' @param upper_bound highest age at death (optional)
-#' @param weights an optional vector of weights
+#' @param lower_age_bound lowest age at death (optional)
+#' @param upper_age_bound highest age at death (optional)
+#' @param weights an optional vector of individual weights
 #' @param maxiter maximum number of iterations for optimizer
 #'
 #' @return Returns a named list consisting of the following components
 #' (See \code{stats::\link[stats:optim]{optim}} for additional details):
 #' \describe{
-#'   \item{\code{starting_values}}{list of starting values of paramters to be estimated}
+#'   \item{\code{starting_values}}{list of starting values of parameters}
 #'   \item{\code{optim_fit}}{A list consisting of:
 #'   \describe{
 #'     \item{\code{par}}{best estimation of parameter values}
 #'     \item{\code{value}}{log likelihood}
 #'     \item{\code{counts}}{number of calls to funcation and gradient}
-#'     \item{\code{convergence}}{returns 0 if the model converged}
+#'     \item{\code{convergence}}{returns 0 if the model converged, for other values see \code{stats::\link[stats:optim]{optim}} }
 #'     \item{\code{message}}{any other information returned by optimizer}
 #'     \item{\code{hessian}}{Hessian matrix}
 #'     }
 #'   }
-#'   \item{results}{a table of estimates and upper/lower bounds}
+#'   \item{\code{results}}{a table of estimates and upper/lower bounds}
 
 #' }
 #'
+#' @examples
+#' #model hazards as function of birthplace using bunmd_demo file
+#' gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = bunmd_demo)
+#'
 #' @export gompertz_mle
 
-gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, byear = byear, lower_bound = NULL, upper_bound = NULL,
-                         weights = NULL, maxiter = 10000) {
+gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, byear = byear, lower_age_bound = NULL,
+                         upper_age_bound = NULL, weights = NULL, maxiter = 10000) {
 
   ## format data
   data_formatted <- data %>%
@@ -64,24 +69,24 @@ gompertz_mle <- function(formula, right_trunc = 2005, left_trunc = 1975, data, b
     data_formatted <- cbind(data_formatted, sample_weights = w) }
 
   ## lower bound (e.g., only observe deaths over 65)
-  if (!missing(lower_bound)) {
+  if (!missing(lower_age_bound)) {
     data_formatted <- data_formatted %>%
       dplyr::mutate(left_trunc_age = case_when(
-        left_trunc_age < lower_bound ~ lower_bound,
+        left_trunc_age < lower_age_bound ~ lower_age_bound,
         TRUE ~ left_trunc_age
       ))
   }
 
   ## upper bound (e.g., only observe deaths over 65)
-  if (!missing(upper_bound)) {
+  if (!missing(upper_age_bound)) {
     data_formatted <- data_formatted %>%
       dplyr::mutate(right_trunc_age = case_when(
-        right_trunc_age > upper_bound ~ upper_bound,
+        right_trunc_age > upper_age_bound ~ upper_age_bound,
         TRUE ~ right_trunc_age
       ))
   }
 
-  ## convert data to integers
+  ## convert integer death years to midpoint
   if (sum(data_formatted$y - floor(data_formatted$y)) == 0){
     data_formatted <- data_formatted %>%
       dplyr::mutate(y = y + 0.5)

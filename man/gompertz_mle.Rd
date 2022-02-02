@@ -6,12 +6,12 @@
 \usage{
 gompertz_mle(
   formula,
-  right_trunc = 2005,
   left_trunc = 1975,
+  right_trunc = 2005,
   data,
   byear = byear,
-  lower_bound = NULL,
-  upper_bound = NULL,
+  lower_age_bound = NULL,
+  upper_age_bound = NULL,
   weights = NULL,
   maxiter = 10000
 )
@@ -21,13 +21,15 @@ gompertz_mle(
 
 \item{right_trunc}{right truncation year}
 
+\item{data}{a data frame containing variables in the model}
+
 \item{byear}{year of birth}
 
-\item{lower_bound}{lowest age at death (optional)}
+\item{lower_age_bound}{lowest age at death (optional)}
 
-\item{upper_bound}{highest age at death (optional)}
+\item{upper_age_bound}{highest age at death (optional)}
 
-\item{weights}{an optional vector of weights}
+\item{weights}{an optional vector of individual weights}
 
 \item{maxiter}{maximum number of iterations for optimizer}
 
@@ -37,21 +39,26 @@ gompertz_mle(
 Returns a named list consisting of the following components
 (See \code{stats::\link[stats:optim]{optim}} for additional details):
 \describe{
-  \item{\code{starting_values}}{list of starting values of paramters to be estimated}
+  \item{\code{starting_values}}{list of starting values of parameters}
   \item{\code{optim_fit}}{A list consisting of:
   \describe{
     \item{\code{par}}{best estimation of parameter values}
     \item{\code{value}}{log likelihood}
     \item{\code{counts}}{number of calls to funcation and gradient}
-    \item{\code{convergence}}{returns 0 if the model converged}
+    \item{\code{convergence}}{returns 0 if the model converged, for other values see \code{stats::\link[stats:optim]{optim}} }
     \item{\code{message}}{any other information returned by optimizer}
     \item{\code{hessian}}{Hessian matrix}
     }
   }
-  \item{results}{a table of estimates and upper/lower bounds}
+  \item{\code{results}}{a table of estimates and upper/lower bounds}
 }
 }
 \description{
 Fits a truncated Gompertz distribution with proportional hazards
 to mortality data using maximum likelihood estimation.
+}
+\examples{
+#model hazards as function of birthplace using bunmd_demo file
+gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = bunmd_demo)
+
 }
