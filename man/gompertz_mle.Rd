@@ -10,20 +10,26 @@ gompertz_mle(
   right_trunc = 2005,
   data,
   byear = byear,
+  dyear = dyear,
   lower_age_bound = NULL,
   upper_age_bound = NULL,
   weights = NULL,
+  death_age_data_type = "auto",
   maxiter = 10000
 )
 }
 \arguments{
 \item{formula}{the estimation formula}
 
+\item{left_trunc}{left truncation year}
+
 \item{right_trunc}{right truncation year}
 
 \item{data}{a data frame containing variables in the model}
 
-\item{byear}{year of birth}
+\item{byear}{name of birth year variable in \code{data}}
+
+\item{dyear}{name of death year variablein \code{data}}
 
 \item{lower_age_bound}{lowest age at death (optional)}
 
@@ -31,9 +37,9 @@ gompertz_mle(
 
 \item{weights}{an optional vector of individual weights}
 
-\item{maxiter}{maximum number of iterations for optimizer}
+\item{death_age_data_type}{option for handling of continuous and discrete death age variable (not yet implemented)}
 
-\item{left_truc}{left truncation year}
+\item{maxiter}{maximum number of iterations for optimizer}
 }
 \value{
 Returns a named list consisting of the following components

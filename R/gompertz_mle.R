@@ -5,14 +5,17 @@
 #'
 #'
 #' @param formula the estimation formula
-#' @param left_truc left truncation year
+#' @param left_trunc left truncation year
 #' @param right_trunc right truncation year
 #' @param data a data frame containing variables in the model
-#' @param byear year of birth
-#' @param lower_age_bound lowest age at death (optional)
-#' @param upper_age_bound highest age at death (optional)
+#' @param byear name of birth year variable in \code{data}
+#' @param dyear name of death year variable in \code{data}
+#' @param lower_age_bound  lowest age at death to include (optional)
+#' @param upper_age_bound highest age at death to include (optional)
 #' @param weights an optional vector of individual weights
+#' @param death_age_data_type option for handling of continuous and discrete death age variable (not yet implemented)
 #' @param maxiter maximum number of iterations for optimizer
+#'
 #'
 #' @return Returns a named list consisting of the following components
 #' (See \code{stats::\link[stats:optim]{optim}} for additional details):
@@ -22,7 +25,7 @@
 #'   \describe{
 #'     \item{\code{par}}{best estimation of parameter values}
 #'     \item{\code{value}}{log likelihood}
-#'     \item{\code{counts}}{number of calls to funcation and gradient}
+#'     \item{\code{counts}}{number of calls to function and gradient}
 #'     \item{\code{convergence}}{returns 0 if the model converged, for other values see \code{stats::\link[stats:optim]{optim}} }
 #'     \item{\code{message}}{any other information returned by optimizer}
 #'     \item{\code{hessian}}{Hessian matrix}
@@ -38,8 +41,8 @@
 #'
 #' @export gompertz_mle
 
-gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, byear = byear, lower_age_bound = NULL,
-                         upper_age_bound = NULL, weights = NULL, maxiter = 10000) {
+gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, byear = byear, dyear=dyear, lower_age_bound = NULL,
+                         upper_age_bound = NULL, weights = NULL, death_age_data_type = 'auto', maxiter = 10000) {
 
   ## format data
   data_formatted <- data %>%
@@ -56,7 +59,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   ## extract weights
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "weights"), names(mf), 0L)
-  mf <- mf[c(1L, m)] # mf[c(1,2,5,6)] # reduces the call to just things specified in m
+  mf <- mf[c(1L, m)] # reduces the call to just things specified in m
   mf$drop.unused.levels <- TRUE # adds argument to call
   mf[[1L]] <- quote(stats::model.frame) # stats:modelframe
   mf <- eval(mf, parent.frame())
@@ -66,7 +69,19 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   } else if(is.null(w)) {
     data_formatted <- data_formatted %>% dplyr::mutate(sample_weights = 1)
   } else {
-    data_formatted <- cbind(data_formatted, sample_weights = w) }
+    data_formatted <- cbind(data_formatted, sample_weights = w)}
+
+
+  ## check truncation bounds
+  detected_minimum_dyear <- min(data$dyear)
+  detected_maximum_dyear <- max(data$dyear)
+  if(right_trunc < left_trunc) {
+    stop('Invalid truncation bounds')
+  }
+  if(right_trunc != detected_maximum_dyear | left_trunc != detected_minimum_dyear) {
+    warning('Supplied truncation bounds do not align with detected minimal and maximal dates
+            in the data. Please make sure they are specified correctly.')
+  }
 
   ## lower bound (e.g., only observe deaths over 65)
   if (!missing(lower_age_bound)) {
@@ -77,7 +92,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
       ))
   }
 
-  ## upper bound (e.g., only observe deaths over 65)
+  ## upper bound (e.g., only observe deaths below 100)
   if (!missing(upper_age_bound)) {
     data_formatted <- data_formatted %>%
       dplyr::mutate(right_trunc_age = case_when(
@@ -90,7 +105,6 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   if (sum(data_formatted$y - floor(data_formatted$y)) == 0){
     data_formatted <- data_formatted %>%
       dplyr::mutate(y = y + 0.5)
-
   }
 
   ## remove endpoints
