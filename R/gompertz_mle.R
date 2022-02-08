@@ -69,7 +69,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   } else if(is.null(w)) {
     data_formatted <- data_formatted %>% dplyr::mutate(sample_weights = 1)
   } else {
-    data_formatted <- cbind(data_formatted, sample_weights = w)}
+    data_formatted <- cbind(data_formatted, sample_weights = w/mean(w))}
 
 
   ## check truncation bounds

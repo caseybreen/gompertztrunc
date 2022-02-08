@@ -62,7 +62,7 @@ First, we load the **gompertztrunc** package from Github.
 
 ```{r, eval = F}
 ## install gompertztrunc package from Github
-install.packages("devtools")
+# install.packages("devtools")
 devtools::install_github("caseybreen/gompertztrunc")
 ```
 
@@ -153,8 +153,8 @@ While investigators will ultimately report hazard ratios, translating hazard rat
 
 ```{r}
 ## translate hazard rates to difference in e65
-convert_hazards_to_ex(simulated_example$results, age = 65, use_model_estimates = T) %>% 
-  select(parameter, e65, e65_lower, e65_upper)
+convert_hazards_to_ex(simulated_example$results, age = 76, use_model_estimates = T) %>% 
+  select(parameter, hr, hr_lower, hr_upper, e65, e65_lower, e65_upper)
 ```
 
 ## Case Study II: Real-World Example with BUNMD Data 
@@ -174,7 +174,7 @@ First, let's look at the distribution of deaths by country:
 ```{r, fig.width = 6, fig.height = 4}
 ## distribution of deaths?
 ggplot(data = bunmd_demo) + 
-  geom_density(aes(x = death_age),
+  geom_histogram(aes(x = death_age),
                  fill = "grey",
                  color = "black",
                  binwidth = 1) + 
@@ -182,6 +182,22 @@ ggplot(data = bunmd_demo) +
   labs(x = "Age of Death",
        y = "Density") + 
   facet_wrap(~bpl_string)
+
+## distribution of deaths?
+bunmd_demo %>% 
+  filter(byear == 1910) %>%  
+  ggplot() + 
+  geom_histogram(aes(x = death_age),
+                 fill = "grey",
+                 color = "black",
+                 binwidth = 1) + 
+  cowplot::theme_cowplot() + 
+  labs(x = "Age of Death",
+       y = "Density") + 
+  xlim(65, 100)
+
+
+
 ```
 
 
@@ -305,7 +321,7 @@ education_gradient <- gompertz_mle(formula = death_age ~ educ_yrs,
 education_gradient$results 
 
 ## look at effect on e65
-convert_hazards_to_ex(education_gradient$results, use_model_estimates = T)
+convert_hazards_to_ex(education_gradient$results, use_model_estimates = T, age = 40)
 ```
 Here, for every additional year of education, the hazard ratio falls by 3.6\% — which corresponds to an additional 0.26 year increase in e(65). 
 
@@ -314,7 +330,7 @@ Do people who own a home live longer than those who rent?
 
 ```{r, eval = F}
 ## Association between longevity and homeownership 
-home_ownership <- gompertz_mle(formula = death_age ~ ownhome, 
+home_ownership <- gompertz_mle(formula = death_age ~ ownhome + educ_yrs, 
                                    data = dmf_demo,
                                    left_trunc = 1975 , 
                                    right_trunc = 2005)
@@ -360,7 +376,7 @@ homeownership_model_weighted <- gompertz_mle(formula = death_age ~ ownhome,
 homeownership_model$results 
 
 ## Looks at weighted results 
-homeownership_model_weighted$results 
+homeownership_model_weighted$results
 ```
 Using our new weights, we see that owning a home no longer is now associated with *higher* mortality rather than *lower* mortality! This make sense because we upweighted people who didn't own a home and died at the most advanced ages. This is a stylized example designed to highlight how weights *could* change an analysis; generally weights will not have such a dramatic effect on research results. 
 

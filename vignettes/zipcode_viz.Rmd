@@ -98,6 +98,8 @@ cleveland_plot_zipben <- choro$render() +
 
 
 ```{r}
-plot_grid(cleveland_plot_zipben, cleveland_plot)
+cleveland_zip <- plot_grid(cleveland_plot_zipben, cleveland_plot)
+
+ggsave(plot = cleveland_zip, filename = "~/Downloads/cleveland_zip.png", width = 20, height = 10)
 ```
 
