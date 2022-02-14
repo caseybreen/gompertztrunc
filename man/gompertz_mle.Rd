@@ -27,13 +27,13 @@ gompertz_mle(
 
 \item{data}{a data frame containing variables in the model}
 
-\item{byear}{name of birth year variable in \code{data}}
+\item{byear}{vector of birth years}
 
-\item{dyear}{name of death year variablein \code{data}}
+\item{dyear}{vector of death years}
 
-\item{lower_age_bound}{lowest age at death (optional)}
+\item{lower_age_bound}{lowest age at death to include (optional)}
 
-\item{upper_age_bound}{highest age at death (optional)}
+\item{upper_age_bound}{highest age at death to include (optional)}
 
 \item{weights}{an optional vector of individual weights}
 
@@ -50,7 +50,7 @@ Returns a named list consisting of the following components
   \describe{
     \item{\code{par}}{best estimation of parameter values}
     \item{\code{value}}{log likelihood}
-    \item{\code{counts}}{number of calls to funcation and gradient}
+    \item{\code{counts}}{number of calls to function and gradient}
     \item{\code{convergence}}{returns 0 if the model converged, for other values see \code{stats::\link[stats:optim]{optim}} }
     \item{\code{message}}{any other information returned by optimizer}
     \item{\code{hessian}}{Hessian matrix}

@@ -8,8 +8,8 @@
 #' @param left_trunc left truncation year
 #' @param right_trunc right truncation year
 #' @param data a data frame containing variables in the model
-#' @param byear name of birth year variable in \code{data}
-#' @param dyear name of death year variable in \code{data}
+#' @param byear vector of birth years
+#' @param dyear vector of death years
 #' @param lower_age_bound  lowest age at death to include (optional)
 #' @param upper_age_bound highest age at death to include (optional)
 #' @param weights an optional vector of individual weights
@@ -44,10 +44,45 @@
 gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, byear = byear, dyear=dyear, lower_age_bound = NULL,
                          upper_age_bound = NULL, weights = NULL, death_age_data_type = 'auto', maxiter = 10000) {
 
+  ## extract arguments
+  mf <- rlang::call_match(defaults=TRUE)
+  m <- match(c("formula", "data", "byear", "dyear", "weights"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
+  mf$drop.unused.levels <- TRUE
+  mf[[1L]] <- quote(stats::model.frame)
+  mf <- eval(mf, parent.frame())
+
+  ## birth year and death year vectors
+  by <- as.vector(model.extract(frame=mf, component = "byear"))
+  dy <- as.vector(model.extract(frame=mf, component = "dyear"))
+
+  ## weights
+  w <- as.vector(model.weights(mf))
+  if(!is.null(w) && !is.numeric(w)) {
+    stop("'weights' must be a numeric vector")
+  } else if(is.null(w)) {
+    w <- rep(1, nrow(data)) # if null, set all weights to 1
+  } else {
+    w <-  w/mean(w) # normalize weights if they exist
+  }
+
+  ## check truncation bounds
+  if(right_trunc < left_trunc) {
+    stop('Invalid truncation bounds')
+  }
+  detected_minimum_dyear <- min(as.numeric(as.character(dy)))
+  detected_maximum_dyear <- max(as.numeric(as.character(dy)))
+  if(right_trunc != detected_maximum_dyear | left_trunc != detected_minimum_dyear) {
+    warning('Supplied truncation bounds do not align with detected minimal and maximal dates
+            in the data. Please make sure they are specified correctly.')
+  }
+
   ## format data
   data_formatted <- data %>%
-    dplyr::mutate(byear = as.numeric(as.character(byear))) %>%
-    dplyr::select(all.vars(formula), byear) %>%
+    dplyr::mutate(byear = as.numeric(as.character(by)),
+                  dyear = as.numeric(as.character(dy)),
+                  sample_weights = as.numeric(as.character(w))) %>%
+    dplyr::select(all.vars(formula), byear, dyear, sample_weights) %>%
     dplyr::mutate(
       y = get(all.vars(formula)[1]),
       right_trunc_age = right_trunc - byear,
@@ -56,32 +91,6 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
     ) %>%
     droplevels()
 
-  ## extract weights
-  mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "weights"), names(mf), 0L)
-  mf <- mf[c(1L, m)] # reduces the call to just things specified in m
-  mf$drop.unused.levels <- TRUE # adds argument to call
-  mf[[1L]] <- quote(stats::model.frame) # stats:modelframe
-  mf <- eval(mf, parent.frame())
-  w <- as.vector(model.weights(mf))
-  if(!is.null(w) && !is.numeric(w)) {
-    stop("'weights' must be a numeric vector")
-  } else if(is.null(w)) {
-    data_formatted <- data_formatted %>% dplyr::mutate(sample_weights = 1)
-  } else {
-    data_formatted <- cbind(data_formatted, sample_weights = w/mean(w))}
-
-
-  ## check truncation bounds
-  detected_minimum_dyear <- min(data$dyear)
-  detected_maximum_dyear <- max(data$dyear)
-  if(right_trunc < left_trunc) {
-    stop('Invalid truncation bounds')
-  }
-  if(right_trunc != detected_maximum_dyear | left_trunc != detected_minimum_dyear) {
-    warning('Supplied truncation bounds do not align with detected minimal and maximal dates
-            in the data. Please make sure they are specified correctly.')
-  }
 
   ## lower bound (e.g., only observe deaths over 65)
   if (!missing(lower_age_bound)) {
