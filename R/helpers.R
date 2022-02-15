@@ -1,6 +1,6 @@
 #' Helper functions
 #'
-#'
+#' @keywords internal
 #'
 
 ## parameterize gompertz with M (mode) and b (slope)

@@ -7,9 +7,9 @@
 hazard_ratio_to_le(lower, upper, hr, M = 80, b = 0.1)
 }
 \arguments{
-\item{lower}{lower age bound}
+\item{lower}{age at which to compute change in remaining life expectancy}
 
-\item{upper}{upper age bound}
+\item{upper}{upper age bound for life table calculations}
 
 \item{hr}{hazard ratio}
 
@@ -18,7 +18,7 @@ hazard_ratio_to_le(lower, upper, hr, M = 80, b = 0.1)
 \item{b}{Gompertz mortality slope parameter}
 }
 \value{
-hazard ratio converted to effect on e65
+hazard ratio converted to effect on life expectancy
 }
 \description{
 Translate a single hazard ratio to life expectancy

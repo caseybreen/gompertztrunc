@@ -11,6 +11,7 @@
 #'
 #' @return The negative log likelihood of parameter estimates given observed data
 #'
+#' @export
 
 negLL_function <- function(par, y, X, y.left, y.right, wt) {
 

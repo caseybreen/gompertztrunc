@@ -4,6 +4,8 @@
 #' @param p the initialization function
 #' @param A data matrix with covariates y, u, l, and covariates, including cohort
 #'
+#' @keywords internal
+#'
 #' @return None
 #'
 

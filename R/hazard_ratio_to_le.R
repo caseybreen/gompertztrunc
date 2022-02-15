@@ -1,15 +1,15 @@
 #' Translate a single hazard ratio to life expectancy
 #'
 #'
-#' @param lower lower age bound
-#' @param upper upper age bound
+#' @param lower age at which to compute change in remaining life expectancy
+#' @param upper upper age bound for life table calculations
 #' @param hr hazard ratio
 #' @param M Gompertz modal age at death parameter
 #' @param b Gompertz mortality slope parameter
 #'
-#' @return hazard ratio converted to effect on e65
+#' @return hazard ratio converted to effect on life expectancy
 #'
-#'
+#' @export
 #'
 
 

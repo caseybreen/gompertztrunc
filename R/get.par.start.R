@@ -8,6 +8,7 @@
 #'
 #' @return Named vector of initial parameter estimates
 #'
+#' @export
 
 
 ## get parameter start values

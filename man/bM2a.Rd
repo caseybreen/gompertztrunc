@@ -9,3 +9,4 @@ bM2a(b, M)
 \description{
 Helper functions
 }
+\keyword{internal}

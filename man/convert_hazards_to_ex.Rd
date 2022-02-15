@@ -14,17 +14,17 @@ convert_hazards_to_ex(
 )
 }
 \arguments{
-\item{df}{dataframe of results given by gompertz_mle() function}
+\item{df}{Dataframe of results given by gompertz_mle() function}
 
-\item{age}{age at which to calculate remaining life expectancy}
+\item{age}{Age at which to calculate remaining life expectancy}
 
-\item{upper_age}{maximal age to use in life table calculation}
+\item{upper_age}{Maximal age to use in life table calculation}
 
 \item{M}{Gompertz parameter modal age at death}
 
 \item{b}{Gompertz mortality slope parameter}
 
-\item{use_model_estimates}{use estimates of the Gompertz Parameters from the model, rather than defaults}
+\item{use_model_estimates}{Use estimates of the Gompertz Parameters from the model, rather than defaults}
 }
 \value{
 A dataframe of hazards ratios and corresponding e(x) estimates and confidence intervals

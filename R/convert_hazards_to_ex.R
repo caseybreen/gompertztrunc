@@ -3,12 +3,12 @@
 #' Convert hazard ratios to differences in remaining life expectancy
 #' at a given age (defaults to age 65)
 #'
-#' @param df dataframe of results given by gompertz_mle() function
-#' @param age age at which to calculate remaining life expectancy
-#' @param upper_age maximal age to use in life table calculation
+#' @param df Dataframe of results given by gompertz_mle() function
+#' @param age Age at which to calculate remaining life expectancy
+#' @param upper_age Maximal age to use in life table calculation
 #' @param M Gompertz parameter modal age at death
 #' @param b Gompertz mortality slope parameter
-#' @param use_model_estimates use estimates of the Gompertz Parameters from the model, rather than defaults
+#' @param use_model_estimates Use estimates of the Gompertz Parameters from the model, rather than defaults
 #'
 #' @return A dataframe of hazards ratios and corresponding e(x) estimates and confidence intervals
 #'
