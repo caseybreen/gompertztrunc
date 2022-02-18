@@ -15,8 +15,8 @@
 #' @return data frame of simulated death ages and covariate values
 #'
 #' @examples
-#' gompertztrunc_simu(n=1000, formula = death_age ~ sex + edu,
-#' coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(T,F))
+#' gompertztrunc_simu(n=1000, formula = death_age ~ sex + ambient_temp,
+#' coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(TRUE,FALSE))
 #'
 #' @export
 
@@ -46,7 +46,7 @@ gompertztrunc_simu <- function(n, ## sample size
   coefs <- c("b0" = log(a0), coefs) ## include log(a0) as intercept
 
   ## check to see if right number of coefs with correct labels
-  myterms <- terms(formula) ## complex object with lots of info from formula
+  myterms <- stats::terms(formula) ## complex object with lots of info from formula
   coef.names.from.formula <- attr(myterms, "term.labels")
   ##
   if (!identical(names(coefs)[-1], coef.names.from.formula)) {
@@ -79,10 +79,10 @@ gompertztrunc_simu <- function(n, ## sample size
   for (i in 1:k)
   {
     if (is.null(sigma[i])) {
-      data[, i] <- rnorm(n, mean = 0, sd = 1)
+      data[, i] <- stats::rnorm(n, mean = 0, sd = 1)
     } ## standardized
     if (!is.null(sigma[i])) {
-      data[, i] <- rnorm(n, mean = 0, sd = sigma[i])
+      data[, i] <- stats::rnorm(n, mean = 0, sd = sigma[i])
     } ## own variance
   }
   ## create dummy vars (for now just random 0,1 coding)
@@ -97,8 +97,8 @@ gompertztrunc_simu <- function(n, ## sample size
 
   ## 2. get design matrix
   form.without.y <- paste(formula[[1]], format(formula[[3]]))
-  form.without.y <- as.formula(form.without.y)
-  mat <- model.matrix(form.without.y, data)
+  form.without.y <- stats::as.formula(form.without.y)
+  mat <- stats::model.matrix(form.without.y, data)
   ## head(mat)
   ##   (Intercept)          x1 x2         x3      x2:x3
   ## 1           1 -0.96193342  1 -1.2913493 -1.2913493
@@ -133,15 +133,15 @@ gompertztrunc_simu <- function(n, ## sample size
   ## From (1), this means life expectancy should go down
   ## by about -0.2/b \approx -.2 * 10, or about 2 years.
   ## (Note: this approximation will not work for truncated data!)
-  lm.form <- update(formula, paste(left.string, " ~ ."))
-  m <- lm(lm.form, data_with_y)
+  lm.form <- stats::update(formula, paste(left.string, " ~ ."))
+  m <- stats::lm(lm.form, data_with_y)
 
   Beta.vec <- as.vector(Beta) ## true coefs as vector
   names(Beta.vec) <- rownames(Beta) ## add rownames
   coef.m.hat <- Beta.vec / (-b)
-  check.dt <- data.table(
-    "coef.name" = names(coef(m)),
-    "coef(m)" = round(coef(m), 3),
+  check.dt <- data.table::data.table(
+    "coef.name" = names(stats::coef(m)),
+    "coef(m)" = round(stats::coef(m), 3),
     "coef.m.hat" = round(coef.m.hat, 3),
     "beta.name" = names(Beta.vec),
     Beta = round(Beta.vec, 3)
@@ -152,6 +152,6 @@ gompertztrunc_simu <- function(n, ## sample size
   }
 
 
-  simu_data <- as.data.table(data_with_y)
+  simu_data <- data.table::as.data.table(data_with_y)
   return(simu_data)
 }

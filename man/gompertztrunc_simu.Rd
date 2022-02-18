@@ -42,7 +42,7 @@ data frame of simulated death ages and covariate values
 Simulate Gompertzian death distribution
 }
 \examples{
-gompertztrunc_simu(n=1000, formula = death_age ~ sex + edu,
-coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(T,F))
+gompertztrunc_simu(n=1000, formula = death_age ~ sex + ambient_temp,
+coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(TRUE,FALSE))
 
 }

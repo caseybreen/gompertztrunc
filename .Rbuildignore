@@ -5,4 +5,6 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^readme.Rmd
+^readme.md
 ^\.github$

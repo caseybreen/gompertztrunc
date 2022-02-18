@@ -17,13 +17,13 @@ get.par.start <- function(formula, data) {
   ##     formula = formula(y ~ -1 + treat)
   ## we start with lm with intercept
 
-  newform <- update.formula(formula, . ~ . + 1)
-  m <- lm(newform, data)
+  newform <- stats::update.formula(formula, . ~ . + 1)
+  m <- stats::lm(newform, data)
 
   ## (Intercept)        treat
   ##      56.004       -1.494
   ## then let m.start be the intercept
-  M.start <- coef(m)["(Intercept)"]
+  M.start <- stats::coef(m)["(Intercept)"]
   names(M.start) <- ""
 
   ## let b.start = 1/10
@@ -34,7 +34,7 @@ get.par.start <- function(formula, data) {
   ## then use entropy-based ball park. Say entropy is 0.1
   ## say 1 year of change is 1%, so 1 year is like 10% decrease
   ## -perc*H*e0 = change = -(-.1) * .1 * 100 = +1 year
-  coef.vec <- coef(m)[names(coef(m)) != "(Intercept)"]
+  coef.vec <- stats::coef(m)[names(stats::coef(m)) != "(Intercept)"]
   b.vec.start <- -1 * coef.vec * .1
 
   ## rename

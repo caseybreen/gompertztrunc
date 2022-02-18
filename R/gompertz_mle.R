@@ -37,7 +37,8 @@
 #'
 #' @examples
 #' #model hazards as function of birthplace using bunmd_demo file
-#' gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = bunmd_demo)
+#' gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005,
+#' data = bunmd_demo)
 #'
 #' @export gompertz_mle
 
@@ -53,11 +54,11 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   mf <- eval(mf, parent.frame())
 
   ## birth year and death year vectors
-  by <- as.vector(model.extract(frame=mf, component = "byear"))
-  dy <- as.vector(model.extract(frame=mf, component = "dyear"))
+  by <- as.vector(stats::model.extract(frame=mf, component = "byear"))
+  dy <- as.vector(stats::model.extract(frame=mf, component = "dyear"))
 
   ## weights
-  w <- as.vector(model.weights(mf))
+  w <- as.vector(stats::model.weights(mf))
   if(!is.null(w) && !is.numeric(w)) {
     stop("'weights' must be a numeric vector")
   } else if(is.null(w)) {
@@ -95,7 +96,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   ## lower bound (e.g., only observe deaths over 65)
   if (!missing(lower_age_bound)) {
     data_formatted <- data_formatted %>%
-      dplyr::mutate(left_trunc_age = case_when(
+      dplyr::mutate(left_trunc_age = dplyr::case_when(
         left_trunc_age < lower_age_bound ~ lower_age_bound,
         TRUE ~ left_trunc_age
       ))
@@ -134,7 +135,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   )
 
   ## get optimization function
-  optim_fit <- optim(
+  optim_fit <- stats::optim(
     par = p.start,
     fn = negLL_function,
     hessian = TRUE,

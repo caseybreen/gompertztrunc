@@ -65,6 +65,7 @@ to mortality data using maximum likelihood estimation.
 }
 \examples{
 #model hazards as function of birthplace using bunmd_demo file
-gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005, data = bunmd_demo)
+gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005,
+data = bunmd_demo)
 
 }

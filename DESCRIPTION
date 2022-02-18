@@ -14,7 +14,7 @@ Authors@R:
     person(given = "Joshua R.",
            family = "Goldstein",
            role = "aut"))
-Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr, tidyverse, socviz, cowplot
+Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr, tidyverse, socviz, cowplot, modelr, rlang, stats
 Maintainer: The package maintainer <caseybreen@berkeley.edu>
 Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data without population denominator.
 License: What license is it under?
@@ -24,7 +24,6 @@ RoxygenNote: 7.1.2
 Depends: 
     R (>= 2.10)
 Suggests: 
-    rmarkdown,
-    knitr
+    rmarkdown
 VignetteBuilder: knitr
 URL: https://caseybreen.github.io/gompertztrunc
