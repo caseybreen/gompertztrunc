@@ -272,13 +272,13 @@ bpl_results %>%
 
 ## Case Study III: Education and longevity
 
-In our third case study, we look at the association between education and longevity. We'll use a demo dataset from the CenSoc-Numident file.   
+In our third case study, we look at the association between education and longevity. We'll use a prelinked “demo” version of the CenSoc-Numident file, which contains 63 thousand mortality records and 20 mortality covariates from the 1940 census (~1% of the complete CenSoc-Numident dataset). 
 
 ```{r}
 ## load in file 
 numident_demo <- numident_demo
 
-## recode categorical education variable to categorical "years of education" 
+## recode categorical education variable to continuous "years of education" 
 numident_demo <- numident_demo %>% 
   mutate(educ_yrs = case_when(
     educd == "No schooling completed" ~ 0,
@@ -309,16 +309,10 @@ data_numident_men <- numident_demo %>%
 
 ```
 
-In the CenSoc-Numident demo dataset, have covariates from the CenSoc-Numident dataset : 
-
-- `educ_yrs`: years of education 
-- `urban`: urban (1) vs. rural (0)
-- `ownhome`: own home (1) rented or N/A (0)
-
  What's the association between a 1-year increase in education and life expectancy at 65 (e65)? 
 
-```{r, eval = F}
-## Example with only one cohort
+```{r}
+## run gompertz model
 education_gradient <- gompertz_mle(formula = death_age ~ educ_yrs, 
                                    data = data_numident_men,
                                   weights = weight,
@@ -328,21 +322,64 @@ education_gradient <- gompertz_mle(formula = death_age ~ educ_yrs,
 ## look at results 
 education_gradient$results 
 
-## look at effect on e65
-convert_hazards_to_ex(education_gradient$results, use_model_estimates = T, age = 65)
+## translate to e65
+mle_results_educ <- convert_hazards_to_ex(education_gradient$results, use_model_estimates = T, age = 65) %>% 
+  mutate(method = "Parametric Gompertz MLE")
+
+## look at results
+mle_results_educ
 ```
+
 Here, for every additional year of education, the hazard ratio falls by 4.6\% — which corresponds to an additional 0.33 year increase in e(65). 
+
+Now, let's compare to a conventional method: OLS regression on age of death.
+
+```{r, fig.width = 7.2, fig.height = 5}
+## run linear model 
+lm_bpl <- lm(death_age ~ educ_yrs + as.factor(byear), data = data_numident_men)
+
+## extract coefficients from model 
+lm_bpl_tidy <- tidy(lm_bpl) %>%
+  filter(str_detect(term, "educ_yrs"))
+
+## rename variables 
+ols_results <- lm_bpl_tidy %>%
+  mutate(
+    e65 = estimate,
+    e65_lower = estimate - 1.96 * std.error,
+    e65_upper = estimate + 1.96 * std.error
+  ) %>%
+  rename(parameter = term) %>%
+  mutate(method = "Regression on Age of Death")
+
+## Plot results
+education_plot <- ols_results %>%
+  bind_rows(mle_results_educ) %>%
+  mutate(parameter = "Education (Years) Regression Coefficient") %>% 
+  ggplot(aes(x = method, y = e65, ymin = e65_lower, ymax = e65_upper)) +
+  geom_pointrange(position = position_dodge(width = 0.2), shape = 1) +
+  cowplot::theme_cowplot(font_size = 12) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  labs(
+    x = "",
+    title = "Association Education (Years) and Longevity",
+    subtitle = "Men, CenSoc-Numident 1910-1920",
+    y = ""
+  ) +
+  scale_color_brewer(palette = "Set1") + 
+  ylim(0, 0.5) 
+
+education_plot
+```
+
 
 ## Person-weights 
 
 The Gompertztrunc package can incorporate person-level weights. Weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive. 
 
-Using our new weights, we see that owning a home no longer is now associated with *higher* mortality rather than *lower* mortality! This make sense because we upweighted people who didn't own a home and died at the most advanced ages. This is a stylized example designed to highlight how weights *could* change an analysis; generally weights will not have such a dramatic effect on research results. 
-
 ## Summary and Limitations 
 
 The \textbf{gompertztrunc} package can be used to estimate mortality differentials without population denominators. A few limitations to this approach: 
-
 
 1. The Gompertz law does not apply perfectly to any application, and major departures from either assumption may bias estimates. 
 
