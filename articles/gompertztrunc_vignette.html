@@ -71,9 +71,9 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>Summary: This vignette gives an overview of the <code>gompertztrunc</code> package for mortality estimation and presents three case-studies illustrating the package’s functionality. The goal of this vignette is to give users a high-level overview of using the <code>gompertztrunc</code> package for mortality estimation including the use of weights, the specification and visualization of models, and limitations of this approach.</p>
+<p>This vignette gives an overview of the <code>gompertztrunc</code> package and presents three case-studies illustrating the package’s functionality. The goal of this vignette is to give users a high-level overview of using the <code>gompertztrunc</code> package for mortality estimation including the use of weights, the specification and visualization of models, and limitations of this approach.</p>
 </div>
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
@@ -117,8 +117,8 @@
 <p>First, we load the <strong>gompertztrunc</strong> package from Github.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## install gompertztrunc package from Github</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"caseybreen/gompertztrunc"</span><span class="op">)</span></code></pre></div>
+<span class="co"># install.packages("devtools")</span>
+<span class="co"># devtools::install_github("caseybreen/gompertztrunc")</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## library packages</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://caseybreen.github.io/gompertztrunc">gompertztrunc</a></span><span class="op">)</span>         <span class="co">## calculate mortality differentials under double-truncation  </span>
@@ -130,13 +130,14 @@
 
 
 <span class="co">## load data </span>
-<span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="va">sim_data</span>           <span class="co">## simulated </span>
-<span class="va">bunmd_demo</span> <span class="op">&lt;-</span> <span class="va">bunmd_demo</span>       <span class="co">## real </span></code></pre></div>
+<span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="va">sim_data</span>             <span class="co">## simulated </span>
+<span class="va">bunmd_demo</span> <span class="op">&lt;-</span> <span class="va">bunmd_demo</span>         <span class="co">## real </span>
+<span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span>   <span class="co">## real </span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="case-study-i-simulated-data">Case Study I: Simulated Data<a class="anchor" aria-label="anchor" href="#case-study-i-simulated-data"></a>
 </h2>
-<p>In our first case study, we use simulated (fake) data included in the Gompertztrunc package. Because we simulated the data, we know the true coefficient values (we also know that the mortality follows a Gomeprtz ditsribution and our proportional hazards assumption holds).</p>
+<p>In our first case study, we use simulated (fake) data included in the gompertztrunc package. Because we simulated the data, we know the true coefficient values (we also know that the mortality follows a Gompertz distribution and our proportional hazards assumption holds).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Look at simulated data </span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_data</span><span class="op">)</span></code></pre></div>
@@ -157,17 +158,17 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## run gompertz_mle function  </span>
 <span class="co">## returns a list </span>
-<span class="va">simulated_example</span> <span class="op">&lt;-</span> <span class="fu">gompertztrunc</span><span class="fu">::</span><span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">aod</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">+</span> <span class="va">isSouth</span>,
+<span class="va">simulated_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">aod</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">+</span> <span class="va">isSouth</span>,
                                                  left_trunc <span class="op">=</span> <span class="fl">1888</span>,
                                                  right_trunc <span class="op">=</span> <span class="fl">1905</span>,
                                                  data <span class="op">=</span> <span class="va">sim_data</span><span class="op">)</span></code></pre></div>
-<p>The  function returns a list which contains three elements:</p>
+<p>The <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function returns a list which contains three elements:</p>
 <ol style="list-style-type: decimal">
-<li><p>The initial starting parameters for the MLE routine. These starting parameter are found using linear regression on age at death</p></li>
-<li><p>The full  object, which gives details of the optimization routine (e.g., whether the model converged)</p></li>
-<li><p>A data.frame of containing estimated Gompertz parameters, coefficients, and hazards ratios with 95% confidence intervals.</p></li>
+<li><p>The initial starting parameters for the MLE routine. These starting parameter are found using OLS regression on age at death</p></li>
+<li><p>The full <code>optim</code> object, which gives details of the optimization routine (e.g., whether the model converged)</p></li>
+<li><p>A data.frame of containing results: the estimated Gompertz parameters, coefficients, and hazards ratios with 95% confidence intervals.</p></li>
 </ol>
-<p>We recommend always checking the full  object to make sure the model has converged.</p>
+<p>We recommend always checking the full <code>optim</code> object to make sure the model has converged.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## 1. starting value for coefficients (from linear regression)</span>
 <span class="va">simulated_example</span><span class="op">$</span><span class="va">starting_values</span></code></pre></div>
@@ -215,7 +216,7 @@
 <span class="co">## <span style="color: #BCBCBC;">3</span> temp             0.207     0.194       0.219  1.23     1.21     1.25 </span>
 <span class="co">## <span style="color: #BCBCBC;">4</span> as.factor(sex)1 -<span style="color: #BB0000;">0.530</span>    -<span style="color: #BB0000;">0.590</span>      -<span style="color: #BB0000;">0.470</span>  0.589    0.554    0.625</span>
 <span class="co">## <span style="color: #BCBCBC;">5</span> isSouth          0.598     0.536       0.661  1.82     1.71     1.94</span></code></pre>
-<p>The first column gives the Gompertz <span class="math inline">\(b\)</span> parameter, and the second row gives the Gompertz mode.</p>
+<p>The first column gives the Gompertz <span class="math inline">\(b\)</span> parameter, and the second row gives the Gompertz mode. The next three rows show each covariate’s estimated coefficient and associate hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards).</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## true coefficient values (we know bc we simulated them)</span>
 <span class="va">mycoefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"temp"</span> <span class="op">=</span> <span class="op">+</span><span class="fl">.2</span>, <span class="st">"sex"</span> <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span>, <span class="st">"isSouth"</span> <span class="op">=</span> <span class="op">+</span><span class="fl">.6</span><span class="op">)</span>
@@ -233,22 +234,22 @@
 <span class="co">## <span style="color: #BCBCBC;">1</span> temp             0.207      0.194      0.219       0.2</span>
 <span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1 -<span style="color: #BB0000;">0.530</span>     -<span style="color: #BB0000;">0.590</span>     -<span style="color: #BB0000;">0.470</span>      -<span style="color: #BB0000;">0.5</span></span>
 <span class="co">## <span style="color: #BCBCBC;">3</span> isSouth          0.598      0.536      0.661       0.6</span></code></pre>
-<p>Many investigators will ultimately report hazard ratios. However, translating hazard ratios into difference in life expectancy may help facilitate interpretation and comparison to other studies.</p>
+<p>While investigators will ultimately report hazard ratios, translating hazard ratios into differences in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## translate hazard rates to difference in e65</span>
-<span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span>, age <span class="op">=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="va">e65</span>, <span class="va">e65_lower</span>, <span class="va">e65_upper</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 4</span></span>
-<span class="co">##   parameter         e65 e65_lower e65_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> temp            -<span style="color: #BB0000;">1.67</span>     -<span style="color: #BB0000;">1.77</span>     -<span style="color: #BB0000;">1.57</span></span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1  4.64      4.10      5.19</span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> isSouth         -<span style="color: #BB0000;">4.55</span>     -<span style="color: #BB0000;">4.97</span>     -<span style="color: #BB0000;">4.11</span></span></code></pre>
+<span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span>, age <span class="op">=</span> <span class="fl">65</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="va">hr</span>, <span class="va">hr_lower</span>, <span class="va">hr_upper</span>, <span class="va">e65</span>, <span class="va">e65_lower</span>, <span class="va">e65_upper</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span>
+<span class="co">##   parameter          hr hr_lower hr_upper    e65 e65_lower e65_upper</span>
+<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">## <span style="color: #BCBCBC;">1</span> temp            1.23     1.21     1.25  -<span style="color: #BB0000;">0.966</span>     -<span style="color: #BB0000;">1.02</span>    -<span style="color: #BB0000;">0.910</span></span>
+<span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1 0.589    0.554    0.625  2.84       2.49     3.20 </span>
+<span class="co">## <span style="color: #BCBCBC;">3</span> isSouth         1.82     1.71     1.94  -<span style="color: #BB0000;">2.57</span>      -<span style="color: #BB0000;">2.80</span>    -<span style="color: #BB0000;">2.33</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="case-study-ii-real-world-example-with-bunmd-data">Case Study II: Real-World Example with BUNMD Data<a class="anchor" aria-label="anchor" href="#case-study-ii-real-world-example-with-bunmd-data"></a>
 </h2>
-<p>In our second case study, we look at the mortality advantage for the foreign-born.</p>
+<p>In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## look at data </span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bunmd_demo</span><span class="op">)</span></code></pre></div>
@@ -278,21 +279,20 @@
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## distribution of deaths?</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">death_age</span><span class="op">)</span>,
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">death_age</span><span class="op">)</span>,
                  fill <span class="op">=</span> <span class="st">"grey"</span>,
                  color <span class="op">=</span> <span class="st">"black"</span>,
                  binwidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Age of Death"</span>,
-       y <span class="op">=</span> <span class="st">"Density"</span><span class="op">)</span> <span class="op">+</span> 
+       y <span class="op">=</span> <span class="st">"N"</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">bpl_string</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Warning: Ignoring unknown parameters: binwidth</span></code></pre>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-9-1.png" width="576"></p>
 <div class="section level3">
-<h3 id="linear-regression-apporach">Linear regression apporach<a class="anchor" aria-label="anchor" href="#linear-regression-apporach"></a>
+<h3 id="linear-regression-approach">Linear regression approach<a class="anchor" aria-label="anchor" href="#linear-regression-approach"></a>
 </h3>
-<p>Let’s look at the association between country of origin and longevity. First, we’ll try using our old approach (linear regression on age of death).</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<p>Let’s look at the association between country of origin and longevity. First, we’ll try using a biased approach (OLS regression on age of death).</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## run linear model </span>
 <span class="va">lm_bpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">byear</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span>
 
@@ -310,8 +310,8 @@
   <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">term</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Regression on Age of Death"</span><span class="op">)</span></code></pre></div>
-<p>Now, we’ll try our new Gompertz MLE parametric approach:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<p>Now we’ll perform estimation with the <code>gompertztrunc</code> package:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Gompertz Trunc </span>
 <span class="co">## Use 1988-2005 because we are using BUNMD </span>
 <span class="va">gompert_mle_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, 
@@ -346,7 +346,7 @@
 <h3 id="visualize-results">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results"></a>
 </h3>
 <p>Compare our estimates from ‘unbiased’ Gompertz MLE method and our old ‘biased’ method, regression on age of death.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## combine results from both models </span>
 <span class="va">bpl_results</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results</span><span class="op">)</span>
@@ -376,49 +376,45 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>, label <span class="op">=</span> <span class="st">"Native Born Whites"</span>, x <span class="op">=</span> <span class="fl">0.1</span>, y <span class="op">=</span> <span class="fl">3</span>, angle <span class="op">=</span> <span class="fl">90</span>, size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></code></pre></div>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-12-1.png" width="691.2"></p>
-<!-- ## Add another covariate  -->
-<!-- Let's another covariate to the model: age at first Social Security application. Why is this interesting?  -->
-<!-- ```{r, fig.width = 8, fig.height = 4} -->
-<!-- ## age first application by country -->
-<!-- bunmd_demo %>% -->
-<!--   ggplot() + -->
-<!--   geom_density(aes(x = age_first_application), -->
-<!--     fill = "grey", -->
-<!--     color = "black" -->
-<!--   ) + -->
-<!--   facet_wrap(~bpl_string) +  -->
-<!--   cowplot::theme_cowplot() -->
-<!-- ``` -->
-<!-- ```{r, eval = F} -->
-<!-- ## now add a covariate   -->
-<!-- gompert_mle_results_cov <- gompertz_mle(formula = death_age ~ bpl_string + age_first_application,  -->
-<!--                                     left_trunc = 1988, -->
-<!--                                     right_trunc = 2005, -->
-<!--                                     data = bunmd_demo) -->
-<!-- ## convert to e65 -->
-<!-- ## here, we use model estimates. but can also set other defaults for Gomperz M and B.  -->
-<!-- mle_results <- convert_hazards_to_ex(gompert_mle_results_cov$results, use_model_estimates = T) -->
-<!-- ``` -->
 </div>
 </div>
 <div class="section level2">
 <h2 id="case-study-iii-education-and-longevity">Case Study III: Education and longevity<a class="anchor" aria-label="anchor" href="#case-study-iii-education-and-longevity"></a>
 </h2>
-<p>In our third case study, we look at the association between education homeownership.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<p>In our third case study, we look at the association between education and longevity. We’ll use a demo dataset from the CenSoc-Numident file.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## load in file </span>
-<span class="va">dmf_demo</span> <span class="op">&lt;-</span> <span class="va">censoc_example</span>
+<span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span>
 
-<span class="co">## what's in the file? </span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dmf_demo</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##    id byear death_age educ_yrs urban ownhome</span>
-<span class="co">## 1:  1  1910        67       10     1       1</span>
-<span class="co">## 2:  2  1910        68        2     0       1</span>
-<span class="co">## 3:  3  1910        77        8     0       1</span>
-<span class="co">## 4:  4  1910        73       11     0       1</span>
-<span class="co">## 5:  5  1910        87       12     1       0</span>
-<span class="co">## 6:  6  1910        89       10     1       0</span></code></pre>
-<p>In the CenSoc-DMF demo dataset, have three covariates:</p>
+<span class="co">## recode categorical education variable to categorical "years of education" </span>
+<span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>educ_yrs <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span>
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"No schooling completed"</span> <span class="op">~</span> <span class="fl">0</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 1"</span> <span class="op">~</span> <span class="fl">1</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 2"</span> <span class="op">~</span> <span class="fl">2</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 3"</span> <span class="op">~</span> <span class="fl">3</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 4"</span> <span class="op">~</span> <span class="fl">4</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 5"</span> <span class="op">~</span> <span class="fl">5</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 6"</span> <span class="op">~</span> <span class="fl">6</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 7"</span> <span class="op">~</span> <span class="fl">7</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 8"</span> <span class="op">~</span> <span class="fl">8</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 9"</span> <span class="op">~</span> <span class="fl">9</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 10"</span> <span class="op">~</span> <span class="fl">10</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 11"</span> <span class="op">~</span> <span class="fl">11</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 12"</span> <span class="op">~</span> <span class="fl">12</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 12"</span> <span class="op">~</span> <span class="fl">12</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"1 year of college"</span> <span class="op">~</span> <span class="fl">13</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"2 years of college"</span> <span class="op">~</span> <span class="fl">14</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"3 years of college"</span> <span class="op">~</span> <span class="fl">15</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"4 years of college"</span> <span class="op">~</span> <span class="fl">16</span>,
+    <span class="va">educd</span> <span class="op">==</span> <span class="st">"5+ years of college"</span> <span class="op">~</span> <span class="fl">17</span>
+  <span class="op">)</span><span class="op">)</span>
+
+<span class="co">## restrict to men </span>
+<span class="va">data_numident_men</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">sex</span> <span class="op">==</span> <span class="st">"Male"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1910</span><span class="op">:</span><span class="fl">1920</span> <span class="op">&amp;</span> <span class="va">death_age</span> <span class="op">&gt;</span> <span class="fl">65</span><span class="op">)</span></code></pre></div>
+<p>In the CenSoc-Numident demo dataset, have covariates from the CenSoc-Numident dataset :</p>
 <ul>
 <li>
 <code>educ_yrs</code>: years of education</li>
@@ -427,84 +423,27 @@
 <li>
 <code>ownhome</code>: own home (1) rented or N/A (0)</li>
 </ul>
-<p><strong>Questions:</strong></p>
-<ol style="list-style-type: decimal">
-<li>What’s the association between a 1-year increase in education and life expectancy at 65 (e65)?</li>
-<li>Do people who own homes live longer than those who rent?</li>
-</ol>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<p>What’s the association between a 1-year increase in education and life expectancy at 65 (e65)?</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Example with only one cohort</span>
 <span class="va">education_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span>, 
-                                   data <span class="op">=</span> <span class="va">dmf_demo</span>,
-                                   left_trunc <span class="op">=</span> <span class="fl">1975</span> , 
+                                   data <span class="op">=</span> <span class="va">data_numident_men</span>,
+                                  weights <span class="op">=</span> <span class="va">weight</span>,
+                                   left_trunc <span class="op">=</span> <span class="fl">1988</span>, 
                                    right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span>
 
 <span class="co">## look at results </span>
 <span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span> 
 
 <span class="co">## look at effect on e65</span>
-<span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
-<p>Here, for every additional year of education, the hazard ratio falls by 3.6%.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Example with only one cohort</span>
-<span class="va">home_ownership</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">ownhome</span>, 
-                                   data <span class="op">=</span> <span class="va">dmf_demo</span>,
-                                   left_trunc <span class="op">=</span> <span class="fl">1975</span> , 
-                                   right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span>
-
-<span class="co">## look at results </span>
-<span class="va">home_ownership</span><span class="op">$</span><span class="va">results</span> 
-
-<span class="co">## look at effect on e65</span>
-<span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">home_ownership</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span>, age <span class="op">=</span> <span class="fl">65</span><span class="op">)</span></code></pre></div>
+<p>Here, for every additional year of education, the hazard ratio falls by 4.6% — which corresponds to an additional 0.33 year increase in e(65).</p>
 </div>
 <div class="section level2">
 <h2 id="person-weights">Person-weights<a class="anchor" aria-label="anchor" href="#person-weights"></a>
 </h2>
-<p>The Gompertztrunc package can incorporate person-level weights.The weight for each person corresponds to the estimated number of persons in the target population that person represents. Weights can help adjust for differential representation.</p>
-<p>The vector of supplied weights must be long as the data, and all weights must be positive.</p>
-<p>In this example, we will simulate person-level weights. Imagine our data was perfectly representative of our population of interest (men born in 1910 dying in our doubly truncated window of 1975-2005) with one exception: people who rented in 1940 and died after the the age of 90 were were only half as likely to be included in our dataset. To adjust for this, we can assign each person who rented in 1940 and died after the age of 90 a weight of 2 and everyone else in the dataset a weight of 1.</p>
-<p>How will the new weights change our substantive conclusions?</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Simulate weights </span>
-<span class="va">dmf_demo</span> <span class="op">&lt;-</span> <span class="va">dmf_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pweight <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span>
-    <span class="va">death_age</span> <span class="op">&gt;</span> <span class="fl">90</span> <span class="op">&amp;</span> <span class="va">ownhome</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="fl">2</span>,
-    <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">1</span>
-  <span class="op">)</span><span class="op">)</span>
-
-<span class="co">## Run model without weights </span>
-<span class="va">homeownership_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">ownhome</span>, 
-                                   data <span class="op">=</span> <span class="va">dmf_demo</span>,
-                                   left_trunc <span class="op">=</span> <span class="fl">1975</span> , 
-                                   right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span>
-
-<span class="co">## Rerun with weights </span>
-<span class="va">homeownership_model_weighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">ownhome</span>, 
-                                   data <span class="op">=</span> <span class="va">dmf_demo</span>,
-                                   left_trunc <span class="op">=</span> <span class="fl">1975</span>, 
-                                   right_trunc <span class="op">=</span> <span class="fl">2005</span>,
-                                   weight <span class="op">=</span> <span class="va">pweight</span><span class="op">)</span>
-
-
-<span class="co">## Looks at results </span>
-<span class="va">homeownership_model</span><span class="op">$</span><span class="va">results</span> </code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="co">##   parameter        coef coef_lower coef_upper     hr hr_lower hr_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b     0.075<span style="text-decoration: underline;">8</span>     0.074<span style="text-decoration: underline;">5</span>     0.077<span style="text-decoration: underline;">1</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 78.5       77.2       79.8    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> ownhome       -<span style="color: #BB0000;">0.061</span><span style="color: #BB0000; text-decoration: underline;">5</span>    -<span style="color: #BB0000;">0.080</span><span style="color: #BB0000; text-decoration: underline;">0</span>    -<span style="color: #BB0000;">0.042</span><span style="color: #BB0000; text-decoration: underline;">9</span>  0.940    0.923    0.958</span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Looks at weighted results </span>
-<span class="va">homeownership_model_weighted</span><span class="op">$</span><span class="va">results</span> </code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="co">##   parameter        coef coef_lower coef_upper    hr hr_lower hr_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b     0.060<span style="text-decoration: underline;">8</span>     0.059<span style="text-decoration: underline;">3</span>     0.062<span style="text-decoration: underline;">4</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>   </span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 80.3       78.5       82.0    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>   </span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> ownhome        0.159      0.137      0.182   1.17     1.15     1.20</span></code></pre>
-<p>Using our new weights, we see that owning a home no longer is now associated with <em>higher</em> mortality rather than <em>lower</em> mortality. This matches our prior, as the we effectively added lots of people dying at very old ages who did not own homes.</p>
+<p>The Gompertztrunc package can incorporate person-level weights. Weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive.</p>
+<p>Using our new weights, we see that owning a home no longer is now associated with <em>higher</em> mortality rather than <em>lower</em> mortality! This make sense because we upweighted people who didn’t own a home and died at the most advanced ages. This is a stylized example designed to highlight how weights <em>could</em> change an analysis; generally weights will not have such a dramatic effect on research results.</p>
 </div>
 <div class="section level2">
 <h2 id="summary-and-limitations">Summary and Limitations<a class="anchor" aria-label="anchor" href="#summary-and-limitations"></a>
@@ -515,7 +454,6 @@
 <li><p>This approach generally requires larger sample sizes to produce reliable estimates.</p></li>
 <li><p>This approach assumes proportional hazards: the survival curves for different strata have hazard functions that are proportional over time.</p></li>
 </ol>
-<!-- ## Confidence Interval Coverage Rate  --><!-- Recall the definition of a confidence interval — a confidence interval represents the long-run frequency that a confidence interval contains the true value of the unknown parameter.  --><!-- We can assess the coverage ratio of our confidence intervals by repeating the following procedure many times: (1) simulate new data; (2) estimating 95% confidence intervals for coefficients; (3) checking whether our 95% confidence intervals for a parameter should contain the true parameter value. --><!-- A 95% confidence interval should in the long run have a coverage ratio of 95%. That is, approximately 95% of the confidence intervals should contain the true value.  --><!-- ```{r, eval = F} --><!-- ## create list for storing our results  --><!-- confidence_interval <- list() --><!-- ## rerun our experiment 100 times  --><!-- for (i in 1:1000) { --><!--   ## we simulate without any cohort distinctions --><!--   myform <- formula(aod ~ temp + sex + isSouth) --><!--   mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.7) --><!--   n <- 10000 --><!--   data <- gompertztrunc_simu( --><!--     n = n, --><!--     formula = myform, --><!--     coefs = mycoefs, --><!--     dummy = c(F, T, T), --><!--     sigma = c(3, 1, 1) --><!--   ) --><!--   ## now we structure into multiple cohorts --><!--   byear.vec <- 1810:1819 ## multiple birth cohorts --><!--   dyear.vec <- 1888:1905 ## a limited window of observations --><!--   min.age <- 65 ## only observe those 65+ --><!--   data[, byear := rep(byear.vec, rep(n / length(byear.vec), length(byear.vec)))] --><!--   ## pretend dates of birth within year are uniform --><!--   data[, dob := byear + runif(length(byear))] --><!--   ## date of death = date of birth + age of death --><!--   data[, dod := dob + aod] --><!--   ## y.left for each person --><!--   data[, y.left := min(dyear.vec) - floor(byear)] --><!--   ## only 65+ --><!--   data[y.left < 65, y.left := 65] --><!--   ## y.right for each person --><!--   data[, y.right := max(dyear.vec) - floor(byear)] --><!--   ## artificially truncate --><!--   data.trunc <- data[y.left <= aod & aod < y.right] --><!--   gompertmle <- gompertztrunc::gompertz_mle(formula = aod ~ temp + sex + isSouth, data = data.trunc, left_trunc = 1888, right_trunc = 1905) --><!--   results <- gompertmle$results %>% --><!--     dplyr::filter(!stringr::str_detect(parameter, "gompertz")) %>% --><!--     mutate(true_value = mycoefs) %>% --><!--     select(parameter, coef, coef_lower, coef_upper, true_value) %>% --><!--     mutate(ci_capture = case_when( --><!--       true_value > coef_lower & true_value < coef_upper ~ 1, --><!--       TRUE ~ 0 --><!--     )) --><!--   ## print simulation  --><!--   cat(i, " ") --><!--   confidence_interval[[i]] <- results --><!-- } --><!-- ## put results into on data.frame  --><!-- confidence_interval_coverage <- bind_rows(confidence_interval) --><!-- ## What's the coverage ratio of our confidence intervals?  --><!-- confidence_interval_coverage %>% --><!--   group_by(parameter) %>% --><!--   summarize(ci_coverage = mean(ci_capture)) --><!-- ``` -->
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
