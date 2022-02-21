@@ -4,6 +4,9 @@
     <loc>https://caseybreen.github.io/gompertztrunc/404.html</loc>
   </url>
   <url>
+    <loc>https://caseybreen.github.io/gompertztrunc/LICENSE.html</loc>
+  </url>
+  <url>
     <loc>https://caseybreen.github.io/gompertztrunc/articles/gompertztrunc_vignette.html</loc>
   </url>
   <url>
@@ -47,6 +50,9 @@
   </url>
   <url>
     <loc>https://caseybreen.github.io/gompertztrunc/reference/negLL_function.html</loc>
+  </url>
+  <url>
+    <loc>https://caseybreen.github.io/gompertztrunc/reference/numident_demo.html</loc>
   </url>
   <url>
     <loc>https://caseybreen.github.io/gompertztrunc/reference/pipe.html</loc>
