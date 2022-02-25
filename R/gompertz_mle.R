@@ -50,6 +50,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   m <- match(c("formula", "data", "byear", "dyear", "weights"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
+  mf$na.action <-  "na.pass"
   mf[[1L]] <- quote(stats::model.frame)
   mf <- eval(mf, parent.frame())
 
@@ -61,18 +62,18 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   w <- as.vector(stats::model.weights(mf))
   if(!is.null(w) && !is.numeric(w)) {
     stop("'weights' must be a numeric vector")
-  } else if(is.null(w)) {
-    w <- rep(1, nrow(data)) # if null, set all weights to 1
-  } else {
-    w <-  w/mean(w) # normalize weights if they exist
+  } else if(!is.null(w)) {
+    w <- as.numeric(as.character(w))
+  } else{
+    w <- rep(1, nrow(data)) # set all weights to 1 if they are not specified
   }
 
   ## check truncation bounds
   if(right_trunc < left_trunc) {
     stop('Invalid truncation bounds')
   }
-  detected_minimum_dyear <- min(as.numeric(as.character(dy)))
-  detected_maximum_dyear <- max(as.numeric(as.character(dy)))
+  detected_minimum_dyear <- min(as.numeric(as.character(dy)), na.rm=T)
+  detected_maximum_dyear <- max(as.numeric(as.character(dy)), na.rm=T)
   if(right_trunc != detected_maximum_dyear | left_trunc != detected_minimum_dyear) {
     warning('Supplied truncation bounds do not align with detected minimal and maximal dates
             in the data. Please make sure they are specified correctly.')
@@ -82,9 +83,11 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   data_formatted <- data %>%
     dplyr::mutate(byear = as.numeric(as.character(by)),
                   dyear = as.numeric(as.character(dy)),
-                  sample_weights = as.numeric(as.character(w))) %>%
+                  sample_weights = w) %>%
     dplyr::select(all.vars(formula), byear, dyear, sample_weights) %>%
+    tidyr::drop_na() %>% # drop all rows with NA values
     dplyr::mutate(
+      sample_weights = sample_weights/mean(sample_weights), # normalize weight
       y = get(all.vars(formula)[1]),
       right_trunc_age = right_trunc - byear,
       left_trunc_age = left_trunc - byear,
@@ -92,6 +95,9 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
     ) %>%
     droplevels()
 
+  if(nrow(data_formatted) < nrow(data)) {
+    message('Rows containing NA values have been dropped')
+  }
 
   ## lower bound (e.g., only observe deaths over 65)
   if (!missing(lower_age_bound)) {
