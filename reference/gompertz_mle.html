@@ -61,6 +61,7 @@ to mortality data using maximum likelihood estimation.</p>
   lower_age_bound <span class="op">=</span> <span class="cn">NULL</span>,
   upper_age_bound <span class="op">=</span> <span class="cn">NULL</span>,
   weights <span class="op">=</span> <span class="cn">NULL</span>,
+  start <span class="op">=</span> <span class="cn">NULL</span>,
   death_age_data_type <span class="op">=</span> <span class="st">"auto"</span>,
   maxiter <span class="op">=</span> <span class="fl">10000</span>
 <span class="op">)</span></code></pre></div>
@@ -86,6 +87,9 @@ to mortality data using maximum likelihood estimation.</p>
 <dd><p>highest age at death to include (optional)</p></dd>
 <dt>weights</dt>
 <dd><p>an optional vector of individual weights</p></dd>
+<dt>start</dt>
+<dd><p>an optional vector of starting values for the optimizer. must be a numeric
+vector that exactly matches the output of <code>get.par.start(formula, data)</code> in length and element names.</p></dd>
 <dt>death_age_data_type</dt>
 <dd><p>option for handling of continuous and discrete death age variable (not yet implemented)</p></dd>
 <dt>maxiter</dt>
