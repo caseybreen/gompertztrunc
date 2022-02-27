@@ -13,6 +13,8 @@
 #' @param lower_age_bound  lowest age at death to include (optional)
 #' @param upper_age_bound highest age at death to include (optional)
 #' @param weights an optional vector of individual weights
+#' @param start an optional vector of starting values for the optimizer. must be a numeric
+#' vector that exactly matches the output of \code{get.par.start(formula, data)} in length and element names.
 #' @param death_age_data_type option for handling of continuous and discrete death age variable (not yet implemented)
 #' @param maxiter maximum number of iterations for optimizer
 #'
@@ -43,7 +45,7 @@
 #' @export gompertz_mle
 
 gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, byear = byear, dyear=dyear, lower_age_bound = NULL,
-                         upper_age_bound = NULL, weights = NULL, death_age_data_type = 'auto', maxiter = 10000) {
+                         upper_age_bound = NULL, weights = NULL, start= NULL, death_age_data_type = 'auto', maxiter = 10000) {
 
   ## extract arguments
   mf <- rlang::call_match(defaults=TRUE)
@@ -129,6 +131,16 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
 
   ## get starting parameters
   p.start <- get.par.start(formula, data_formatted)
+  if (!is.null(start)) {
+    if(!is.vector(start) | length(start) != length(p.start) | is.null(names(start)) | !is.numeric(start) |
+       ( (length(start) == length(p.start)) & !is.null(names(start)) &(mean(names(start) == names(p.start)))!=1 ) ) {
+        stop("Invalid start parameter. starting values must be a numeric vector with exactly the
+            same length and named elements as output of get.par.start(formula, data).")
+    }
+    else {
+      p.start <- start
+    }
+  }
 
   model_matrix <- modelr::model_matrix(formula = formula, data = data_formatted) %>%
     as.matrix()

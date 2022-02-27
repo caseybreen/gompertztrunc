@@ -14,6 +14,7 @@ gompertz_mle(
   lower_age_bound = NULL,
   upper_age_bound = NULL,
   weights = NULL,
+  start = NULL,
   death_age_data_type = "auto",
   maxiter = 10000
 )
@@ -36,6 +37,9 @@ gompertz_mle(
 \item{upper_age_bound}{highest age at death to include (optional)}
 
 \item{weights}{an optional vector of individual weights}
+
+\item{start}{an optional vector of starting values for the optimizer. must be a numeric
+vector that exactly matches the output of \code{get.par.start(formula, data)} in length and element names.}
 
 \item{death_age_data_type}{option for handling of continuous and discrete death age variable (not yet implemented)}
 
