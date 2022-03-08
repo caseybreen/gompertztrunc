@@ -82,6 +82,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   }
 
   ## format data
+  sample_weights <- left_trunc_age <- right_trunc_age <- y <-  NULL
   data_formatted <- data %>%
     dplyr::mutate(byear = as.numeric(as.character(by)),
                   dyear = as.numeric(as.character(dy)),
@@ -113,7 +114,7 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   ## upper bound (e.g., only observe deaths below 100)
   if (!missing(upper_age_bound)) {
     data_formatted <- data_formatted %>%
-      dplyr::mutate(right_trunc_age = case_when(
+      dplyr::mutate(right_trunc_age = dplyr::case_when(
         right_trunc_age > upper_age_bound ~ upper_age_bound,
         TRUE ~ right_trunc_age
       ))
@@ -168,28 +169,30 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   fit <- optim_fit
 
   ## tidy up optim output
+  lower <-  upper <- NULL
   fit <- broom::tidy(fit) %>%
     dplyr::mutate(
-      lower = value - 1.96 * std.error,
-      upper = value + 1.96 * std.error
+      lower = .data$value - 1.96 * .data$std.error,
+      upper = .data$value + 1.96 * .data$std.error
     )
 
   ## calculate mode
+  parameter <- NULL
   mode <- fit %>%
     dplyr::filter(parameter == "b0.start") %>%
     dplyr::mutate(parameter = "gompertz_mode",
-           value = ab2M(exp(value), b = exp(fit$value[1])),
-           lower = ab2M(exp(lower), b = exp(fit$value[1])),
-           upper = ab2M(exp(upper), b = exp(fit$value[1]))) %>%
+           value = ab2M(exp(.data$value), b = exp(fit$value[1])),
+           lower = ab2M(exp(.data$lower), b = exp(fit$value[1])),
+           upper = ab2M(exp(.data$upper), b = exp(fit$value[1]))) %>%
     dplyr::rename(upper = lower, lower = upper)
 
   ## calculate b
   b <- fit %>%
     dplyr::filter(parameter == "log.b.start") %>%
     dplyr::mutate(parameter = "gompertz_b",
-           value = exp(value),
-           lower = exp(lower),
-           upper = exp(upper))
+           value = exp(.data$value),
+           lower = exp(.data$lower),
+           upper = exp(.data$upper))
 
   ## calculate mode
   fit <- dplyr::bind_rows(b, mode) %>%
@@ -197,16 +200,17 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
                 dplyr::filter(!parameter %in% c("b0.start", "log.b.start")))
 
   ## tidy up fit object
+  hr_lower <- hr_upper <- hr <-  NULL
   fit <- fit %>%
-    dplyr::mutate(parameter = stringr::str_replace_all(parameter, "log.", "")) %>%
-    dplyr::mutate(parameter = stringr::str_replace_all(parameter, "of.", "")) %>%
-    dplyr::select(-std.error) %>%
-    dplyr::mutate(hr = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(value)),
-           hr_lower = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(lower)),
-           hr_upper = dplyr::if_else(parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(upper)))
+    dplyr::mutate(parameter = stringr::str_replace_all(.data$parameter, "log.", "")) %>%
+    dplyr::mutate(parameter = stringr::str_replace_all(.data$parameter, "of.", "")) %>%
+    dplyr::select(-.data$std.error) %>%
+    dplyr::mutate(hr = dplyr::if_else(.data$parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(.data$value)),
+           hr_lower = dplyr::if_else(.data$parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(.data$lower)),
+           hr_upper = dplyr::if_else(.data$parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(.data$upper)))
 
   results <- fit %>%
-    dplyr::select(parameter, coef = value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)
+    dplyr::select(parameter, coef = .data$value, coef_lower = lower, coef_upper = upper, hr, hr_lower, hr_upper)
 
   ## return all results as a list
   gompertz_trunc <- list("starting_values" = p.start, "optim_fit" = optim_fit, "results" = results)

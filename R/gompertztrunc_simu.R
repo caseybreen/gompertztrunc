@@ -18,6 +18,7 @@
 #' gompertztrunc_simu(n=1000, formula = death_age ~ sex + ambient_temp,
 #' coefs = c('sex'=-0.8, 'ambient_temp'=0.3), dummy=c(TRUE,FALSE))
 #'
+#' @importFrom rlang .data
 #' @export
 
 

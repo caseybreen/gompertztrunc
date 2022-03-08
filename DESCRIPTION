@@ -1,6 +1,6 @@
 Package: gompertztrunc
 Type: Package
-Title: gompertztrunc: Tools for estimating 
+Title: gompertztrunc: Tools for Conducting Maximum Likelihood Estimation on Truncated Mortality Data 
 Version: 0.1.0
 Authors@R: 
     c(person(given = "Casey",

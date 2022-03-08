@@ -35,7 +35,7 @@ mll.gomp.multi.cohort.cov <- function(p, ## as many alphas as cohorts, and 1 bet
   ## note: effects are multiplicative of form haz_i = base * exp(covar_i * b)
 
   matrix <- A %>%
-    dplyr::select(all_of(predictors)) %>%
+    dplyr::select(dplyr::all_of(predictors)) %>%
     as.matrix()
 
   covar_effect.vec <- exp(matrix %*% as.matrix(b))
