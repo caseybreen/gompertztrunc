@@ -1,0 +1,2 @@
+library(gompertztrunc)
+gompertz_mle

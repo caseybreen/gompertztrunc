@@ -20,13 +20,11 @@ This vignette gives an overview of the `gompertztrunc` package and presents thre
 
 ## Background 
 
-Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. 
-
-The **gompertztrunc** package includes tools for mortality estimation doubly-truncated datasets without population denominators.  
+Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The **gompertztrunc** package includes tools for mortality estimation of doubly-truncated datasets without population denominators.  
 
 ## Summary of Parametric Gompertz Approach 
 
-This method assumes mortality follows a parametric model Gompertz model and uses maximum likelihood methods to estimate the underlying mortality distribution. Specifically, the hazard for individual $i$ at age $x$ given parameters $\beta$ is given by 
+This method assumes mortality follows a parametric Gompertz proportional-hazard model and uses maximum likelihood methods to estimate the parameters of this mortality distribution. Specifically, the hazard for individual $i$ at age $x$ given parameters $\beta$ is given by 
 
 $$h_i(x | \beta) = a_0 e^{b_0 x} e^{\beta Z_i}$$ 
 where
@@ -40,7 +38,7 @@ where
 
 The model will estimate the values of $\widehat{a}$, $\widehat{b}$, and $\widehat{\beta}$. 
 
-The main function in the package is the `gompertztrunc::gompertz_mle` function, which takes the following arguments: 
+The main function in the package is the `gompertztrunc::gompertz_mle` function, which takes the following main arguments: 
 
 - `formula`: model formula (for example, death_age ~ educ_yrs + homeownership)
 
@@ -52,20 +50,11 @@ The main function in the package is the `gompertztrunc::gompertz_mle` function, 
 
 - `byear`: year of birth 
 
-- `maxiter` maximum number of iteration for [optim](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/optim) function  
+- `maxiter`: maximum number of iteration for [optim](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/optim) function  
 
-- `weights` a person-level weight 
+- `weights`: an optional vector of person-level weights
 
 ## Setup 
-
-First, we load the **gompertztrunc** package from Github. 
-
-```{r, eval = F}
-## install gompertztrunc package from Github
-# install.packages("devtools")
-# devtools::install_github("caseybreen/gompertztrunc")
-```
-
 
 ```{r, warning=FALSE, results='hide',message=FALSE}
 ## library packages
@@ -80,7 +69,7 @@ library(broom)                 ## "tidy" model output
 ## load data 
 sim_data <- sim_data             ## simulated 
 bunmd_demo <- bunmd_demo         ## real 
-numident_demo <- numident_demo   ## real 
+numident_demo <- gompertztrunc::numident_demo   ## real 
 ```
 
 ## Case Study I: Simulated Data
@@ -236,7 +225,7 @@ mle_results
 
 ### Visualize Results 
 
-Compare our estimates from 'unbiased' Gompertz MLE method and our old 'biased' method, regression on age of death. 
+Here, we compare our estimates from 'unbiased' Gompertz MLE method and our old 'biased' method, regression on age of death. 
 
 ```{r, fig.width = 7.2, fig.height = 5}
 ## combine results from both models 
@@ -270,9 +259,13 @@ bpl_results %>%
 ```
 
 
-## Case Study III: Education and longevity
+## Case Study III: Education and longevity analysis with person-weights 
 
-In our third case study, we look at the association between education and longevity. We'll use a prelinked “demo” version of the CenSoc-Numident file, which contains 63 thousand mortality records and 20 mortality covariates from the 1940 census (~1% of the complete CenSoc-Numident dataset). 
+In our third case study, we look at the association between education and longevity. We'll use a pre-linked “demo” version of the CenSoc-Numident file, which contains 63 thousand mortality records and 20 mortality covariates from the 1940 census (~1% of the complete CenSoc-Numident dataset). We'll also incorporate person-level weights into our analysis. 
+
+### Person-weights 
+
+The `gompertz_mle()` function can incorporate person-level weights via the `weights` argument. These person weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive. 
 
 ```{r}
 ## load in file 
@@ -309,13 +302,16 @@ data_numident_men <- numident_demo %>%
 
 ```
 
- What's the association between a 1-year increase in education and life expectancy at 65 (e65)? 
+What's the association between a 1-year increase in education and life expectancy at 65 (e65)? For this analysis, we'll use the person-level weights using the `weights` argument in the `gompertz_mle()` function. 
 
 ```{r}
-## run gompertz model
+## look at person-level weights 
+head(data_numident_men$weight)
+
+## run gompertz model with person weights
 education_gradient <- gompertz_mle(formula = death_age ~ educ_yrs, 
                                    data = data_numident_men,
-                                  weights = weight,
+                                   weights = weight, ## specify person-level weights 
                                    left_trunc = 1988, 
                                    right_trunc = 2005)
 
@@ -336,7 +332,7 @@ Now, let's compare to a conventional method: OLS regression on age of death.
 
 ```{r, fig.width = 7.2, fig.height = 5}
 ## run linear model 
-lm_bpl <- lm(death_age ~ educ_yrs + as.factor(byear), data = data_numident_men)
+lm_bpl <- lm(death_age ~ educ_yrs + as.factor(byear), data = data_numident_men, weights = weight)
 
 ## extract coefficients from model 
 lm_bpl_tidy <- tidy(lm_bpl) %>%
@@ -373,19 +369,17 @@ education_plot
 ```
 
 
-## Person-weights 
-
-The Gompertztrunc package can incorporate person-level weights. Weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive. 
-
 ## Summary and Limitations 
 
 The \textbf{gompertztrunc} package can be used to estimate mortality differentials without population denominators. A few limitations to this approach: 
 
 1. The Gompertz law does not apply perfectly to any application, and major departures from either assumption may bias estimates. 
 
-2. This approach generally requires larger sample sizes to produce reliable estimates.
+2. This approach assumes proportional hazards: the survival curves for different strata have hazard functions that are proportional over time. 
 
-3. This approach assumes proportional hazards: the survival curves for different strata have hazard functions that are proportional over time. 
+3. The computational demands of this approach are intensive, and the `gompert_mle()` function runs into computational challenges when there are many parameters (e.g., models that have family fixed-effects). 
+
+4. The sample distribution of available deaths must be representative of the population distribution of deaths. 
 
 
 
