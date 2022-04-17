@@ -77,4 +77,22 @@ get.trunc.mean.gomp <- function(alpha, b, l, u) {
   sum((dx * x)[s]) / sum(dx[s])
 }
 
+## hx calc
+hx_calc <- function(x, b, M) {
+  hx = b * exp(b*(x - M))
+  return(hx)
+}
+
+## lx calc
+lx_calc <- function(hx) {
+  lx <- 1 * exp(-cumsum(hx))
+  return(lx)
+}
+
+## dx calc
+dx_calc <- function(n, lx) {
+  lx <- n * lx
+  dx <-  lx - lead(lx)
+  return(dx)
+}
 
