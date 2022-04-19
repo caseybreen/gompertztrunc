@@ -1,4 +1,4 @@
-#' Run diagnostic plots
+#' Run diagnostic plots - plot hazards
 #'
 #' Empirical and modeled distribution of ages of death.
 #'
@@ -12,7 +12,7 @@
 #' @export
 #'
 
-mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
+mle_plot_hazard <- function(data, object, var = hs, death_range = c(65, 110)) {
 
   ## create lists and counter
   counter = 1
@@ -32,12 +32,12 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
     select(hr) %>% as.numeric()
 
   ## calculate lifetable quantities (modeled)
-  hx <- hx_calc(b = b, M = M, x = 1:121) # 0.6158778 *
+  hx <- hx_calc(b = b, M = M, x = 0:121) # 0.6158778 *
   lx <- c(1, lx_calc(hx))
   dx <- dx_calc(1, lx)
 
   ## calculate number of deaths simulate
-  deaths <- tibble(dx, death_age = 1:122) %>%
+  deaths <- tibble(dx, death_age = 0:122) %>%
     filter(!is.na(dx))
 
   ## calculate bounds dropping endpoints
@@ -64,7 +64,7 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
   dx <- dx_calc(multiplier, lx)
 
   ## number of deaths
-  deaths <- tibble(dx, death_age = 1:122) %>%
+  deaths <- tibble(dx, hx = c(hx, NA), death_age = 0:122) %>%
     filter(!is.na(dx))
 
   death_counts_modeled[[counter]] <- deaths %>%
@@ -85,12 +85,12 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
       select(hr) %>% as.numeric()
 
     ## calculate lifetable quantities (modeled)
-    hx <- hr * hx_calc(b = b, M = M, x = 1:121) # 0.6158778 *
+    hx <- hr * hx_calc(b = b, M = M, x = 0:121) # 0.6158778 *
     lx <- c(1, lx_calc(hx))
     dx <- dx_calc(1, lx)
 
     ## calculate number of deaths simulate
-    deaths <- tibble(dx, death_age = 1:122) %>%
+    deaths <- tibble(dx, death_age = 0:122) %>%
       filter(!is.na(dx))
 
     ## calculate bounds dropping endpoints
@@ -115,7 +115,7 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
     ## new dx and simulate deaths
     dx <- dx_calc(multiplier, lx)
 
-    deaths <- tibble(dx, death_age = 1:122) %>%
+    deaths <- tibble(dx, hx = c(hx, NA), death_age = 0:122) %>%
       filter(!is.na(dx))
 
     death_counts_modeled[[counter]] <- deaths %>%
@@ -123,26 +123,48 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
 
   }
 
+  ## death counts modeled
   death_counts_modeled <- bind_rows(death_counts_modeled) %>%
     rename(var=!!var)
 
-  ## create plot
-  plot <- data %>%
+  ## number of deaths
+  deaths <- data %>%
+    mutate(death_age = floor(death_age)) %>%
     rename(var=!!var) %>%
+    group_by(var, death_age) %>%
+    summarize(dx = n())
+
+  ## calculate radix
+  radix <- death_counts_modeled %>%
+    group_by(var) %>%
+    filter(death_age %in% 0:120) %>%
+    summarize(radix = sum(dx))
+
+  ## calculate lx
+  hazards <- deaths %>%
+    left_join(radix, by = "var") %>%
+    mutate(death = cumsum(dx)) %>%
+    mutate(lx = radix - lag(death)) %>% # + 0.5*(dx)
+    mutate(hx = dx/lx) %>%
+    mutate(type = "observed")
+
+  hazards_modeled <- death_counts_modeled %>%
+    mutate(type = "modeled")
+
+  hr_ratio_plot <- hazards %>%
+    bind_rows(hazards_modeled) %>%
+    filter(between(death_age, left = death_range[1], right = death_range[2])) %>%
+    select(death_age, var, hx, type) %>%
     ggplot() +
-    geom_histogram(aes(x = death_age), binwidth  = 1, color = "black", fill = "grey") +
-    cowplot::theme_cowplot() +
-    geom_line(data = death_counts_modeled, aes(x = death_age, y = dx, color = "Modeled"), size = 1, linetype = "solid") +
-    labs(x = "Death Age",
-         y = "n",
-         title = "") +
-    scale_color_manual(name = "", values = c("Modeled" = "blue")) +
-    theme(legend.position = "bottom", legend.key.width= unit(1.5, 'cm')) +
-    labs(x = "Death Age",
-         y = "n") +
+    geom_line(aes(x = death_age, y = log(hx), color = var, linetype = type),  size = 1) +
     xlim(death_range) +
-    facet_wrap(~var, scales = "free")
+    ggsci::scale_color_lancet() +
+    cowplot::theme_cowplot() +
+    labs(x = "Death Age",
+         y = "Log Hazard rate") +
+    theme(legend.position = "bottom", legend.title = element_blank())
+
 
   ## return plot
-  return(plot)
+  return(hr_ratio_plot)
 }
