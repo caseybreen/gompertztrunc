@@ -4,7 +4,9 @@
 #'
 #' @param data data.frame use for gompertz_mle
 #' @param object gompertz_mle object
-#' @param var variable of interest
+#' @param covar covariate of interest
+#' @param death_var death age variable
+#' @param xlim x-limits for figure
 #'
 #' @return a ggplot object
 #'
@@ -12,12 +14,16 @@
 #' @export
 #'
 
-mle_plot <- function(data, object, covar, byear, xlim =c(65, 110) ) {
+mle_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "death_age") {
 
   ## give warning if data isn't a factor
   if (!(is.factor(data[[var]]) | is.character(data[[var]]))){
     stop('Covariate must be a factor or character variable')
   }
+
+  ## make death age var
+  data <- data %>%
+    rename(death_age = !!death_var)
 
   ## create lists and counter
   counter = 1
@@ -109,7 +115,7 @@ mle_plot <- function(data, object, covar, byear, xlim =c(65, 110) ) {
       as.numeric()
 
     deaths_real <- data %>%
-      filter(get(var) == cov) %>%
+      filter(get(covar) == cov) %>%
       filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
       summarize(n()) %>%
       as.numeric()
@@ -124,16 +130,16 @@ mle_plot <- function(data, object, covar, byear, xlim =c(65, 110) ) {
       filter(!is.na(dx))
 
     death_counts_modeled[[counter]] <- deaths %>%
-      mutate(!!var := covariates[[counter-1]])
+      mutate(!!covar := covariates[[counter-1]])
 
   }
 
   death_counts_modeled <- bind_rows(death_counts_modeled) %>%
-    rename(var=!!var)
+    rename(var=!!covar)
 
   ## create plot
   plot <- data %>%
-    rename(var=!!var) %>%
+    rename(var=!!covar) %>%
     ggplot() +
     geom_histogram(aes(x = death_age), binwidth  = 1, color = "black", fill = "grey") +
     cowplot::theme_cowplot() +
