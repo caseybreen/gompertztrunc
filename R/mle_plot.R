@@ -2,7 +2,7 @@
 #'
 #' Empirical and modeled distribution of ages of death.
 #'
-#' @param data data from model plot
+#' @param data data.frame use for gompertz_mle
 #' @param object gompertz_mle object
 #' @param var variable of interest
 #'
@@ -12,7 +12,12 @@
 #' @export
 #'
 
-mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
+mle_plot <- function(data, object, covar, byear, xlim =c(65, 110) ) {
+
+  ## give warning if data isn't a factor
+  if (!(is.factor(data[[var]]) | is.character(data[[var]]))){
+    stop('Covariate must be a factor or character variable')
+  }
 
   ## create lists and counter
   counter = 1
@@ -32,7 +37,7 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
     select(hr) %>% as.numeric()
 
   ## calculate lifetable quantities (modeled)
-  hx <- hx_calc(b = b, M = M, x = 1:121) # 0.6158778 *
+  hx <- hx_calc(b = b, M = M, x = 1:121+0.5) # 0.6158778 *
   lx <- c(1, lx_calc(hx))
   dx <- dx_calc(1, lx)
 
@@ -85,7 +90,7 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
       select(hr) %>% as.numeric()
 
     ## calculate lifetable quantities (modeled)
-    hx <- hr * hx_calc(b = b, M = M, x = 1:121) # 0.6158778 *
+    hx <- hr * hx_calc(b = b, M = M, x = 1:121+0.5) # 0.6158778 *
     lx <- c(1, lx_calc(hx))
     dx <- dx_calc(1, lx)
 
@@ -140,7 +145,7 @@ mle_plot <- function(data, object, var = hs, death_range =c(65, 110) ) {
     theme(legend.position = "bottom", legend.key.width= unit(1.5, 'cm')) +
     labs(x = "Death Age",
          y = "n") +
-    xlim(death_range) +
+    xlim(xlim) +
     facet_wrap(~var, scales = "free")
 
   ## return plot

@@ -9,7 +9,6 @@
 #' @return a ggplot object
 #'
 #' @importFrom rlang := .data
-#' @export
 #'
 
 mle_plot_hazard <- function(data, object, var = hs, death_range = c(65, 110)) {
@@ -120,7 +119,6 @@ mle_plot_hazard <- function(data, object, var = hs, death_range = c(65, 110)) {
 
     death_counts_modeled[[counter]] <- deaths %>%
       mutate(!!var := covariates[[counter-1]])
-
   }
 
   ## death counts modeled
