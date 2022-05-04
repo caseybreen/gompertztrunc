@@ -31,10 +31,15 @@ Compare empirical and model-based distribution of ages of death within a cohort.
 works with a single discrete covariate and a single cohort
 }
 \examples{
-numident_c1920 <- numident_demo \%>\% dplyr::filter(byear == 1920) \%>\% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
+# Create a single-cohort data set
+numident_c1920 <- numident_demo \%>\% dplyr::filter(byear == 1920) \%>\%
+dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 
-gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+# Run gompertz_mle()
+gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs,
+left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
 
-gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
-
+# Create diagnostic histogram plot using model outcome
+gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920,
+covar = "finished_hs", xlim = c(60, 95))
 }

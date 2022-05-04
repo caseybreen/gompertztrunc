@@ -14,12 +14,17 @@
 #' @importFrom rlang := .data
 #'
 #' @examples
-#' numident_c1920 <- numident_demo %>% dplyr::filter(byear == 1920) %>% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
+#' # Create a single-cohort data set
+#' numident_c1920 <- numident_demo %>% dplyr::filter(byear == 1920) %>%
+#' dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 #'
-#' gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+#' # Run gompertz_mle()
+#' gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs,
+#' left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
 #'
-#' gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
-#'
+#' # Create diagnostic histogram plot using model outcome
+#' gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920,
+#' covar = "finished_hs", xlim = c(60, 95))
 #' @export
 #'
 
@@ -31,6 +36,7 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
   }
 
   ## make death age var
+  death_age <-  NULL
   data <- data %>%
     dplyr::rename(death_age = !!death_var) %>%
     dplyr::mutate(death_age = floor(death_age))
@@ -48,6 +54,7 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
   M <- object$results$coef[[2]]
 
   ## calculate hazard ratio
+  parameter <- NULL
   hr <- object$results %>%
     dplyr::filter(parameter == !!covar) %>%
     dplyr::select(hr) %>% as.numeric()

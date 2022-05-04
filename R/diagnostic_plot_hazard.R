@@ -16,19 +16,25 @@
 #' @export
 #'
 #' @examples
-
-#' numident_c1920 <- numident_demo %>% dplyr::filter(byear == 1920) %>% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 #'
-#' gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+#' # Create a single-cohort data set
+#' numident_c1920 <- numident_demo %>% dplyr::filter(byear == 1920) %>%
+#' dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 #'
-#' gompertztrunc::diagnostic_plot_hazard(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
+#' # Run gompertz_mle()
+#' gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs,
+#' left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
 #'
+#' # Create diagnostic hazards plot using model outcome
+#' gompertztrunc::diagnostic_plot_hazard(object = gradient, data = numident_c1920,
+#' covar = "finished_hs", xlim = c(60, 95))
 #' @export
 
-diagnostic_plot_hazard <- function(data, object, death_var = "death_age", covar = hs, xlim = c(65, 110)) {
+diagnostic_plot_hazard <- function(data, object, death_var = "death_age", covar, xlim = c(65, 110)) {
 
 
   ## make death age var
+  death_age <- NULL
   data <- data %>%
     dplyr::rename(death_age = !!death_var) %>%
     dplyr::mutate(death_age = floor(death_age)) # %>% filter(death_age %in% c((min(death_age)+1):(max(death_age)-1)))
@@ -91,6 +97,7 @@ diagnostic_plot_hazard <- function(data, object, death_var = "death_age", covar 
     dplyr::mutate(!!covar := cov_levels[1])
 
   ## get covariates
+  parameter <- NULL
   covariates <- stringr::str_remove(object$results$parameter[3:length(object$results$parameter)], pattern = covar)
 
   for (cov in covariates) {
@@ -158,11 +165,14 @@ diagnostic_plot_hazard <- function(data, object, death_var = "death_age", covar 
     dplyr::filter(death_age %in% (max(deaths$death_age)+1):120) %>%
     dplyr::summarize(radix = sum(dx))
 
+  obs_deaths <- NULL
   death_count <- deaths %>%
     dplyr::group_by(covar) %>%
     dplyr::summarize(obs_deaths = sum(dx))
 
   ## calculate lx
+  type <- NULL
+  death <- NULL
   hazards <- deaths %>%
     dplyr::left_join(radix, by = "covar") %>%
     dplyr::left_join(death_count, by = "covar") %>%

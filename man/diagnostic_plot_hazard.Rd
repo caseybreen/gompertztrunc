@@ -8,7 +8,7 @@ diagnostic_plot_hazard(
   data,
   object,
   death_var = "death_age",
-  covar = hs,
+  covar,
   xlim = c(65, 110)
 )
 }
@@ -31,10 +31,16 @@ Compare empirical and model-based estimated hazard ratios within a cohort. Only
 works with a single discrete covariate.
 }
 \examples{
-numident_c1920 <- numident_demo \%>\% dplyr::filter(byear == 1920) \%>\% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 
-gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+# Create a single-cohort data set
+numident_c1920 <- numident_demo \%>\% dplyr::filter(byear == 1920) \%>\%
+dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 
-gompertztrunc::diagnostic_plot_hazard(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
+# Run gompertz_mle()
+gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs,
+left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
 
+# Create diagnostic hazards plot using model outcome
+gompertztrunc::diagnostic_plot_hazard(object = gradient, data = numident_c1920,
+covar = "finished_hs", xlim = c(60, 95))
 }
