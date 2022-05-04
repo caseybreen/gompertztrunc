@@ -1,7 +1,7 @@
-#' Run diagnostic plots
+#' Create diagnostic plots
 #'
 #' Compare empirical and model-based distribution of ages of death within a cohort. Only
-#' works with a single discrete covariate.
+#' works with a single discrete covariate and a single cohort
 #'
 #' @param data data.frame use for gompertz_mle
 #' @param object gompertz_mle object
@@ -12,12 +12,15 @@
 #' @return a ggplot object
 #'
 #' @importFrom rlang := .data
-#' @examples
 #'
-#' # Diagnostic plot to assess model fit. This diagnostic plot only works for one birth cohort
-#' # and discrete covariates.
-#' gompertztrunc::diagnostic_plot(object = gradient, data = sim_data_trunc, covar = "sex",
-#'death_range = c(65, 85))
+#' @examples
+#' numident_c1920 <- numident_demo %>% dplyr::filter(byear == 1920) %>% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
+#'
+#' gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+#'
+#' gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
+#'
+#' @export
 #'
 
 diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "death_age") {
@@ -29,8 +32,8 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
 
   ## make death age var
   data <- data %>%
-    rename(death_age = !!death_var) %>%
-    mutate(death_age = floor(death_age))
+    dplyr::rename(death_age = !!death_var) %>%
+    dplyr::mutate(death_age = floor(death_age))
 
   ## create lists and counter
   counter = 1
@@ -46,8 +49,8 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
 
   ## calculate hazard ratio
   hr <- object$results %>%
-    filter(parameter == !!covar) %>%
-    select(hr) %>% as.numeric()
+    dplyr::filter(parameter == !!covar) %>%
+    dplyr::select(hr) %>% as.numeric()
 
   ## calculate lifetable quantities (modeled)
   hx <- hx_calc(b = b, M = M, x = 0:121+ 0.5) # 0.6158778 *
@@ -55,24 +58,24 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
   dx <- dx_calc(1, lx)
 
   ## calculate number of deaths simulate
-  deaths <- tibble(dx, death_age = 0:122) %>%
-    filter(!is.na(dx))
+  deaths <- tibble::tibble(dx, death_age = 0:122) %>%
+    dplyr::filter(!is.na(dx))
 
   ## calculate bounds dropping endpoints
-  bounds <- data %>% summarize(min(death_age) + 1, max(death_age) - 1) %>%
+  bounds <- data %>% dplyr::summarize(min(death_age) + 1, max(death_age) - 1) %>%
     as.numeric()
 
   ## calculate multiplier
   deaths_sim <- deaths %>%
-    filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
-    summarize(sum(dx)) %>%
+    dplyr::filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
+    dplyr::summarize(sum(dx)) %>%
     as.numeric()
 
   ## calculate deaths real
   deaths_real <- data %>%
-    filter(get(covar) == cov_levels[1]) %>%
-    filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
-    summarize(n()) %>%
+    dplyr::filter(get(covar) == cov_levels[1]) %>%
+    dplyr::filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
+    dplyr::summarize(dplyr::n()) %>%
     as.numeric()
 
   ## multipled
@@ -82,14 +85,14 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
   dx <- dx_calc(multiplier, lx)
 
   ## number of deaths
-  deaths <- tibble(dx, death_age = 0:122) %>%
-    filter(!is.na(dx))
+  deaths <- tibble::tibble(dx, death_age = 0:122) %>%
+    dplyr::filter(!is.na(dx))
 
   death_counts_modeled[[counter]] <- deaths %>%
-    mutate(!!covar := cov_levels[1])
+    dplyr::mutate(!!covar := cov_levels[1])
 
   ## get covariates
-  covariates <- str_remove(object$results$parameter[3:length(object$results$parameter)], pattern = covar)
+  covariates <- stringr::str_remove(object$results$parameter[3:length(object$results$parameter)], pattern = covar)
 
   for (cov in covariates) {
 
@@ -98,9 +101,9 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
 
     ## calculate hazard ratio
     hr <- object$results %>%
-      mutate(parameter = str_remove(parameter, pattern = covar)) %>%
-      filter(parameter == !!cov) %>%
-      select(hr) %>% as.numeric()
+      dplyr::mutate(parameter = stringr::str_remove(parameter, pattern = covar)) %>%
+      dplyr::filter(parameter == !!cov) %>%
+      dplyr::select(hr) %>% as.numeric()
 
     ## calculate lifetable quantities (modeled)
     hx <- hr * hx_calc(b = b, M = M, x = 0:121+0.5) # 0.6158778 *
@@ -108,23 +111,23 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
     dx <- dx_calc(1, lx)
 
     ## calculate number of deaths simulate
-    deaths <- tibble(dx, death_age = 0:122) %>%
-      filter(!is.na(dx))
+    deaths <- tibble::tibble(dx, death_age = 0:122) %>%
+      dplyr::filter(!is.na(dx))
 
     ## calculate bounds dropping endpoints
-    bounds <- data %>% summarize(min(death_age) + 1, max(death_age) - 1) %>%
+    bounds <- data %>% dplyr::summarize(min(death_age) + 1, max(death_age) - 1) %>%
       as.numeric()
 
     ## calculate multiplier
     deaths_sim <- deaths %>%
-      filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
-      summarize(sum(dx)) %>%
+      dplyr::filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
+      dplyr::summarize(sum(dx)) %>%
       as.numeric()
 
     deaths_real <- data %>%
-      filter(get(covar) == cov) %>%
-      filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
-      summarize(n()) %>%
+      dplyr::filter(get(covar) == cov) %>%
+      dplyr::filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
+      dplyr::summarize(dplyr::n()) %>%
       as.numeric()
 
     ## multiplied
@@ -133,36 +136,35 @@ diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "
     ## new dx and simulate deaths
     dx <- dx_calc(multiplier, lx)
 
-    deaths <- tibble(dx, death_age = 0:122) %>%
-      filter(!is.na(dx))
+    deaths <- tibble::tibble(dx, death_age = 0:122) %>%
+      dplyr::filter(!is.na(dx))
 
     death_counts_modeled[[counter]] <- deaths %>%
-      mutate(!!covar := covariates[[counter-1]])
+      dplyr::mutate(!!covar := covariates[[counter-1]])
 
   }
 
   ## death counts modeled
-  death_counts_modeled <- bind_rows(death_counts_modeled) %>%
-    rename(var=!!covar)
+  death_counts_modeled <- dplyr::bind_rows(death_counts_modeled) %>%
+    dplyr::rename(var=!!covar)
 
   ## create plot
   plot <- data %>%
-    rename(var=!!covar) %>%
-    filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
-
-    ggplot() +
-    geom_histogram(aes(x = death_age), binwidth  = 1, color = "black", fill = "grey") + #  center = .499,
+    dplyr::rename(var=!!covar) %>%
+    dplyr::filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
+    ggplot2::ggplot() +
+    ggplot2::geom_histogram(ggplot2::aes(x = death_age), binwidth  = 1, color = "black", fill = "grey") + #  center = .499,
     cowplot::theme_cowplot() +
-    geom_line(data = death_counts_modeled, aes(x = death_age, y = dx, color = "Modeled"), size = 1, linetype = "solid") +
-    labs(x = "Death Age",
+    ggplot2::geom_line(data = death_counts_modeled, ggplot2::aes(x = death_age, y = dx, color = "Modeled"), size = 1, linetype = "solid") +
+    ggplot2::labs(x = "Death Age",
          y = "n",
          title = "") +
-    scale_color_manual(name = "", values = c("Modeled" = "blue")) +
-    theme(legend.position = "bottom", legend.key.width= unit(1.5, 'cm')) +
-    labs(x = "Death Age",
+    ggplot2::scale_color_manual(name = "", values = c("Modeled" = "blue")) +
+    ggplot2::theme(legend.position = "bottom", legend.key.width= grid::unit(1.5, 'cm')) +
+    ggplot2::labs(x = "Death Age",
          y = "n") +
-    xlim(xlim) +
-    facet_wrap(~var, scales = "free")
+    ggplot2::xlim(xlim) +
+    ggplot2::facet_wrap(~var, scales = "free")
 
   ## return plot
   return(plot)

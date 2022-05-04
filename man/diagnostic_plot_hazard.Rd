@@ -31,9 +31,10 @@ Compare empirical and model-based estimated hazard ratios within a cohort. Only
 works with a single discrete covariate.
 }
 \examples{
-# Diagnostic hazard plot to assess model fit. This diagnostic plot only works for one birth cohort
-# and discrete covariates.
-gompertztrunc::diagnostic_plot_hazard(object = gradient, data = sim_data_trunc, covar = "sex",
- death_range = c(65, 85))
+numident_c1920 <- numident_demo \%>\% dplyr::filter(byear == 1920) \%>\% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
+
+gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+
+gompertztrunc::diagnostic_plot_hazard(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
 
 }

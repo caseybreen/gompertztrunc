@@ -92,7 +92,7 @@ lx_calc <- function(hx) {
 ## dx calc
 dx_calc <- function(n, lx) {
   lx <- n * lx
-  dx <-  lx - lead(lx)
+  dx <-  lx - dplyr::lead(lx)
   return(dx)
 }
 

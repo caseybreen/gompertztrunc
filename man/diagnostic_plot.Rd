@@ -2,7 +2,7 @@
 % Please edit documentation in R/diagnostic_plot.R
 \name{diagnostic_plot}
 \alias{diagnostic_plot}
-\title{Run diagnostic plots}
+\title{Create diagnostic plots}
 \usage{
 diagnostic_plot(
   data,
@@ -28,13 +28,13 @@ a ggplot object
 }
 \description{
 Compare empirical and model-based distribution of ages of death within a cohort. Only
-works with a single discrete covariate.
+works with a single discrete covariate and a single cohort
 }
 \examples{
+numident_c1920 <- numident_demo \%>\% dplyr::filter(byear == 1920) \%>\% dplyr::mutate(finished_hs = as.factor(educ_yrs >= 12))
 
-# Diagnostic plot to assess model fit. This diagnostic plot only works for one birth cohort
-# and discrete covariates.
-gompertztrunc::diagnostic_plot(object = gradient, data = sim_data_trunc, covar = "sex",
-death_range = c(65, 85))
+gradient <- gompertztrunc::gompertz_mle(formula = death_age ~ finished_hs, left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
+
+gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920, covar = "finished_hs", xlim = c(60, 95))
 
 }

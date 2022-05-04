@@ -13,8 +13,8 @@ A data frame with 62,899 rows and 30 variables:
 \item{dyear}{Year of death}
 \item{dmonth}{Month of death}
 \item{death_age}{Age at death (years)}
-\item{zip_residence}{ZIP Code of residence at time of death}
 \item{weight}{CenSoc weight}
+\item{zip_residence}{ZIP Code of residence at time of death}
 \item{pernum}{Person number in sample unit}
 \item{perwt}{IPUMS person weight}
 \item{age}{Age in 1940}
@@ -37,6 +37,7 @@ A data frame with 62,899 rows and 30 variables:
 \item{serial}{Household serial number}
 \item{statefip}{State of residence 1940}
 \item{urban}{Urban/rural status}
+\item{educ_yrs}{Years of education attained}
 
 }
 }

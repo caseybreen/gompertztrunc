@@ -12,8 +12,8 @@
 #' \item{dyear}{Year of death}
 #' \item{dmonth}{Month of death}
 #' \item{death_age}{Age at death (years)}
-#' \item{zip_residence}{ZIP Code of residence at time of death}
 #' \item{weight}{CenSoc weight}
+#' \item{zip_residence}{ZIP Code of residence at time of death}
 #' \item{pernum}{Person number in sample unit}
 #' \item{perwt}{IPUMS person weight}
 #' \item{age}{Age in 1940}
@@ -36,6 +36,7 @@
 #' \item{serial}{Household serial number}
 #' \item{statefip}{State of residence 1940}
 #' \item{urban}{Urban/rural status}
+#' \item{educ_yrs}{Years of education attained}
 #'
 #' }
 "numident_demo"

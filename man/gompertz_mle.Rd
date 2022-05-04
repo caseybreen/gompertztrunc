@@ -60,7 +60,7 @@ Returns a named list consisting of the following components
     \item{\code{hessian}}{Hessian matrix}
     }
   }
-  \item{\code{results}}{A table of estimates and upper/lower bounds of the 95\% confidence interval
+  \item{\code{results}}{A table of estimates and upper/lower bounds of the 95 percent confidence interval
   for the estimates. Confidence interval computed with 1.96*standard_error.}
 }
 }
