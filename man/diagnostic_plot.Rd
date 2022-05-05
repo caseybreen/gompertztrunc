@@ -27,8 +27,8 @@ diagnostic_plot(
 a ggplot object
 }
 \description{
-Compare empirical and model-based distribution of ages of death within a cohort. Only
-works with a single discrete covariate and a single cohort
+Compare empirical and modeled distribution of ages of death within a cohort. Only
+works with a single discrete covariate and a single cohort.
 }
 \examples{
 # Create a single-cohort data set

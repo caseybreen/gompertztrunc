@@ -2,7 +2,7 @@
 % Please edit documentation in R/diagnostic_plot_hazard.R
 \name{diagnostic_plot_hazard}
 \alias{diagnostic_plot_hazard}
-\title{Run diagnostic plots - plot hazards}
+\title{Create diagnostic plot - hazard scale}
 \usage{
 diagnostic_plot_hazard(
   data,
@@ -27,8 +27,8 @@ diagnostic_plot_hazard(
 a ggplot object
 }
 \description{
-Compare empirical and model-based estimated hazard ratios within a cohort. Only
-works with a single discrete covariate.
+Compare empirical and model-based estimated hazard rates within a cohort. Only
+works with a single discrete covariate and a single cohort
 }
 \examples{
 

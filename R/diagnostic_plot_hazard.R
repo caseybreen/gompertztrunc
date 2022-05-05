@@ -1,7 +1,7 @@
-#' Run diagnostic plots - plot hazards
+#' Create diagnostic plot - hazard scale
 #'
-#' Compare empirical and model-based estimated hazard ratios within a cohort. Only
-#' works with a single discrete covariate.
+#' Compare empirical and model-based estimated hazard rates within a cohort. Only
+#' works with a single discrete covariate and a single cohort
 #'
 #' @param data data.frame use for gompertz_mle
 #' @param object gompertz_mle object

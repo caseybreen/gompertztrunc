@@ -1,7 +1,7 @@
 #' Create diagnostic plots
 #'
-#' Compare empirical and model-based distribution of ages of death within a cohort. Only
-#' works with a single discrete covariate and a single cohort
+#' Compare empirical and modeled distribution of ages of death within a cohort. Only
+#' works with a single discrete covariate and a single cohort.
 #'
 #' @param data data.frame use for gompertz_mle
 #' @param object gompertz_mle object
