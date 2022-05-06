@@ -7,7 +7,7 @@
 \format{
 A data frame with 62,899 rows and 30 variables:
 \describe{
-\item{histid}{Historical unique identiﬁer}
+\item{histid}{Historical unique identifier}
 \item{byear}{Year of birth}
 \item{bmonth}{Month of birth}
 \item{dyear}{Year of death}
