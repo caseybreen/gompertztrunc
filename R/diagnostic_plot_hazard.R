@@ -1,12 +1,26 @@
 #' Create diagnostic plot - hazard scale
 #'
 #' Compare empirical and model-based estimated hazard rates within a cohort. Only
-#' works with a single discrete covariate and a single cohort
+#' works with a single discrete covariate and a single cohort. Will plot hazards
+#' for to 9 levels/values of the discrete covariate.
 #'
-#' @param data data.frame use for gompertz_mle
+#' @details This function assumes that no population denominators exist with
+#' which to calculate hazards. Therefore, the "observed" hazards produced are
+#' not truly empirical values. Instead, it relies partially on the modeled
+#' parameters to compute life table values.
+#'
+#' To find these quasi-observed hazards, the modeled Gompertz distribution
+#' is used to calculate \emph{l(x_min)}; i.e., the number of survivors to the earliest
+#' observable age at death in the data. This is done for each category/level of the
+#' specified covariate. Then, the number of observed deaths at each age is used
+#' to infer the number of survivors to each subsequent age and the death rate at
+#' each age.
+#'
+#' @param data data.frame of observed data for gompertz_mle
 #' @param object gompertz_mle object
 #' @param covar covariate of interest
 #' @param death_var death age variable
+#' @param byear_var birth year/cohort variable
 #' @param xlim x-limits for figure
 #'
 #'
@@ -30,8 +44,18 @@
 #' covar = "finished_hs", xlim = c(60, 95))
 #' @export
 
-diagnostic_plot_hazard <- function(data, object, death_var = "death_age", covar, xlim = c(65, 110)) {
+diagnostic_plot_hazard <- function(data, object,  covar, death_var = "death_age", byear_var = "byear",
+                                   xlim = c(65, 110)) {
 
+  ## give warning if data isn't a factor
+  if (!(is.factor(data[[covar]]) | is.character(data[[covar]]))){
+    stop('Covariate must be a factor or character variable')
+  }
+
+  ## give warning if data frame contains multiple cohorts
+  if(length(unique(data[[byear_var]])) > 1) {
+    stop('Data and model can only include a single birth cohort')
+  }
 
   ## make death age var
   death_age <- NULL

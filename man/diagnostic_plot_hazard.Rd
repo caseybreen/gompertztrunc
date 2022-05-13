@@ -7,19 +7,22 @@
 diagnostic_plot_hazard(
   data,
   object,
-  death_var = "death_age",
   covar,
+  death_var = "death_age",
+  byear_var = "byear",
   xlim = c(65, 110)
 )
 }
 \arguments{
-\item{data}{data.frame use for gompertz_mle}
+\item{data}{data.frame of observed data for gompertz_mle}
 
 \item{object}{gompertz_mle object}
 
+\item{covar}{covariate of interest}
+
 \item{death_var}{death age variable}
 
-\item{covar}{covariate of interest}
+\item{byear_var}{birth year/cohort variable}
 
 \item{xlim}{x-limits for figure}
 }
@@ -28,7 +31,21 @@ a ggplot object
 }
 \description{
 Compare empirical and model-based estimated hazard rates within a cohort. Only
-works with a single discrete covariate and a single cohort
+works with a single discrete covariate and a single cohort. Will plot hazards
+for to 9 levels/values of the discrete covariate.
+}
+\details{
+This function assumes that no population denominators exist with
+which to calculate hazards. Therefore, the "observed" hazards produced are
+not truly empirical values. Instead, it relies partially on the modeled
+parameters to compute life table values.
+
+To find these quasi-observed hazards, the modeled Gompertz distribution
+is used to calculate \emph{l(x_min)}; i.e., the number of survivors to the earliest
+observable age at death in the data. This is done for each category/level of the
+specified covariate. Then, the number of observed deaths at each age is used
+to infer the number of survivors to each subsequent age and the death rate at
+each age.
 }
 \examples{
 

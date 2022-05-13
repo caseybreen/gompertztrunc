@@ -7,6 +7,7 @@
 #' @param object gompertz_mle object
 #' @param covar covariate of interest
 #' @param death_var death age variable
+#' @param byear_var birth year/cohort variable
 #' @param xlim x-limits for figure
 #'
 #' @return a ggplot object
@@ -28,11 +29,17 @@
 #' @export
 #'
 
-diagnostic_plot <- function(data, object, covar, xlim =c(65, 110), death_var = "death_age") {
+diagnostic_plot <- function(data, object, covar, death_var = "death_age", byear_var = "byear",
+                            xlim =c(65, 110)) {
 
   ## give warning if data isn't a factor
   if (!(is.factor(data[[covar]]) | is.character(data[[covar]]))){
     stop('Covariate must be a factor or character variable')
+  }
+
+  ## give warning if data frame contains multiple cohorts
+  if(length(unique(data[[byear_var]])) > 1) {
+    stop('Data and model can only include a single birth cohort')
   }
 
   ## make death age var

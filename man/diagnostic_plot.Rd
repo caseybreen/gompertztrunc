@@ -8,8 +8,9 @@ diagnostic_plot(
   data,
   object,
   covar,
-  xlim = c(65, 110),
-  death_var = "death_age"
+  death_var = "death_age",
+  byear_var = "byear",
+  xlim = c(65, 110)
 )
 }
 \arguments{
@@ -19,9 +20,11 @@ diagnostic_plot(
 
 \item{covar}{covariate of interest}
 
-\item{xlim}{x-limits for figure}
-
 \item{death_var}{death age variable}
+
+\item{byear_var}{birth year/cohort variable}
+
+\item{xlim}{x-limits for figure}
 }
 \value{
 a ggplot object
