@@ -19,7 +19,6 @@ ab2M <- function(a, b) {
   M
 }
 
-library(flexsurv)
 
 # cdf (-inf, q) of gompertz distribution with modal parameterization
 pgompertz.M <- function(q, b, M, ...) {

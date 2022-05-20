@@ -10,7 +10,7 @@ convert_hazards_to_ex(
   upper_age = 120,
   M = 80,
   b = 0.075,
-  use_model_estimates = F
+  use_model_estimates = FALSE
 )
 }
 \arguments{

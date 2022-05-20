@@ -8,8 +8,8 @@
 A data frame with 6732 rows and 6 variables:
 \describe{
   \item{aod}{Age at death, in integer years}
-  \item{byear}{Calender year of birth}
-  \item{dyear}{Calender year of death}
+  \item{byear}{Calendar year of birth}
+  \item{dyear}{Calendar year of death}
   \item{temp}{Temperature}
   \item{sex}{Sex (0 = male, 1 = female)}
   \item{isSouth}{Live in south (0 = FALSE, 1 = TRUE)}

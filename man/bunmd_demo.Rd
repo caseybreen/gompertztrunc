@@ -10,8 +10,8 @@ A data frame with 81,002 rows and 6 variables:
   \item{ssn}{Social Security number}
   \item{bpl_string}{Country of birth}
   \item{death_age}{Age at death (integer years)}
-  \item{byear}{Calender year of birth}
-  \item{dyear}{Calender year of death}
+  \item{byear}{Calendar year of birth}
+  \item{dyear}{Calendar year of death}
   \item{age_first_application}{Age at first Social Security application}
 
 }

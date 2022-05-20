@@ -38,10 +38,12 @@ gompertz_mle(
 
 \item{weights}{an optional vector of individual weights}
 
-\item{start}{an optional vector of starting values for the optimizer. must be a numeric
-vector that exactly matches the output of \code{get.par.start(formula, data)} in length and element names.}
+\item{start}{an optional vector of starting values for the optimizer. must be
+a numeric vector that exactly matches the output of
+\code{get.par.start(formula, data)} in length and element names.}
 
-\item{death_age_data_type}{option for handling of continuous and discrete death age variable (not yet implemented)}
+\item{death_age_data_type}{option for handling of continuous and discrete
+death age variable (not yet implemented)}
 
 \item{maxiter}{maximum number of iterations for optimizer}
 }

@@ -21,7 +21,7 @@ gompertztrunc_simu(
 
 \item{formula}{estimation formula}
 
-\item{coefs}{named vactors of coefficients and corresponding true values}
+\item{coefs}{named vectors of coefficients and corresponding true values}
 
 \item{dummy}{vector flags for each coefficient}
 

@@ -6,7 +6,7 @@
 #' @param y a vector of death ages
 #' @param X a model matrix
 #' @param y.left left truncation age
-#' @param y.right right trunction age
+#' @param y.right right truncation age
 #' @param wt weight
 #'
 #' @return The negative log likelihood of parameter estimates given observed data

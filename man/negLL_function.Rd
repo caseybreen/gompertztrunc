@@ -15,7 +15,7 @@ negLL_function(par, y, X, y.left, y.right, wt)
 
 \item{y.left}{left truncation age}
 
-\item{y.right}{right trunction age}
+\item{y.right}{right truncation age}
 
 \item{wt}{weight}
 }

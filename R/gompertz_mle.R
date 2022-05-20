@@ -13,9 +13,11 @@
 #' @param lower_age_bound  lowest age at death to include (optional)
 #' @param upper_age_bound highest age at death to include (optional)
 #' @param weights an optional vector of individual weights
-#' @param start an optional vector of starting values for the optimizer. must be a numeric
-#' vector that exactly matches the output of \code{get.par.start(formula, data)} in length and element names.
-#' @param death_age_data_type option for handling of continuous and discrete death age variable (not yet implemented)
+#' @param start an optional vector of starting values for the optimizer. must be
+#' a numeric vector that exactly matches the output of
+#' \code{get.par.start(formula, data)} in length and element names.
+#' @param death_age_data_type option for handling of continuous and discrete
+#' death age variable (not yet implemented)
 #' @param maxiter maximum number of iterations for optimizer
 #'
 #'
@@ -74,8 +76,8 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   if(right_trunc < left_trunc) {
     stop('Invalid truncation bounds')
   }
-  detected_minimum_dyear <- min(as.numeric(as.character(dy)), na.rm=T)
-  detected_maximum_dyear <- max(as.numeric(as.character(dy)), na.rm=T)
+  detected_minimum_dyear <- min(as.numeric(as.character(dy)), na.rm=TRUE)
+  detected_maximum_dyear <- max(as.numeric(as.character(dy)), na.rm=TRUE)
   if(right_trunc != detected_maximum_dyear | left_trunc != detected_minimum_dyear) {
     warning('Supplied truncation bounds do not align with detected minimal and maximal dates
             in the data. Please make sure they are specified correctly.')

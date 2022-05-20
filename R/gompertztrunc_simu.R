@@ -4,7 +4,7 @@
 #'
 #' @param n sample size
 #' @param formula estimation formula
-#' @param coefs named vactors of coefficients and corresponding true values
+#' @param coefs named vectors of coefficients and corresponding true values
 #' @param dummy vector flags for each coefficient
 #' @param sigma standard deviation for each variable
 #' @param seed random seed to duplicate data

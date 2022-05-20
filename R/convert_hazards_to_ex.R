@@ -17,7 +17,7 @@
 #'
 
 
-convert_hazards_to_ex <- function(df, age = 65, upper_age = 120, M = 80, b = 0.075, use_model_estimates=F) {
+convert_hazards_to_ex <- function(df, age = 65, upper_age = 120, M = 80, b = 0.075, use_model_estimates=FALSE) {
 
   # Use estimated mode and b from model, overriding any other input
   if(use_model_estimates) {
