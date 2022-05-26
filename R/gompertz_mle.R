@@ -41,8 +41,10 @@
 #'
 #' @examples
 #' #model hazards as function of birthplace using bunmd_demo file
+#' demo_dataset <- dplyr::filter(bunmd_demo, bpl_string %in% c("Cuba", "England"))
+#'
 #' gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005,
-#' data = bunmd_demo)
+#' data = demo_dataset)
 #'
 #' @export gompertz_mle
 

@@ -27,7 +27,6 @@
 #' gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920,
 #' covar = "finished_hs", xlim = c(60, 95))
 #' @export
-#'
 
 diagnostic_plot <- function(data, object, covar, death_var = "death_age", byear_var = "byear",
                             xlim =c(65, 110)) {

@@ -9,3 +9,4 @@
 ^readme.md
 ^\.github$
 ^LICENSE\.md$
+^cran-comments\.md$

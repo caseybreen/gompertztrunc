@@ -1,30 +1,45 @@
-Package: gompertztrunc
 Type: Package
-Title: Tools for Conducting Maximum Likelihood Estimation on Truncated Mortality Data 
+Package: gompertztrunc
+Title: Tools for Conducting Maximum Likelihood Estimation on Truncated
+    Mortality Data
 Version: 0.1.0
-Authors@R: 
-    c(person(given = "Casey",
-           family = "Breen",
-           role = "aut",
-           email = "caseybreen@berkeley.edu",
+Authors@R: c(
+    person("Casey", "Breen", , "caseybreen@berkeley.edu", role = "aut",
            comment = c(ORCID = "https://orcid.org/0000-0001-9114-981X")),
-    person(given = "Maria",
-           family = "Osborne",
-           role = c("aut", "cre"),
-           email = "mariaosborne@berkeley.edu"),
-    person(given = "Joshua R.",
-           family = "Goldstein",
-           role = "aut"))
-Imports: dplyr, data.table, broom, stringr, magrittr, flexsurv, knitr, tidyverse, socviz, cowplot, modelr, rlang, stats, tidyr, ggsci, grid, ggplot2, tibble
+    person("Maria", "Osborne", , "mariaosborne@berkeley.edu", role = c("aut", "cre")),
+    person("Joshua R.", "Goldstein", role = "aut")
+  )
 Maintainer: Maria Osborne <mariaosborne@berkeley.edu>
-Description: Functions for estimating hazard ratios and mortality differentials for doubly-truncated data without population denominators.
+Description: Functions for estimating hazard ratios and mortality
+    differentials for doubly-truncated data without population
+    denominators.
 License: GPL (>= 3)
+URL: https://caseybreen.github.io/gompertztrunc/
+Depends: 
+    R (>= 2.10)
+Imports: 
+    broom,
+    cowplot,
+    data.table,
+    dplyr,
+    flexsurv,
+    ggplot2,
+    ggsci,
+    grid,
+    knitr,
+    magrittr,
+    modelr,
+    rlang,
+    socviz,
+    stats,
+    stringr,
+    tibble,
+    tidyr,
+    tidyverse
+Suggests: 
+    rmarkdown
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
-Depends: 
-    R (>= 2.10)
-Suggests: 
-    rmarkdown
-VignetteBuilder: knitr
-URL: https://caseybreen.github.io/gompertztrunc/
