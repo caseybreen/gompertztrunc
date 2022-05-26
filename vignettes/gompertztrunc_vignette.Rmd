@@ -1,6 +1,8 @@
 ---
 title: "Analyzing doubly-truncated mortality data using the gompertztrunc package"
-author: Casey Breen (caseybreen@berkeley.edu)
+author:
+- Casey Breen (caseybreen@berkeley.edu)
+- Maria Osborne (mariaosborne@berkeley.edu)
 output: 
   rmarkdown::html_vignette
 vignette: >
@@ -38,7 +40,7 @@ where
 
 The model will estimate the values of $\widehat{a}$, $\widehat{b}$, and $\widehat{\beta}$. 
 
-The main function in the package is the `gompertztrunc::gompertz_mle` function, which takes the following main arguments: 
+The main function in the package is the `gompertztrunc::gompertz_mle()` function, which takes the following main arguments: 
 
 - `formula`: model formula (for example, death_age ~ educ_yrs + homeownership)
 
@@ -48,11 +50,20 @@ The main function in the package is the `gompertztrunc::gompertz_mle` function, 
 
 - `data`: data frame with age of death variable and covariates 
 
-- `byear`: year of birth 
+- `byear`: year of birth variable
+
+- `dyear`: year of death variable 
+
+- `lower_age_bound`: lowest age at death to include (optional)
+
+- `upper_age_bound`: highest age at death to include (optional)
+
+- `weights`: an optional vector of person-level weights
+
+- `start`: an optional vector of starting values for the optimizer
 
 - `maxiter`: maximum number of iteration for [optim](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/optim) function  
 
-- `weights`: an optional vector of person-level weights
 
 ## Setup 
 
@@ -90,7 +101,7 @@ Now let's try running `gompertz_mle()` function on the simulated data:
 ```{r}
 ## run gompertz_mle function  
 ## returns a list 
-simulated_example <- gompertz_mle(formula = aod ~ temp + as.factor(sex) + isSouth,
+simulated_example <- gompertz_mle(formula = aod ~ temp + as.factor(sex) + as.factor(isSouth),
                                                  left_trunc = 1888,
                                                  right_trunc = 1905,
                                                  data = sim_data)
@@ -100,9 +111,9 @@ simulated_example <- gompertz_mle(formula = aod ~ temp + as.factor(sex) + isSout
 
 The `gompertz_mle()` function returns a list which contains three elements:
 
-1. The initial starting parameters for the MLE routine. These starting parameter are found using OLS regression on age at death
+1. The initial starting parameters for the MLE routine. Unless specified by the user, these starting parameter are found using OLS regression on age at death.
 
-2. The full `optim` object, which gives details of the optimization routine (e.g., whether the model converged)
+2. The full `optim` object, which gives details of the optimization routine (e.g., whether the model converged).
 
 3. A data.frame of containing results: the estimated Gompertz parameters, coefficients, and hazards ratios with 95\% confidence intervals.  
 
@@ -125,20 +136,21 @@ simulated_example$results
 
 The first column gives the Gompertz $b$ parameter, and the second row gives the Gompertz mode. The next three rows show each covariate's estimated coefficient and associate hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards). 
 
+
+Let's compare our estimated values to true value. We can only do this because this is simulated (fake) data.
 ```{r}
-## true coefficient values (we know bc we simulated them)
+## true coefficient values (we know because we simulated them)
 mycoefs <- c("temp" = +.2, "sex" = -.5, "isSouth" = +.6)
 
-## compare our estimated values to true value 
-## we can only do this because this is simulated (fake) data 
-
+## compare
 simulated_example$results %>%
   filter(!stringr::str_detect(parameter, "gompertz")) %>%
   mutate(true_coef = mycoefs) %>%
   select(parameter, coef, coef_lower, coef_upper, true_coef)
 ```
 
-While investigators will ultimately report hazard ratios, translating hazard ratios into differences in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package: 
+
+While investigators will likely report hazard ratios, translating hazard ratios into differences in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package with the `convert_hazards_to_ex()` function: 
 
 ```{r}
 ## translate hazard rates to difference in e65
@@ -148,7 +160,7 @@ convert_hazards_to_ex(simulated_example$results, age = 65, use_model_estimates =
 
 ## Case Study II: Real-World Example with BUNMD Data 
 
-In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD). 
+In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD) and compare our results to results from OLS regression (a method which is biased in the presence of truncation)
 
 ```{r}
 ## look at data 
@@ -201,16 +213,16 @@ lm_bpl_tidy <- lm_bpl_tidy %>%
 Now we'll perform estimation with the `gompertztrunc` package: 
 
 ```{r}
-## Gompertz Trunc 
-## Use 1988-2005 because we are using BUNMD 
-gompert_mle_results <- gompertz_mle(formula = death_age ~ bpl_string, 
+## run gompertztrunc
+## set truncation bounds to 1988-2005 because we are using BUNMD 
+gompertz_mle_results <- gompertz_mle(formula = death_age ~ bpl_string, 
                                     left_trunc = 1988,
                                     right_trunc = 2005,
                                     data = bunmd_demo)
 
 ## convert to e65
-## use model estimates — but can also set other defaults for Gompertz M and B. 
-mle_results <- convert_hazards_to_ex(gompert_mle_results$results, use_model_estimates = T)
+## use model estimates — but can also set other defaults for Gompertz M and b. 
+mle_results <- convert_hazards_to_ex(gompertz_mle_results$results, use_model_estimates = T)
 
 ## tidy up results 
 mle_results <- mle_results %>% 
@@ -225,14 +237,14 @@ mle_results
 
 ### Visualize Results 
 
-Here, we compare our estimates from 'unbiased' Gompertz MLE method and our old 'biased' method, regression on age of death. 
+Here, we compare our estimates from 'unbiased' Gompertz MLE method and our old 'biased' method, OLS regression on age of death. We can see that the OLS results are attenuated towards 0 due to truncation.
 
 ```{r, fig.width = 7.2, fig.height = 5}
 ## combine results from both models 
 bpl_results <- lm_bpl_tidy %>%
   bind_rows(mle_results)
 
-## Calculate adjustment factor (i.e., how much bigger are Gompertz MLE results)
+## calculate adjustment factor (i.e., how much bigger are Gompertz MLE results)
 adjustment_factor <- bpl_results %>% 
   select(country, method, e65) %>%
   pivot_wider(names_from = method, values_from = e65) %>%
@@ -240,7 +252,7 @@ adjustment_factor <- bpl_results %>%
   summarize(adjustment_factor_mean = round(mean(adjustment_factor), 3)) %>%
   as.vector()
 
-## Plot results
+## plot results
 bpl_results %>%
   bind_rows(mle_results) %>%
   ggplot(aes(y = reorder(country, e65), x = e65, xmin = e65_lower, xmax = e65_upper, color = method)) +
@@ -256,6 +268,41 @@ bpl_results %>%
   ) +
   scale_color_brewer(palette = "Set1") +
   annotate("text", label = "Native Born Whites", x = 0.1, y = 3, angle = 90, size = 3, color = "black")
+```
+
+### Diagnostic Plots
+The `gompertztrunc` package offers two different graphical methods for assessing model fit. Please note that these diagnostic plots are only designed to assess the effect of a single categorical variable within a single cohort.
+
+To illustrate, we will visually assess how well the modeled Gompertz distribution of mortality by country of origin fits empirical data. We will limit the model to the birth cohort of 1915. Additionally, to reduce the number of plots generated, we will only consider men born in the US and Mexico.
+
+```{r}
+## create the dataset
+bunmd_1915_cohort <- bunmd_demo %>% 
+  filter(byear == 1915, death_age >= 65) %>% 
+  filter(bpl_string %in% c("Native Born White", "Mexico"))
+
+## run the model
+bpl_results_1915_cohort <- gompertz_mle(formula = death_age ~ bpl_string, 
+                                   data = bunmd_1915_cohort,
+                                   left_trunc = 1988, 
+                                   right_trunc = 2005)
+
+## look at results
+bpl_results_1915_cohort$results
+```
+
+The first diagnostic graph, `diagnostic_plot()`, compares the empirical distribution of deaths to the modeled distribution. The `object` argument to this function is a gompertz_mle object.
+
+```{r}
+diagnostic_plot(object = bpl_results_1915_cohort, data = bunmd_1915_cohort,
+                covar = "bpl_string", death_var = "death_age")
+```
+
+Additionally, we can compare modeled and "observed" hazards with the `diagnostic_plot_hazard()` function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not the number of survivors to age 65, this value is inferred from the *modeled* Gompertz distribution. Refer to the `diagnostic_plot_hazard()` documentation for more details.
+
+```{r}
+diagnostic_plot_hazard(object = bpl_results_1915_cohort, data = bunmd_1915_cohort,
+                covar = "bpl_string", death_var = "death_age", xlim=c(65,95))
 ```
 
 
@@ -326,9 +373,9 @@ mle_results_educ <- convert_hazards_to_ex(education_gradient$results, use_model_
 mle_results_educ
 ```
 
-Here, for every additional year of education, the hazard ratio falls by 4.6\% — which corresponds to an additional 0.33 year increase in e(65). 
+Here, for every additional year of education, the hazard ratio falls by 4.8\% — which corresponds to an additional 0.33 year increase in life expectancy at age 65. 
 
-Now, let's compare to a conventional method: OLS regression on age of death.
+Now, let's compare to a conventional method: OLS regression on age of death. Again we can see that the OLS estimate is biased downward.
 
 ```{r, fig.width = 7.2, fig.height = 5}
 ## run linear model 
@@ -369,15 +416,17 @@ education_plot
 ```
 
 
+
+
 ## Summary and Limitations 
 
 The \textbf{gompertztrunc} package can be used to estimate mortality differentials without population denominators. A few limitations to this approach: 
 
 1. The Gompertz law does not apply perfectly to any application, and major departures from either assumption may bias estimates. 
 
-2. This approach assumes proportional hazards: the survival curves for different strata have hazard functions that are proportional over time. 
+2. This approach assumes proportional hazards: i.e., the survival curves for different strata have hazard functions that are proportional over time. 
 
-3. The computational demands of this approach are intensive, and the `gompert_mle()` function runs into computational challenges when there are many parameters (e.g., models that have family fixed-effects). 
+3. The computational demands of this approach can be intensive, and the `gompertz_mle()` function runs into computational challenges when there are many parameters (e.g., models that have family fixed-effects). 
 
 4. The sample distribution of available deaths must be representative of the population distribution of deaths. 
 
