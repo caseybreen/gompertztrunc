@@ -135,27 +135,25 @@ death age variable (not yet implemented)</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">#model hazards as function of birthplace using bunmd_demo file</span></span>
+<span class="r-in"><span class="va">demo_dataset</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">bunmd_demo</span>, <span class="va">bpl_string</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cuba"</span>, <span class="st">"England"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"></span>
 <span class="r-in"><span class="fu">gompertz_mle</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, left_trunc <span class="op">=</span> <span class="fl">1988</span>, right_trunc <span class="op">=</span> <span class="fl">2005</span>,</span>
-<span class="r-in">data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span></span>
+<span class="r-in">data <span class="op">=</span> <span class="va">demo_dataset</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $starting_values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       log.b.start          b0.start    bpl_stringCuba bpl_stringEngland </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       -2.30258509      -10.53734176       -0.16960453       -0.08867522 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bpl_stringItaly  bpl_stringMexico  bpl_stringPoland </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       -0.10895325       -0.18448462       -0.10019333 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       log.b.start          b0.start bpl_stringEngland </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       -2.30258509      -10.70694629        0.08092931 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $optim_fit</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $optim_fit$par</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       log.b.start          b0.start    bpl_stringCuba bpl_stringEngland </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        -2.3031755       -10.5167314        -0.2286272        -0.1304346 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bpl_stringItaly  bpl_stringMexico  bpl_stringPoland </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        -0.1775261        -0.3685382        -0.1849352 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       log.b.start          b0.start bpl_stringEngland </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       -2.30766073      -10.71340941        0.09296218 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $optim_fit$value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 218401</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 56043.39</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $optim_fit$counts</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function gradient </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      836       NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      106       NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $optim_fit$convergence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
@@ -164,35 +162,19 @@ death age variable (not yet implemented)</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $optim_fit$hessian</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   log.b.start   b0.start bpl_stringCuba bpl_stringEngland</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> log.b.start        1368091.93 173211.996   2.968256e+04      1.717994e+04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b0.start            173212.00  22071.417   3.729687e+03      2.180600e+03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringCuba       29682.56   3729.687   3.729549e+03     -6.247565e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringEngland    17179.94   2180.600  -6.247565e-05      2.180519e+03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringItaly      32424.46   4138.901   3.339027e-05     -3.339027e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringMexico     23930.43   3035.624   1.971969e-05      1.971969e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringPoland     22524.43   2886.899   0.000000e+00      0.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   bpl_stringItaly bpl_stringMexico bpl_stringPoland</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> log.b.start          3.242446e+04     2.393043e+04     2.252443e+04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b0.start             4.138901e+03     3.035624e+03     2.886899e+03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringCuba       3.339027e-05     1.971969e-05     0.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringEngland   -3.339027e-05     1.971969e-05     0.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringItaly      4.138740e+03    -3.339027e-05     0.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringMexico    -3.339027e-05     3.035496e+03    -1.971969e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringPoland     0.000000e+00    -1.971969e-05     2.886782e+03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   log.b.start  b0.start bpl_stringEngland</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> log.b.start         362452.83 45704.256         16619.792</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b0.start             45704.26  5798.314          2123.036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bpl_stringEngland    16619.79  2123.036          2122.954</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 7 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   parameter            coef coef_lower coef_upper     hr hr_lower hr_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> gompertz_b         0.099<span style="text-decoration: underline;">9</span>     0.097<span style="text-decoration: underline;">9</span>     0.102  <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> gompertz_mode     82.2       80.5       83.8    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> bpl_stringCuba    -<span style="color: #BB0000;">0.229</span>     -<span style="color: #BB0000;">0.270</span>     -<span style="color: #BB0000;">0.188</span>   0.796    0.764    0.829</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> bpl_stringEngland -<span style="color: #BB0000;">0.130</span>     -<span style="color: #BB0000;">0.179</span>     -<span style="color: #BB0000;">0.081</span><span style="color: #BB0000; text-decoration: underline;">5</span>  0.878    0.836    0.922</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> bpl_stringItaly   -<span style="color: #BB0000;">0.178</span>     -<span style="color: #BB0000;">0.217</span>     -<span style="color: #BB0000;">0.138</span>   0.837    0.805    0.871</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> bpl_stringMexico  -<span style="color: #BB0000;">0.369</span>     -<span style="color: #BB0000;">0.412</span>     -<span style="color: #BB0000;">0.325</span>   0.692    0.662    0.723</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> bpl_stringPoland  -<span style="color: #BB0000;">0.185</span>     -<span style="color: #BB0000;">0.229</span>     -<span style="color: #BB0000;">0.141</span>   0.831    0.795    0.869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   parameter            coef coef_lower coef_upper    hr hr_lower hr_upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> gompertz_b         0.099<span style="text-decoration: underline;">5</span>     0.095<span style="text-decoration: underline;">4</span>      0.104 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> gompertz_mode     84.5       81.1        87.8   <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> bpl_stringEngland  0.093<span style="text-decoration: underline;">0</span>     0.039<span style="text-decoration: underline;">4</span>      0.147  1.10     1.04     1.16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 </code></pre></div>
