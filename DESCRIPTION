@@ -26,18 +26,18 @@ Imports:
     ggplot2,
     ggsci,
     grid,
-    knitr,
     magrittr,
     modelr,
     rlang,
-    socviz,
     stats,
     stringr,
     tibble,
-    tidyr,
-    tidyverse
+    tidyr
 Suggests: 
-    rmarkdown
+    knitr,
+    rmarkdown,
+    socviz,
+    tidyverse,
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
