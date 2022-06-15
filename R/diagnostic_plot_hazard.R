@@ -47,12 +47,12 @@
 diagnostic_plot_hazard <- function(data, object,  covar, death_var = "death_age", byear_var = "byear",
                                    xlim = c(65, 110)) {
 
-  ## give warning if data isn't a factor
+  ## abort if covariate isn't a factor or string
   if (!(is.factor(data[[covar]]) | is.character(data[[covar]]))){
     stop('Covariate must be a factor or character variable')
   }
 
-  ## give warning if data frame contains multiple cohorts
+  ## abort if data contains multiple cohorts
   if(length(unique(data[[byear_var]])) > 1) {
     stop('Data and model can only include a single birth cohort')
   }

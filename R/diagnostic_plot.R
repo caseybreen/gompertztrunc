@@ -3,7 +3,7 @@
 #' Compare empirical and modeled distribution of ages of death within a cohort. Only
 #' works with a single discrete covariate and a single cohort.
 #'
-#' @param data data.frame use for gompertz_mle
+#' @param data data used to create gompertz_mle object
 #' @param object gompertz_mle object
 #' @param covar covariate of interest
 #' @param death_var death age variable
@@ -26,17 +26,18 @@
 #' # Create diagnostic histogram plot using model outcome
 #' gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920,
 #' covar = "finished_hs", xlim = c(60, 95))
+#'
 #' @export
 
 diagnostic_plot <- function(data, object, covar, death_var = "death_age", byear_var = "byear",
                             xlim =c(65, 110)) {
 
-  ## give warning if data isn't a factor
+  ## abort if covariate isn't a factor or string
   if (!(is.factor(data[[covar]]) | is.character(data[[covar]]))){
     stop('Covariate must be a factor or character variable')
   }
 
-  ## give warning if data frame contains multiple cohorts
+  ## abort if data contains multiple cohorts
   if(length(unique(data[[byear_var]])) > 1) {
     stop('Data and model can only include a single birth cohort')
   }

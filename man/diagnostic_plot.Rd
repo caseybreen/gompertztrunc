@@ -14,7 +14,7 @@ diagnostic_plot(
 )
 }
 \arguments{
-\item{data}{data.frame use for gompertz_mle}
+\item{data}{data used to create gompertz_mle object}
 
 \item{object}{gompertz_mle object}
 
@@ -45,4 +45,5 @@ left_trunc = 1988, right_trunc = 2005, data = numident_c1920)
 # Create diagnostic histogram plot using model outcome
 gompertztrunc::diagnostic_plot(object = gradient, data = numident_c1920,
 covar = "finished_hs", xlim = c(60, 95))
+
 }
