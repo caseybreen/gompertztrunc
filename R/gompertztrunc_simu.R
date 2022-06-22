@@ -12,7 +12,7 @@
 #' @param b Gompertz b parameter
 #' @param verbose print internal check if true
 #'
-#' @return data frame of simulated death ages and covariate values
+#' @return dataframe of simulated death ages and covariate values
 #'
 #' @examples
 #' gompertztrunc_simu(n=1000, formula = death_age ~ sex + ambient_temp,

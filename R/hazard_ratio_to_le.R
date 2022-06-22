@@ -1,5 +1,8 @@
-#' Translate a single hazard ratio to life expectancy
+#' Translate a single hazard ratio to remaining life expectancy
 #'
+#' Translate a single hazard ratio to effect on remaining life
+#' expectancy at a specified age, using a Gompertz mortality schedule
+#' as the baseline
 #'
 #' @param lower age at which to compute change in remaining life expectancy
 #' @param upper upper age bound for life table calculations

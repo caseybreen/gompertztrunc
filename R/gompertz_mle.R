@@ -1,7 +1,7 @@
 #' Gompertz MLE function
 #'
-#' Fits a truncated Gompertz distribution with proportional hazards
-#' to mortality data using maximum likelihood estimation.
+#' Fits a Gompertz distribution with proportional hazards
+#' to doubly-truncated mortality data using maximum likelihood estimation.
 #'
 #'
 #' @param formula the estimation formula
@@ -36,7 +36,7 @@
 #'     }
 #'   }
 #'   \item{\code{results}}{A table of estimates and upper/lower bounds of the 95 percent confidence interval
-#'   for the estimates. Confidence interval computed with 1.96*standard_error.}
+#'   for the estimates. Confidence interval computed as 1.96*standard_error.}
 #' }
 #'
 #' @examples

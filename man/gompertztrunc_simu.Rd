@@ -36,7 +36,7 @@ gompertztrunc_simu(
 \item{verbose}{print internal check if true}
 }
 \value{
-data frame of simulated death ages and covariate values
+dataframe of simulated death ages and covariate values
 }
 \description{
 Simulate Gompertzian death distribution

@@ -1,4 +1,4 @@
-#' Create diagnostic plot - hazard scale
+#' Create diagnostic plot (hazard scale)
 #'
 #' Compare empirical and model-based estimated hazard rates within a cohort. Only
 #' works with a single discrete covariate and a single cohort. Will plot hazards

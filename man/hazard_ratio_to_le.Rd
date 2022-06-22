@@ -2,7 +2,7 @@
 % Please edit documentation in R/hazard_ratio_to_le.R
 \name{hazard_ratio_to_le}
 \alias{hazard_ratio_to_le}
-\title{Translate a single hazard ratio to life expectancy}
+\title{Translate a single hazard ratio to remaining life expectancy}
 \usage{
 hazard_ratio_to_le(lower, upper, hr, M = 80, b = 0.1)
 }
@@ -21,5 +21,7 @@ hazard_ratio_to_le(lower, upper, hr, M = 80, b = 0.1)
 hazard ratio converted to effect on life expectancy
 }
 \description{
-Translate a single hazard ratio to life expectancy
+Translate a single hazard ratio to effect on remaining life
+expectancy at a specified age, using a Gompertz mortality schedule
+as the baseline
 }

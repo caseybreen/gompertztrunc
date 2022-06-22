@@ -15,6 +15,6 @@ mll.gomp.multi.cohort.cov(p, A, predictors = predictors)
 None
 }
 \description{
-Gompertz mle function
+Estimates seperate alpha values for each cohort
 }
 \keyword{internal}

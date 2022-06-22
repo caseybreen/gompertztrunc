@@ -13,6 +13,18 @@
 #' @return A dataframe of hazards ratios and corresponding e(x) estimates and confidence intervals
 #'
 #' @importFrom rlang := .data
+#'
+#' @examples
+#' #model hazards as function of birthplace using bunmd_demo data
+#' demo_dataset <- dplyr::filter(bunmd_demo, bpl_string %in% c("Cuba", "England"))
+#'
+#' #run gompertz_mle()
+#' bpl <- gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988,
+#'                     right_trunc = 2005, data = demo_dataset)
+#'
+#' #convert to difference in life expectancy
+#' convert_hazards_to_ex(df = bpl$results, use_model_estimates = FALSE)
+#'
 #' @export
 #'
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/diagnostic_plot_hazard.R
 \name{diagnostic_plot_hazard}
 \alias{diagnostic_plot_hazard}
-\title{Create diagnostic plot - hazard scale}
+\title{Create diagnostic plot (hazard scale)}
 \usage{
 diagnostic_plot_hazard(
   data,

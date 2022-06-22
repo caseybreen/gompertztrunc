@@ -37,7 +37,7 @@ Suggests:
     knitr,
     rmarkdown,
     socviz,
-    tidyverse,
+    tidyverse
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

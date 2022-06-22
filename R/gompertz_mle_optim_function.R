@@ -1,5 +1,7 @@
 #' Gompertz mle function
 #'
+#' Estimates seperate alpha values for each cohort
+#'
 #'
 #' @param p the initialization function
 #' @param A data matrix with covariates y, u, l, and covariates, including cohort
