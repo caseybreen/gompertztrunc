@@ -1,6 +1,6 @@
 # First Submission to CRAN, version 0.1.0
 
-The first submission of the gompertztrunc package
+The first submission of the `gompertztrunc` package
 
 ## Test environments
 - R-hub windows-x86_64-devel (r-devel)
