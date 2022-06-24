@@ -43,10 +43,11 @@
 #' @details
 #'
 #' The CenSoc-Numident dataset links the 1940 census to the National Archives’
-#' public release of the Social Security Numident file. The prelinked “demo”
+#' public release of the Social Security Numident file. The prelinked demo
 #' version of the file has 63 thousand mortality records and 20
-#' mortality covariates from the 1940 census (~1\% of the complete CenSoc-Numident dataset).It
-#' is availible at \link[https://censoc.berkeley.edu/data/]{https://censoc.berkeley.edu/data/}.
+#' mortality covariates from the 1940 census (~1 percent of the complete CenSoc-Numident
+#' dataset).Both demo and full versions of the data are available at
+#' <https://censoc.berkeley.edu/data/>.
 #'
 #'
 #' @source
@@ -54,10 +55,10 @@
 #' Joshua R. Goldstein, Monica Alexander, Casey Breen, Andrea Miranda González,
 #' Felipe Menares, Maria Osborne, Mallika Snyder, and Ugur Yildirim.
 #' CenSoc Mortality File: Version 2.0. Berkeley: University of California, 2021.
-#' \link[https://censoc.berkeley.edu/]{https://censoc.berkeley.edu/}
+#' <https://censoc.berkeley.edu/>.
 #'
 #' Steven Ruggles, Sarah Flood, Ronald Goeken, Megan Schouweiler and Matthew Sobek.
-#' IPUMS USA: Version 12.0 [dataset]. Minneapolis, MN: IPUMS, 2022.
-#' \link[https://doi.org/10.18128/D010.V12.0]{https://doi.org/10.18128/D010.V12.0}
+#' IPUMS USA: Version 12.0 (dataset). Minneapolis, MN: IPUMS, 2022.
+#' <https://doi.org/10.18128/D010.V12.0>.
 #'
 "numident_demo"

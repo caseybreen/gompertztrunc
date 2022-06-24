@@ -22,7 +22,7 @@
 #'
 #'
 #' @return Returns a named list consisting of the following components
-#' (See \code{stats::\link[stats:optim]{optim}} for additional details):
+#' (See [stats::optim()] for additional details):
 #' \describe{
 #'   \item{\code{starting_values}}{list of starting values of parameters}
 #'   \item{\code{optim_fit}}{A list consisting of:
@@ -30,7 +30,7 @@
 #'     \item{\code{par}}{best estimation of parameter values}
 #'     \item{\code{value}}{log likelihood}
 #'     \item{\code{counts}}{number of calls to function and gradient}
-#'     \item{\code{convergence}}{returns 0 if the model converged, for other values see \code{stats::\link[stats:optim]{optim}} }
+#'     \item{\code{convergence}}{returns 0 if the model converged, for other values see [stats::optim()] }
 #'     \item{\code{message}}{any other information returned by optimizer}
 #'     \item{\code{hessian}}{Hessian matrix}
 #'     }
