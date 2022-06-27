@@ -203,7 +203,7 @@ diagnostic_plot_hazard <- function(data, object,  covar, death_var = "death_age"
     dplyr::mutate(death = cumsum(dx)) %>%
     dplyr::mutate(lx = obs_deaths + radix - dplyr::lag(death)) %>% #
     dplyr::mutate(hx = -log(dplyr::lead(lx) / lx)) %>%
-    dplyr::mutate(type = "observed")
+    dplyr::mutate(type = "inferred observed")
 
   hazards_modeled <- death_counts_modeled %>%
     dplyr::mutate(type = "modeled")
@@ -221,7 +221,8 @@ diagnostic_plot_hazard <- function(data, object,  covar, death_var = "death_age"
     dplyr::filter(dplyr::between(x = death_age, left = xlim[1], right = xlim[2])) %>%
     dplyr::select(death_age, covar, hx, type) %>%
     ggplot2::ggplot() +
-    ggplot2::geom_line(ggplot2::aes(x = death_age, y = log(hx), color = covar, linetype = type, alpha = type),  size = 1.3 ) +
+    ggplot2::geom_line(ggplot2::aes(x = death_age, y = log(hx), color = covar, linetype = type,
+                                    alpha = type),  size = 1.3 ) +
     ggsci::scale_color_lancet() +
     cowplot::theme_cowplot() +
     ggplot2::labs(x = "Death Age",

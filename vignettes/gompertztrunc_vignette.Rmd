@@ -22,7 +22,7 @@ This vignette gives an overview of the `gompertztrunc` package and presents thre
 
 ## Background 
 
-Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The **gompertztrunc** package includes tools for mortality estimation of doubly-truncated datasets without population denominators.  
+Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The **gompertztrunc** package includes tools for mortality estimation of doubly-truncated data sets without population denominators.  
 
 ## Summary of Parametric Gompertz Approach 
 
@@ -44,9 +44,9 @@ The main function in the package is the `gompertztrunc::gompertz_mle()` function
 
 - `formula`: model formula (for example, death_age ~ educ_yrs + homeownership)
 
-- `left_trunc`: year of upper truncation 
+- `left_trunc`: year of lower truncation 
 
-- `right_trunc`: year of lower truncation 
+- `right_trunc`: year of upper truncation 
 
 - `data`: data frame with age of death variable and covariates 
 
@@ -134,7 +134,7 @@ simulated_example$optim_fit$convergence
 simulated_example$results
 ```
 
-The first column gives the Gompertz $b$ parameter, and the second row gives the Gompertz mode. The next three rows show each covariate's estimated coefficient and associate hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards). 
+The first row gives the estimated Gompertz $b$ parameter, and the second row gives the Gompertz mode. The next three rows show each covariate's estimated coefficient and associated hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards). 
 
 
 Let's compare our estimated values to true value. We can only do this because this is simulated (fake) data.
@@ -281,7 +281,7 @@ bunmd_1915_cohort <- bunmd_demo %>%
   filter(byear == 1915, death_age >= 65) %>% 
   filter(bpl_string %in% c("Native Born White", "Mexico"))
 
-## run the model
+## run gompertz_mle()
 bpl_results_1915_cohort <- gompertz_mle(formula = death_age ~ bpl_string, 
                                    data = bunmd_1915_cohort,
                                    left_trunc = 1988, 
@@ -291,14 +291,14 @@ bpl_results_1915_cohort <- gompertz_mle(formula = death_age ~ bpl_string,
 bpl_results_1915_cohort$results
 ```
 
-The first diagnostic graph, `diagnostic_plot()`, compares the empirical distribution of deaths to the modeled distribution. The `object` argument to this function is a gompertz_mle object.
+The first diagnostic graph, `diagnostic_plot()`, compares the empirical distribution of deaths to the modeled distribution. 
 
 ```{r}
 diagnostic_plot(object = bpl_results_1915_cohort, data = bunmd_1915_cohort,
                 covar = "bpl_string", death_var = "death_age")
 ```
 
-Additionally, we can compare modeled and "observed" hazards with the `diagnostic_plot_hazard()` function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not the number of survivors to age 65, this value is inferred from the *modeled* Gompertz distribution. Refer to the `diagnostic_plot_hazard()` documentation for more details.
+Additionally, we can compare modeled and "observed" hazards with the `diagnostic_plot_hazard()` function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not know the actual number of survivors to the observable death window, this value is inferred from the *modeled* Gompertz distribution. Refer to the `diagnostic_plot_hazard()` documentation for more details.
 
 ```{r}
 diagnostic_plot_hazard(object = bpl_results_1915_cohort, data = bunmd_1915_cohort,
@@ -420,9 +420,9 @@ education_plot
 
 ## Summary and Limitations 
 
-The \textbf{gompertztrunc} package can be used to estimate mortality differentials without population denominators. A few limitations to this approach: 
+The \textbf{gompertztrunc} package can be used to estimate mortality differentials without population denominators. A few limitations and considerations to this approach: 
 
-1. The Gompertz law does not apply perfectly to any application, and major departures from either assumption may bias estimates. 
+1. The Gompertz law does not apply perfectly to any application, and major departures from this assumption may bias estimates. 
 
 2. This approach assumes proportional hazards: i.e., the survival curves for different strata have hazard functions that are proportional over time. 
 
