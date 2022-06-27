@@ -1,4 +1,4 @@
-#' Demo Numident dataset
+#' Demo Numident Data Set
 #'
 #' A data set containing a sample of the CenSoc-Numident file,
 #' including age at death and select covariates.

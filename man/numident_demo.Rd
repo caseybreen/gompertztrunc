@@ -3,7 +3,7 @@
 \docType{data}
 \name{numident_demo}
 \alias{numident_demo}
-\title{Demo Numident dataset}
+\title{Demo Numident Data Set}
 \format{
 A data frame with 62,899 rows and 30 variables:
 \describe{
