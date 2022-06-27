@@ -45,13 +45,13 @@
     </div>
 
 <div id="gompertztrunc" class="section level1"><div class="section level2">
-<h2 id="about-the-package-under-development">About the package (under development)<a class="anchor" aria-label="anchor" href="#about-the-package-under-development"></a></h2>
+<h2 id="about-the-package">About the package<a class="anchor" aria-label="anchor" href="#about-the-package"></a></h2>
 <p><code>gompertztrunc</code> is an R package for estimating Gompertz distributions from doubly-truncated data using maximum likelihood estimation.</p>
 <p>To install the package:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"caseybreen/gompertztrunc"</span><span class="op">)</span></code></pre></div>
-<!-- ## TODO  --><!-- 1. Apply to real data (e.g., BUNMD) or one of Censoc datasets. The `gompertz_mle` function seems to work okay on a simple DMF dataset — but BUNMD or Numident is a better test.  --><!-- 2. Get `gompertz_mle` function to work with weights.  --><!-- 3. More flexible functions for estimating e65 (using MLE gompertz parameters OR baseline ) --><!-- 4. Double-check that code works with both discrete (integer) and continuous death ages.  --><!-- 5. Check if CI is correct. Casey thinks the confidence intervals are probably anti-conservative, e.g. coverage ratio of the "95% intervals" is probably closer to 70%.  --><!-- 6. Include way to specify structure of "b," e.g. different for men and women, or smooth function of cohort or ... (Later) --><!-- 7. Fixed effects (Later) -->
+<!-- ## TODO  --><!-- 1. Implement option for  discrete (integer) and continuous death ages. (later) --><!--2. Check if CI is correct. Casey thinks the confidence intervals are probably anti-conservative, e.g. coverage ratio of the "95% intervals" is probably closer to 70%.  --><!-- 3. Include way to specify structure of "b," e.g. different for men and women, or smooth function of cohort or ... (Later) --><!-- 4. Fixed effects (Later) -->
 </div></div>
 
   </main></div>
