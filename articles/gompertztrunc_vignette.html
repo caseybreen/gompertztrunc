@@ -82,7 +82,7 @@
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
-<p>Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The <strong>gompertztrunc</strong> package includes tools for mortality estimation of doubly-truncated datasets without population denominators.</p>
+<p>Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The <strong>gompertztrunc</strong> package includes tools for mortality estimation of doubly-truncated data sets without population denominators.</p>
 </div>
 <div class="section level2">
 <h2 id="summary-of-parametric-gompertz-approach">Summary of Parametric Gompertz Approach<a class="anchor" aria-label="anchor" href="#summary-of-parametric-gompertz-approach"></a>
@@ -106,8 +106,8 @@
 <p>The main function in the package is the <code><a href="../reference/gompertz_mle.html">gompertztrunc::gompertz_mle()</a></code> function, which takes the following main arguments:</p>
 <ul>
 <li><p><code>formula</code>: model formula (for example, death_age ~ educ_yrs + homeownership)</p></li>
-<li><p><code>left_trunc</code>: year of upper truncation</p></li>
-<li><p><code>right_trunc</code>: year of lower truncation</p></li>
+<li><p><code>left_trunc</code>: year of lower truncation</p></li>
+<li><p><code>right_trunc</code>: year of upper truncation</p></li>
 <li><p><code>data</code>: data frame with age of death variable and covariates</p></li>
 <li><p><code>byear</code>: year of birth variable</p></li>
 <li><p><code>dyear</code>: year of death variable</p></li>
@@ -228,7 +228,7 @@
 <span class="co">## <span style="color: #BCBCBC;">3</span> temp                 0.207     0.194       0.219  1.23     1.21     1.25 </span>
 <span class="co">## <span style="color: #BCBCBC;">4</span> as.factor(sex)1     -<span style="color: #BB0000;">0.530</span>    -<span style="color: #BB0000;">0.590</span>      -<span style="color: #BB0000;">0.470</span>  0.589    0.554    0.625</span>
 <span class="co">## <span style="color: #BCBCBC;">5</span> as.factor(isSouth)1  0.598     0.536       0.661  1.82     1.71     1.94</span></code></pre>
-<p>The first column gives the Gompertz <span class="math inline">\(b\)</span> parameter, and the second row gives the Gompertz mode. The next three rows show each covariate’s estimated coefficient and associate hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards).</p>
+<p>The first row gives the estimated Gompertz <span class="math inline">\(b\)</span> parameter, and the second row gives the Gompertz mode. The next three rows show each covariate’s estimated coefficient and associated hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards).</p>
 <p>Let’s compare our estimated values to true value. We can only do this because this is simulated (fake) data.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## true coefficient values (we know because we simulated them)</span>
@@ -399,7 +399,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op">==</span> <span class="fl">1915</span>, <span class="va">death_age</span> <span class="op">&gt;=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">bpl_string</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Native Born White"</span>, <span class="st">"Mexico"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="co">## run the model</span>
+<span class="co">## run gompertz_mle()</span>
 <span class="va">bpl_results_1915_cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, 
                                    data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
                                    left_trunc <span class="op">=</span> <span class="fl">1988</span>, 
@@ -413,14 +413,14 @@
 <span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b        0.083<span style="text-decoration: underline;">1</span>     0.071<span style="text-decoration: underline;">5</span>     0.096<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
 <span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode    81.1       70.2       91.9    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
 <span class="co">## <span style="color: #BCBCBC;">3</span> bpl_stringMexico -<span style="color: #BB0000;">0.419</span>     -<span style="color: #BB0000;">0.575</span>     -<span style="color: #BB0000;">0.263</span>   0.658    0.563    0.769</span></code></pre>
-<p>The first diagnostic graph, <code><a href="../reference/diagnostic_plot.html">diagnostic_plot()</a></code>, compares the empirical distribution of deaths to the modeled distribution. The <code>object</code> argument to this function is a gompertz_mle object.</p>
+<p>The first diagnostic graph, <code><a href="../reference/diagnostic_plot.html">diagnostic_plot()</a></code>, compares the empirical distribution of deaths to the modeled distribution.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/diagnostic_plot.html">diagnostic_plot</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
                 covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## Warning: Removed 4 rows containing missing values (geom_bar).</span></code></pre>
 <pre><code><span class="co">## Warning: Removed 76 row(s) containing missing values (geom_path).</span></code></pre>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
-<p>Additionally, we can compare modeled and “observed” hazards with the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not the number of survivors to age 65, this value is inferred from the <em>modeled</em> Gompertz distribution. Refer to the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> documentation for more details.</p>
+<p>Additionally, we can compare modeled and “observed” hazards with the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not know the actual number of survivors to the observable death window, this value is inferred from the <em>modeled</em> Gompertz distribution. Refer to the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> documentation for more details.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
                 covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">65</span>,<span class="fl">95</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -547,9 +547,9 @@
 <div class="section level2">
 <h2 id="summary-and-limitations">Summary and Limitations<a class="anchor" aria-label="anchor" href="#summary-and-limitations"></a>
 </h2>
-<p>The  package can be used to estimate mortality differentials without population denominators. A few limitations to this approach:</p>
+<p>The  package can be used to estimate mortality differentials without population denominators. A few limitations and considerations to this approach:</p>
 <ol style="list-style-type: decimal">
-<li><p>The Gompertz law does not apply perfectly to any application, and major departures from either assumption may bias estimates.</p></li>
+<li><p>The Gompertz law does not apply perfectly to any application, and major departures from this assumption may bias estimates.</p></li>
 <li><p>This approach assumes proportional hazards: i.e., the survival curves for different strata have hazard functions that are proportional over time.</p></li>
 <li><p>The computational demands of this approach can be intensive, and the <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function runs into computational challenges when there are many parameters (e.g., models that have family fixed-effects).</p></li>
 <li><p>The sample distribution of available deaths must be representative of the population distribution of deaths.</p></li>
