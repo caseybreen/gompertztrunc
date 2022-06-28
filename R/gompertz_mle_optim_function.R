@@ -1,6 +1,6 @@
 #' Gompertz mle function
 #'
-#' Estimates seperate alpha values for each cohort
+#' Estimates separate alpha values for each cohort
 #'
 #'
 #' @param p the initialization function

@@ -63,7 +63,7 @@ The CenSoc-Numident dataset links the 1940 census to the National Archives’
 public release of the Social Security Numident file. The prelinked demo
 version of the file has 63 thousand mortality records and 20
 mortality covariates from the 1940 census (~1 percent of the complete CenSoc-Numident
-dataset).Both demo and full versions of the data are available at
+dataset). Both demo and full versions of the data are available at
 \url{https://censoc.berkeley.edu/data/}.
 }
 \keyword{datasets}

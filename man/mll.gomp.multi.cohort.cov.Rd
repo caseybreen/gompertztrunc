@@ -15,6 +15,6 @@ mll.gomp.multi.cohort.cov(p, A, predictors = predictors)
 None
 }
 \description{
-Estimates seperate alpha values for each cohort
+Estimates separate alpha values for each cohort
 }
 \keyword{internal}
