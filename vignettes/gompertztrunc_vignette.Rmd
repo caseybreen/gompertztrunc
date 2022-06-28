@@ -22,7 +22,7 @@ This vignette gives an overview of the `gompertztrunc` package and presents thre
 
 ## Background 
 
-Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The **gompertztrunc** package includes tools for mortality estimation of doubly-truncated data sets without population denominators.  
+Researchers increasingly have access to administrative mortality records that only include those who have died for a limited observation window without information on survivors. The double truncation and absence of denominators precludes the use of conventional tools of survival analysis. The `gompertztrunc` package includes tools for mortality estimation of doubly-truncated data sets without population denominators.  
 
 ## Summary of Parametric Gompertz Approach 
 
@@ -160,7 +160,7 @@ convert_hazards_to_ex(simulated_example$results, age = 65, use_model_estimates =
 
 ## Case Study II: Real-World Example with BUNMD Data 
 
-In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD) and compare our results to results from OLS regression (a method which is biased in the presence of truncation)
+In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD) and compare our results to results from OLS regression (a method which is biased in the presence of truncation).
 
 ```{r}
 ## look at data 
