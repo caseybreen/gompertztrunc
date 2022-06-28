@@ -59,6 +59,6 @@
 #'
 #' Steven Ruggles, Sarah Flood, Ronald Goeken, Megan Schouweiler and Matthew Sobek.
 #' IPUMS USA: Version 12.0 (dataset). Minneapolis, MN: IPUMS, 2022.
-#' <https://doi.org/10.18128/D010.V12.0>.
+#' \doi{10.18128/D010.V12.0}.
 #'
 "numident_demo"
