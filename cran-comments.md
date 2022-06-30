@@ -21,9 +21,7 @@ The first submission of the `gompertztrunc` package
 
 0 errors ✓ | 0 warnings ✓ | 2 notes x
 
-
-## Explanation of Notes
-
-The 'lastMiKTeXException' note only occurs when build is checked on windows-x86_64-devel. As noted in [rhub issue 503](https://github.com/r-hub/rhub/issues/503), it can likely be ignored.
+Notes:
+* The 'lastMiKTeXException' note only occurs when build is checked on windows-x86_64-devel. After searching online, it seems that this note is possibly due to a MiKTeX bug during checking and can probably be ignored.
 
 
