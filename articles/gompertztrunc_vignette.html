@@ -417,16 +417,11 @@
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/diagnostic_plot.html">diagnostic_plot</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
                 covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Warning: Removed 4 rows containing missing values (geom_bar).</span></code></pre>
-<pre><code><span class="co">## Warning: Removed 76 row(s) containing missing values (geom_path).</span></code></pre>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>Additionally, we can compare modeled and “observed” hazards with the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not know the actual number of survivors to the observable death window, this value is inferred from the <em>modeled</em> Gompertz distribution. Refer to the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> documentation for more details.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
                 covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">65</span>,<span class="fl">95</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Warning in log(dplyr::lead(lx)/lx): NaNs produced</span></code></pre>
-<pre><code><span class="co">## Warning: Using alpha for a discrete variable is not advised.</span></code></pre>
-<pre><code><span class="co">## Warning: Removed 4 row(s) containing missing values (geom_path).</span></code></pre>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
 </div>
@@ -438,7 +433,7 @@
 <h3 id="person-weights">Person-weights<a class="anchor" aria-label="anchor" href="#person-weights"></a>
 </h3>
 <p>The <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function can incorporate person-level weights via the <code>weights</code> argument. These person weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## load in file </span>
 <span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span>
 
@@ -471,11 +466,11 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">sex</span> <span class="op">==</span> <span class="st">"Male"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1910</span><span class="op">:</span><span class="fl">1920</span> <span class="op">&amp;</span> <span class="va">death_age</span> <span class="op">&gt;</span> <span class="fl">65</span><span class="op">)</span></code></pre></div>
 <p>What’s the association between a 1-year increase in education and life expectancy at 65 (e65)? For this analysis, we’ll use the person-level weights using the <code>weights</code> argument in the <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## look at person-level weights </span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_numident_men</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] 3.399339 3.507209 4.615740 4.092312 3.655178 7.781576</span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## run gompertz model with person weights</span>
 <span class="va">education_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span>, 
                                    data <span class="op">=</span> <span class="va">data_numident_men</span>,
@@ -491,7 +486,7 @@
 <span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b     0.079<span style="text-decoration: underline;">9</span>     0.073<span style="text-decoration: underline;">6</span>     0.086<span style="text-decoration: underline;">8</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
 <span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 73.9       67.2       80.5    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
 <span class="co">## <span style="color: #BCBCBC;">3</span> educ_yrs      -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span>    -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">7</span>    -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span>  0.954    0.941    0.966</span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## translate to e65</span>
 <span class="va">mle_results_educ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span>, age <span class="op">=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Parametric Gompertz MLE"</span><span class="op">)</span>
@@ -505,7 +500,7 @@
 <span class="co">## <span style="color: #949494;"># … with 3 more variables: e65_lower &lt;dbl&gt;, e65_upper &lt;dbl&gt;, method &lt;chr&gt;</span></span></code></pre>
 <p>Here, for every additional year of education, the hazard ratio falls by 4.8% — which corresponds to an additional 0.33 year increase in life expectancy at age 65.</p>
 <p>Now, let’s compare to a conventional method: OLS regression on age of death. Again we can see that the OLS estimate is biased downward.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## run linear model </span>
 <span class="va">lm_bpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">byear</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_numident_men</span>, weights <span class="op">=</span> <span class="va">weight</span><span class="op">)</span>
 
