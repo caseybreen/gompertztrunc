@@ -167,9 +167,11 @@ diagnostic_plot <- function(data, object, covar, death_var = "death_age", byear_
     dplyr::rename(var=!!covar) %>%
     dplyr::filter(death_age >= bounds[[1]] & death_age <= bounds[[2]]) %>%
     ggplot2::ggplot() +
-    ggplot2::geom_histogram(ggplot2::aes(x = death_age), binwidth  = 1, color = "black", fill = "grey") + #  center = .499,
+    ggplot2::geom_histogram(ggplot2::aes(x = death_age), binwidth  = 1, color = "black",
+                            fill = "grey", na.rm=TRUE) + #  center = .499,
     cowplot::theme_cowplot() +
-    ggplot2::geom_line(data = death_counts_modeled, ggplot2::aes(x = death_age, y = dx, color = "Modeled"), size = 1, linetype = "solid") +
+    ggplot2::geom_line(data = death_counts_modeled, ggplot2::aes(x = death_age, y = dx,color = "Modeled"),
+                       size = 1, linetype = "solid", na.rm=TRUE) +
     ggplot2::labs(x = "Death Age",
          y = "n",
          title = "") +

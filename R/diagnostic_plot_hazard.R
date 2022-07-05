@@ -208,27 +208,27 @@ diagnostic_plot_hazard <- function(data, object,  covar, death_var = "death_age"
   hazards_modeled <- death_counts_modeled %>%
     dplyr::mutate(type = "modeled")
 
-  hazards_modeled_alt <- death_counts_modeled %>%
-    dplyr::left_join(radix, by = "covar") %>%
-    dplyr::mutate(death = cumsum(dx)) %>%
-    dplyr::mutate(lx = radix - dplyr::lag(death)) %>% #
-    dplyr::mutate(hx = dx/lx) %>%
-    dplyr::mutate(hx = -log(dplyr::lead(lx) / lx)) %>%
-    dplyr::mutate(type = "modeled")
+  # hazards_modeled_alt <- death_counts_modeled %>%
+  #   dplyr::left_join(radix, by = "covar") %>%
+  #   dplyr::mutate(death = cumsum(dx)) %>%
+  #   dplyr::mutate(lx = radix - dplyr::lag(death)) %>% #
+  #   dplyr::mutate(hx = dx/lx) %>%
+  #   dplyr::mutate(hx = -log(dplyr::lead(lx) / lx)) %>%
+  #   dplyr::mutate(type = "modeled")
 
-  hr_ratio_plot <- hazards %>%
+  hr_ratio_plot <- suppressWarnings(hazards %>%
     dplyr::bind_rows(hazards_modeled) %>%
     dplyr::filter(dplyr::between(x = death_age, left = xlim[1], right = xlim[2])) %>%
     dplyr::select(death_age, covar, hx, type) %>%
     ggplot2::ggplot() +
     ggplot2::geom_line(ggplot2::aes(x = death_age, y = log(hx), color = covar, linetype = type,
-                                    alpha = type),  size = 1.3 ) +
+                                    alpha = type),  size = 1.3, na.rm=TRUE) +
     ggsci::scale_color_lancet() +
     cowplot::theme_cowplot() +
     ggplot2::labs(x = "Death Age",
          y = "Log Hazard rate") +
     ggplot2::scale_alpha_discrete(range = c(0.5, 1)) +
-    ggplot2::theme(legend.position = "bottom", legend.title = ggplot2::element_blank())
+    ggplot2::theme(legend.position = "bottom", legend.title = ggplot2::element_blank()))
 
 
   ## return plot

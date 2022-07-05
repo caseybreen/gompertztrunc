@@ -3,7 +3,11 @@ The following changes have been made in response to CRAN's comments:
 
 - Reworded the description so that it does not start with "Functions for"
 
-- Changed print() statements to warning()
+- Changed `print()` statements to `warning()` or made sure they were encompassed by an
+`if verbose()` block
+
+- Altered `diagnostic_plot()` and `diagnostic_plot_hazard()` functions so that they do
+not write internal ggplot warnings to the console
 
 ### test environments
 
