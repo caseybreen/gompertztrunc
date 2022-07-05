@@ -5,14 +5,14 @@ The following changes have been made in response to CRAN's comments:
 
 - Changed print() statements to warning()
 
-## test environments
+### test environments
 
-## R CMD Check results
+### R CMD Check results
 
 
 
 # Reply from CRAN for first submission
--Please do not start the description with "This package", package name, title or
+- Please do not start the description with "This package", package name, title or
 "Functions for".
 
 - If there are references describing the methods in your package, please 
@@ -38,12 +38,12 @@ Instead of print() rather use message()/warning()  or if(verbose)cat(..)
 
 The first submission of the `gompertztrunc` package
 
-## Test environments
+### Test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-## R CMD check results
+### R CMD check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
   checking CRAN incoming feasibility ... NOTE
   
