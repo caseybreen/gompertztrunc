@@ -43,7 +43,7 @@ mll.gomp.multi.cohort.cov <- function(p, ## as many alphas as cohorts, and 1 bet
   covar_effect.vec <- exp(matrix %*% as.matrix(b))
 
   if (length(alpha.vec) != length(covar_effect.vec)) {
-    print("warning: length(alpha.vec) != length(covar_effect.vec)")
+    warning("warning: length(alpha.vec) != length(covar_effect.vec)")
   }
   rate.vec <- alpha.vec * (covar_effect.vec)
 

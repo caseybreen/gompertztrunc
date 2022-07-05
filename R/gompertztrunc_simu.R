@@ -62,7 +62,7 @@ gompertztrunc_simu <- function(n, ## sample size
   vars.to.sim <- all.vars(formula[[3]])
   k <- length(vars.to.sim)
   if (!is.null(dummy) & length(dummy) != k) {
-    print("incorrect length of dummy argument:\n
+    warning("incorrect length of dummy argument:\n
            should equal number of vars in formula.\n
            E.g., in y ~ x1 + x2 + x1:x2, there are 2 vars")
   }

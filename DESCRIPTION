@@ -10,7 +10,7 @@ Authors@R: c(
     person("Joshua R.", "Goldstein", role = "aut")
   )
 Maintainer: Maria Osborne <mariaosborne@berkeley.edu>
-Description: Functions for estimating hazard ratios and mortality
+Description: Estimates hazard ratios and mortality
     differentials for doubly-truncated data without population
     denominators.
 License: GPL (>= 3)
