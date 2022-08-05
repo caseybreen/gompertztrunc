@@ -7,7 +7,9 @@ The following changes have been made in response to CRAN's comments:
 `if verbose()` block
 
 - Altered `diagnostic_plot()` and `diagnostic_plot_hazard()` functions so that they do
-not write internal ggplot warnings to the console
+not write internal ggplot warnings to the console or produce fewer internal warnings.
+
+The second point about references was a suggestion and did not require changes.
 
 ### test environments
 
