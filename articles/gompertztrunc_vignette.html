@@ -8,8 +8,8 @@
 <meta name="description" content="gompertztrunc">
 <title>Analyzing doubly-truncated mortality data using the gompertztrunc package • gompertztrunc</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Analyzing doubly-truncated mortality data using the gompertztrunc package">
 <meta property="og:description" content="gompertztrunc">
@@ -122,48 +122,48 @@
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## library packages</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://caseybreen.github.io/gompertztrunc/">gompertztrunc</a></span><span class="op">)</span>         <span class="co">## calculate mortality differentials under double-truncation  </span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>             <span class="co">## data manipulation and visualization  </span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span>            <span class="co">## fast data manipulation</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span>               <span class="co">## publication-ready themes for ggplot</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://kjhealy.github.io/socviz/" class="external-link">socviz</a></span><span class="op">)</span>                <span class="co">## helper functions for data visualization (Kieran Healy)  </span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/" class="external-link">broom</a></span><span class="op">)</span>                 <span class="co">## "tidy" model output </span>
-
-
-<span class="co">## load data </span>
-<span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="va">sim_data</span>             <span class="co">## simulated </span>
-<span class="va">bunmd_demo</span> <span class="op">&lt;-</span> <span class="va">bunmd_demo</span>         <span class="co">## real </span>
-<span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="fu">gompertztrunc</span><span class="fu">::</span><span class="va"><a href="../reference/numident_demo.html">numident_demo</a></span>   <span class="co">## real </span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## library packages</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://caseybreen.github.io/gompertztrunc/">gompertztrunc</a></span><span class="op">)</span>         <span class="co">## calculate mortality differentials under double-truncation  </span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>             <span class="co">## data manipulation and visualization  </span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span>            <span class="co">## fast data manipulation</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span>               <span class="co">## publication-ready themes for ggplot</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://kjhealy.github.io/socviz/" class="external-link">socviz</a></span><span class="op">)</span>                <span class="co">## helper functions for data visualization (Kieran Healy)  </span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/" class="external-link">broom</a></span><span class="op">)</span>                 <span class="co">## "tidy" model output </span></span>
+<span></span>
+<span></span>
+<span><span class="co">## load data </span></span>
+<span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="va">sim_data</span>             <span class="co">## simulated </span></span>
+<span><span class="va">bunmd_demo</span> <span class="op">&lt;-</span> <span class="va">bunmd_demo</span>         <span class="co">## real </span></span>
+<span><span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="fu">gompertztrunc</span><span class="fu">::</span><span class="va"><a href="../reference/numident_demo.html">numident_demo</a></span>   <span class="co">## real </span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="case-study-i-simulated-data">Case Study I: Simulated Data<a class="anchor" aria-label="anchor" href="#case-study-i-simulated-data"></a>
 </h2>
 <p>In our first case study, we use simulated (fake) data included in the gompertztrunc package. Because we simulated the data, we know the true coefficient values (we also know that the mortality follows a Gompertz distribution and our proportional hazards assumption holds).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Look at simulated data </span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_data</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##    aod byear dyear       temp sex isSouth</span>
-<span class="co">## 1:  87  1810  1897 -4.6198501   1       0</span>
-<span class="co">## 2:  78  1810  1888 -0.8841613   1       0</span>
-<span class="co">## 3:  79  1810  1890  0.7566703   1       0</span>
-<span class="co">## 4:  85  1810  1895 -0.6728037   1       0</span>
-<span class="co">## 5:  85  1810  1896 -3.8537981   1       0</span>
-<span class="co">## 6:  81  1810  1891 -1.2885393   1       0</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## Look at simulated data </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_data</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    aod byear dyear       temp sex isSouth</span></span>
+<span><span class="co">## 1:  87  1810  1897 -4.6198501   1       0</span></span>
+<span><span class="co">## 2:  78  1810  1888 -0.8841613   1       0</span></span>
+<span><span class="co">## 3:  79  1810  1890  0.7566703   1       0</span></span>
+<span><span class="co">## 4:  85  1810  1895 -0.6728037   1       0</span></span>
+<span><span class="co">## 5:  85  1810  1896 -3.8537981   1       0</span></span>
+<span><span class="co">## 6:  81  1810  1891 -1.2885393   1       0</span></span></code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## What years do we have mortality coverage? </span>
-<span class="va">sim_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">dyear</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dyear</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<pre><code><span class="co">##   min(dyear) max(dyear)</span>
-<span class="co">## 1       1888       1905</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## What years do we have mortality coverage? </span></span>
+<span><span class="va">sim_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">dyear</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dyear</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<pre><code><span><span class="co">##   min(dyear) max(dyear)</span></span>
+<span><span class="co">## 1       1888       1905</span></span></code></pre>
 <p>Now let’s try running <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function on the simulated data:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## run gompertz_mle function  </span>
-<span class="co">## returns a list </span>
-<span class="va">simulated_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">aod</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">isSouth</span><span class="op">)</span>,
-                                                 left_trunc <span class="op">=</span> <span class="fl">1888</span>,
-                                                 right_trunc <span class="op">=</span> <span class="fl">1905</span>,
-                                                 data <span class="op">=</span> <span class="va">sim_data</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## run gompertz_mle function  </span></span>
+<span><span class="co">## returns a list </span></span>
+<span><span class="va">simulated_example</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">aod</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">isSouth</span><span class="op">)</span>,</span>
+<span>                                                 left_trunc <span class="op">=</span> <span class="fl">1888</span>,</span>
+<span>                                                 right_trunc <span class="op">=</span> <span class="fl">1905</span>,</span>
+<span>                                                 data <span class="op">=</span> <span class="va">sim_data</span><span class="op">)</span></span></code></pre></div>
 <p>The <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function returns a list which contains three elements:</p>
 <ol style="list-style-type: decimal">
 <li><p>The initial starting parameters for the MLE routine. Unless specified by the user, these starting parameter are found using OLS regression on age at death.</p></li>
@@ -172,220 +172,222 @@
 </ol>
 <p>We recommend always checking the full <code>optim</code> object to make sure the model has converged.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## 1. starting value for coefficients (from linear regression)</span>
-<span class="va">simulated_example</span><span class="op">$</span><span class="va">starting_values</span></code></pre></div>
-<pre><code><span class="co">##         log.b.start            b0.start                temp     as.factor(sex)1 </span>
-<span class="co">##         -2.30258509         -9.96897213          0.07505734         -0.18001387 </span>
-<span class="co">## as.factor(isSouth)1 </span>
-<span class="co">##          0.22607193</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## 1. starting value for coefficients (from linear regression)</span></span>
+<span><span class="va">simulated_example</span><span class="op">$</span><span class="va">starting_values</span></span></code></pre></div>
+<pre><code><span><span class="co">##         log.b.start            b0.start                temp     as.factor(sex)1 </span></span>
+<span><span class="co">##         -2.30258509         -9.96897213          0.07505734         -0.18001387 </span></span>
+<span><span class="co">## as.factor(isSouth)1 </span></span>
+<span><span class="co">##          0.22607193</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## 2. optim fit object</span>
-<span class="va">simulated_example</span><span class="op">$</span><span class="va">optim_fit</span></code></pre></div>
-<pre><code><span class="co">## $par</span>
-<span class="co">##         log.b.start            b0.start                temp     as.factor(sex)1 </span>
-<span class="co">##          -2.2745186          -9.4083999           0.2068584          -0.5300299 </span>
-<span class="co">## as.factor(isSouth)1 </span>
-<span class="co">##           0.5983461 </span>
-<span class="co">## </span>
-<span class="co">## $value</span>
-<span class="co">## [1] 17549.16</span>
-<span class="co">## </span>
-<span class="co">## $counts</span>
-<span class="co">## function gradient </span>
-<span class="co">##      886       NA </span>
-<span class="co">## </span>
-<span class="co">## $convergence</span>
-<span class="co">## [1] 0</span>
-<span class="co">## </span>
-<span class="co">## $message</span>
-<span class="co">## NULL</span>
-<span class="co">## </span>
-<span class="co">## $hessian</span>
-<span class="co">##                     log.b.start  b0.start       temp as.factor(sex)1</span>
-<span class="co">## log.b.start           283845.66 35822.202 -36549.785       20205.368</span>
-<span class="co">## b0.start               35822.20  4536.154  -4552.676        2553.982</span>
-<span class="co">## temp                  -36549.79 -4552.676  32378.684       -1569.926</span>
-<span class="co">## as.factor(sex)1        20205.37  2553.982  -1569.926        2553.949</span>
-<span class="co">## as.factor(isSouth)1    14017.01  1783.017  -3199.463        1109.978</span>
-<span class="co">##                     as.factor(isSouth)1</span>
-<span class="co">## log.b.start                   14017.009</span>
-<span class="co">## b0.start                       1783.017</span>
-<span class="co">## temp                          -3199.463</span>
-<span class="co">## as.factor(sex)1                1109.978</span>
-<span class="co">## as.factor(isSouth)1            1783.000</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## 2. optim fit object</span></span>
+<span><span class="va">simulated_example</span><span class="op">$</span><span class="va">optim_fit</span></span></code></pre></div>
+<pre><code><span><span class="co">## $par</span></span>
+<span><span class="co">##         log.b.start            b0.start                temp     as.factor(sex)1 </span></span>
+<span><span class="co">##          -2.2745186          -9.4083999           0.2068584          -0.5300299 </span></span>
+<span><span class="co">## as.factor(isSouth)1 </span></span>
+<span><span class="co">##           0.5983461 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $value</span></span>
+<span><span class="co">## [1] 17549.16</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $counts</span></span>
+<span><span class="co">## function gradient </span></span>
+<span><span class="co">##      886       NA </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $convergence</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $message</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $hessian</span></span>
+<span><span class="co">##                     log.b.start  b0.start       temp as.factor(sex)1</span></span>
+<span><span class="co">## log.b.start           283845.66 35822.202 -36549.785       20205.368</span></span>
+<span><span class="co">## b0.start               35822.20  4536.154  -4552.676        2553.982</span></span>
+<span><span class="co">## temp                  -36549.79 -4552.676  32378.684       -1569.926</span></span>
+<span><span class="co">## as.factor(sex)1        20205.37  2553.982  -1569.926        2553.949</span></span>
+<span><span class="co">## as.factor(isSouth)1    14017.01  1783.017  -3199.463        1109.978</span></span>
+<span><span class="co">##                     as.factor(isSouth)1</span></span>
+<span><span class="co">## log.b.start                   14017.009</span></span>
+<span><span class="co">## b0.start                       1783.017</span></span>
+<span><span class="co">## temp                          -3199.463</span></span>
+<span><span class="co">## as.factor(sex)1                1109.978</span></span>
+<span><span class="co">## as.factor(isSouth)1            1783.000</span></span></code></pre>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## 2. check model convergence (0 == convergence)</span>
-<span class="va">simulated_example</span><span class="op">$</span><span class="va">optim_fit</span><span class="op">$</span><span class="va">convergence</span></code></pre></div>
-<pre><code><span class="co">## [1] 0</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## 2. check model convergence (0 == convergence)</span></span>
+<span><span class="va">simulated_example</span><span class="op">$</span><span class="va">optim_fit</span><span class="op">$</span><span class="va">convergence</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## 3. Look at model results </span>
-<span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 5 × 7</span></span>
-<span class="co">##   parameter             coef coef_lower coef_upper     hr hr_lower hr_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b           0.103     0.096<span style="text-decoration: underline;">4</span>      0.110 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode       69.4      64.4        74.3   <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> temp                 0.207     0.194       0.219  1.23     1.21     1.25 </span>
-<span class="co">## <span style="color: #BCBCBC;">4</span> as.factor(sex)1     -<span style="color: #BB0000;">0.530</span>    -<span style="color: #BB0000;">0.590</span>      -<span style="color: #BB0000;">0.470</span>  0.589    0.554    0.625</span>
-<span class="co">## <span style="color: #BCBCBC;">5</span> as.factor(isSouth)1  0.598     0.536       0.661  1.82     1.71     1.94</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## 3. Look at model results </span></span>
+<span><span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 7</span></span></span>
+<span><span class="co">##   parameter             coef coef_lower coef_upper     hr hr_lower hr_upper</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b           0.103     0.096<span style="text-decoration: underline;">4</span>      0.110 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode       69.4      64.4        74.3   <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> temp                 0.207     0.194       0.219  1.23     1.21     1.25 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> as.factor(sex)1     -<span style="color: #BB0000;">0.530</span>    -<span style="color: #BB0000;">0.590</span>      -<span style="color: #BB0000;">0.470</span>  0.589    0.554    0.625</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> as.factor(isSouth)1  0.598     0.536       0.661  1.82     1.71     1.94</span></span></code></pre>
 <p>The first row gives the estimated Gompertz <span class="math inline">\(b\)</span> parameter, and the second row gives the Gompertz mode. The next three rows show each covariate’s estimated coefficient and associated hazard ratio. A hazard ratio compares the ratio of the hazard rate in a population strata (e.g., treated group) to a population baseline (i.e., control group). A hazard ratio above 1 suggests a higher risk at all ages and a hazard ratio below 1 suggests a smaller mortality risk at all ages (assuming proportional hazards).</p>
 <p>Let’s compare our estimated values to true value. We can only do this because this is simulated (fake) data.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## true coefficient values (we know because we simulated them)</span>
-<span class="va">mycoefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"temp"</span> <span class="op">=</span> <span class="op">+</span><span class="fl">.2</span>, <span class="st">"sex"</span> <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span>, <span class="st">"isSouth"</span> <span class="op">=</span> <span class="op">+</span><span class="fl">.6</span><span class="op">)</span>
-
-<span class="co">## compare</span>
-<span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="st">"gompertz"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>true_coef <span class="op">=</span> <span class="va">mycoefs</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="va">coef</span>, <span class="va">coef_lower</span>, <span class="va">coef_upper</span>, <span class="va">true_coef</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 5</span></span>
-<span class="co">##   parameter             coef coef_lower coef_upper true_coef</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> temp                 0.207      0.194      0.219       0.2</span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1     -<span style="color: #BB0000;">0.530</span>     -<span style="color: #BB0000;">0.590</span>     -<span style="color: #BB0000;">0.470</span>      -<span style="color: #BB0000;">0.5</span></span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> as.factor(isSouth)1  0.598      0.536      0.661       0.6</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## true coefficient values (we know because we simulated them)</span></span>
+<span><span class="va">mycoefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"temp"</span> <span class="op">=</span> <span class="op">+</span><span class="fl">.2</span>, <span class="st">"sex"</span> <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span>, <span class="st">"isSouth"</span> <span class="op">=</span> <span class="op">+</span><span class="fl">.6</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## compare</span></span>
+<span><span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="st">"gompertz"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>true_coef <span class="op">=</span> <span class="va">mycoefs</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="va">coef</span>, <span class="va">coef_lower</span>, <span class="va">coef_upper</span>, <span class="va">true_coef</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">##   parameter             coef coef_lower coef_upper true_coef</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> temp                 0.207      0.194      0.219       0.2</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1     -<span style="color: #BB0000;">0.530</span>     -<span style="color: #BB0000;">0.590</span>     -<span style="color: #BB0000;">0.470</span>      -<span style="color: #BB0000;">0.5</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> as.factor(isSouth)1  0.598      0.536      0.661       0.6</span></span></code></pre>
 <p>While investigators will likely report hazard ratios, translating hazard ratios into differences in life expectancy may help facilitate interpretation and comparison to other studies. We have included this functionality in the gompertztrunc package with the <code><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex()</a></code> function:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## translate hazard rates to difference in e65</span>
-<span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span>, age <span class="op">=</span> <span class="fl">65</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="va">hr</span>, <span class="va">hr_lower</span>, <span class="va">hr_upper</span>, <span class="va">e65</span>, <span class="va">e65_lower</span>, <span class="va">e65_upper</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="co">##   parameter              hr hr_lower hr_upper    e65 e65_lower e65_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> temp                1.23     1.21     1.25  -<span style="color: #BB0000;">0.966</span>     -<span style="color: #BB0000;">1.02</span>    -<span style="color: #BB0000;">0.910</span></span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1     0.589    0.554    0.625  2.84       2.49     3.20 </span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> as.factor(isSouth)1 1.82     1.71     1.94  -<span style="color: #BB0000;">2.57</span>      -<span style="color: #BB0000;">2.80</span>    -<span style="color: #BB0000;">2.33</span></span></code></pre>
+<code class="sourceCode R"><span><span class="co">## translate hazard rates to difference in e65</span></span>
+<span><span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">simulated_example</span><span class="op">$</span><span class="va">results</span>, age <span class="op">=</span> <span class="fl">65</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">parameter</span>, <span class="va">hr</span>, <span class="va">hr_lower</span>, <span class="va">hr_upper</span>, <span class="va">e65</span>, <span class="va">e65_lower</span>, <span class="va">e65_upper</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
+<span><span class="co">##   parameter              hr hr_lower hr_upper    e65 e65_lower e65_upper</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> temp                1.23     1.21     1.25  -<span style="color: #BB0000;">0.966</span>     -<span style="color: #BB0000;">1.02</span>    -<span style="color: #BB0000;">0.910</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> as.factor(sex)1     0.589    0.554    0.625  2.84       2.49     3.20 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> as.factor(isSouth)1 1.82     1.71     1.94  -<span style="color: #BB0000;">2.57</span>      -<span style="color: #BB0000;">2.80</span>    -<span style="color: #BB0000;">2.33</span></span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="case-study-ii-real-world-example-with-bunmd-data">Case Study II: Real-World Example with BUNMD Data<a class="anchor" aria-label="anchor" href="#case-study-ii-real-world-example-with-bunmd-data"></a>
 </h2>
 <p>In our second case study, we look at the mortality advantage for the foreign-born. We use a demo dataset from the Berkeley Unified Numident Mortality Database (BUNMD) and compare our results to results from OLS regression (a method which is biased in the presence of truncation).</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## look at data </span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bunmd_demo</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 6 × 6</span></span>
-<span class="co">##         ssn bpl_string death_age byear dyear age_first_application</span>
-<span class="co">##       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> 267<span style="text-decoration: underline;">729</span>143 Cuba              89  <span style="text-decoration: underline;">1</span>912  <span style="text-decoration: underline;">2</span>002                    49</span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> 266<span style="text-decoration: underline;">172</span>087 Cuba              80  <span style="text-decoration: underline;">1</span>911  <span style="text-decoration: underline;">1</span>991                    57</span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> 590<span style="text-decoration: underline;">072</span>321 Cuba              92  <span style="text-decoration: underline;">1</span>911  <span style="text-decoration: underline;">2</span>004                    69</span>
-<span class="co">## <span style="color: #BCBCBC;">4</span> 265<span style="text-decoration: underline;">064</span>566 Cuba              76  <span style="text-decoration: underline;">1</span>913  <span style="text-decoration: underline;">1</span>989                    53</span>
-<span class="co">## <span style="color: #BCBCBC;">5</span> 265<span style="text-decoration: underline;">877</span>097 Cuba              86  <span style="text-decoration: underline;">1</span>908  <span style="text-decoration: underline;">1</span>995                    70</span>
-<span class="co">## <span style="color: #BCBCBC;">6</span> 264<span style="text-decoration: underline;">745</span>485 Cuba              87  <span style="text-decoration: underline;">1</span>915  <span style="text-decoration: underline;">2</span>003                    46</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## look at data </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bunmd_demo</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
+<span><span class="co">##         ssn bpl_string death_age byear dyear age_first_application</span></span>
+<span><span class="co">##       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> 267<span style="text-decoration: underline;">729</span>143 Cuba              89  <span style="text-decoration: underline;">1</span>912  <span style="text-decoration: underline;">2</span>002                    49</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> 266<span style="text-decoration: underline;">172</span>087 Cuba              80  <span style="text-decoration: underline;">1</span>911  <span style="text-decoration: underline;">1</span>991                    57</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> 590<span style="text-decoration: underline;">072</span>321 Cuba              92  <span style="text-decoration: underline;">1</span>911  <span style="text-decoration: underline;">2</span>004                    69</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> 265<span style="text-decoration: underline;">064</span>566 Cuba              76  <span style="text-decoration: underline;">1</span>913  <span style="text-decoration: underline;">1</span>989                    53</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> 265<span style="text-decoration: underline;">877</span>097 Cuba              86  <span style="text-decoration: underline;">1</span>908  <span style="text-decoration: underline;">1</span>995                    70</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">6</span> 264<span style="text-decoration: underline;">745</span>485 Cuba              87  <span style="text-decoration: underline;">1</span>915  <span style="text-decoration: underline;">2</span>003                    46</span></span></code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## how many people per country? </span>
-<span class="va">bunmd_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">bpl_string</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 6 × 2</span></span>
-<span class="co">##   bpl_string            n</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> Native Born White <span style="text-decoration: underline;">20</span>000</span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> Cuba              <span style="text-decoration: underline;">13</span>194</span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> England            <span style="text-decoration: underline;">7</span>561</span>
-<span class="co">## <span style="color: #BCBCBC;">4</span> Italy             <span style="text-decoration: underline;">15</span>306</span>
-<span class="co">## <span style="color: #BCBCBC;">5</span> Mexico            <span style="text-decoration: underline;">13</span>755</span>
-<span class="co">## <span style="color: #BCBCBC;">6</span> Poland            <span style="text-decoration: underline;">11</span>186</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## how many people per country? </span></span>
+<span><span class="va">bunmd_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">bpl_string</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
+<span><span class="co">##   bpl_string            n</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> Native Born White <span style="text-decoration: underline;">20</span>000</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> Cuba              <span style="text-decoration: underline;">13</span>194</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> England            <span style="text-decoration: underline;">7</span>561</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> Italy             <span style="text-decoration: underline;">15</span>306</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> Mexico            <span style="text-decoration: underline;">13</span>755</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">6</span> Poland            <span style="text-decoration: underline;">11</span>186</span></span></code></pre>
 <p>First, let’s look at the distribution of deaths by country:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## distribution of deaths?</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">death_age</span><span class="op">)</span>,
-                 fill <span class="op">=</span> <span class="st">"grey"</span>,
-                 color <span class="op">=</span> <span class="st">"black"</span>,
-                 binwidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Age of Death"</span>,
-       y <span class="op">=</span> <span class="st">"N"</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">bpl_string</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## distribution of deaths?</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">death_age</span><span class="op">)</span>,</span>
+<span>                 fill <span class="op">=</span> <span class="st">"grey"</span>,</span>
+<span>                 color <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>                 binwidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Age of Death"</span>,</span>
+<span>       y <span class="op">=</span> <span class="st">"N"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">bpl_string</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-8-1.png" width="576"></p>
 <div class="section level3">
 <h3 id="linear-regression-approach">Linear regression approach<a class="anchor" aria-label="anchor" href="#linear-regression-approach"></a>
 </h3>
 <p>Let’s look at the association between country of origin and longevity. First, we’ll try using a biased approach (OLS regression on age of death).</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## run linear model </span>
-<span class="va">lm_bpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">byear</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span>
-
-<span class="co">## extract coefficients from model </span>
-<span class="va">lm_bpl_tidy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">lm_bpl</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">term</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>term <span class="op">=</span> <span class="fu"><a href="http://kjhealy.github.io/socviz/reference/prefix_strip.html" class="external-link">prefix_strip</a></span><span class="op">(</span><span class="va">term</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## rename variables </span>
-<span class="va">lm_bpl_tidy</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>
-    e65 <span class="op">=</span> <span class="va">estimate</span>,
-    e65_lower <span class="op">=</span> <span class="va">estimate</span> <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span>,
-    e65_upper <span class="op">=</span> <span class="va">estimate</span> <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span>
-  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">term</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Regression on Age of Death"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## run linear model </span></span>
+<span><span class="va">lm_bpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">byear</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## extract coefficients from model </span></span>
+<span><span class="va">lm_bpl_tidy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">lm_bpl</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">term</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>term <span class="op">=</span> <span class="fu"><a href="http://kjhealy.github.io/socviz/reference/prefix_strip.html" class="external-link">prefix_strip</a></span><span class="op">(</span><span class="va">term</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## rename variables </span></span>
+<span><span class="va">lm_bpl_tidy</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    e65 <span class="op">=</span> <span class="va">estimate</span>,</span>
+<span>    e65_lower <span class="op">=</span> <span class="va">estimate</span> <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span>,</span>
+<span>    e65_upper <span class="op">=</span> <span class="va">estimate</span> <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">term</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Regression on Age of Death"</span><span class="op">)</span></span></code></pre></div>
 <p>Now we’ll perform estimation with the <code>gompertztrunc</code> package:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## run gompertztrunc</span>
-<span class="co">## set truncation bounds to 1988-2005 because we are using BUNMD </span>
-<span class="va">gompertz_mle_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, 
-                                    left_trunc <span class="op">=</span> <span class="fl">1988</span>,
-                                    right_trunc <span class="op">=</span> <span class="fl">2005</span>,
-                                    data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span>
-
-<span class="co">## convert to e65</span>
-<span class="co">## use model estimates — but can also set other defaults for Gompertz M and b. </span>
-<span class="va">mle_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">gompertz_mle_results</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
-
-<span class="co">## tidy up results </span>
-<span class="va">mle_results</span> <span class="op">&lt;-</span> <span class="va">mle_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">parameter</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">country</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="http://kjhealy.github.io/socviz/reference/prefix_strip.html" class="external-link">prefix_strip</a></span><span class="op">(</span><span class="va">country</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Gompertz Parametric Estimate"</span><span class="op">)</span>
-
-<span class="co">## look at results </span>
-<span class="va">mle_results</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 5 × 11</span></span>
-<span class="co">##   country   coef coef_lower coef_upper    hr hr_lower hr_upper   e65 e65_lower</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> Cuba    -<span style="color: #BB0000;">0.229</span>     -<span style="color: #BB0000;">0.270</span>    -<span style="color: #BB0000;">0.188</span>  0.796    0.764    0.829 1.70      1.39 </span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> England -<span style="color: #BB0000;">0.130</span>     -<span style="color: #BB0000;">0.179</span>    -<span style="color: #BB0000;">0.081</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.878    0.836    0.922 0.960     0.597</span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> Italy   -<span style="color: #BB0000;">0.178</span>     -<span style="color: #BB0000;">0.217</span>    -<span style="color: #BB0000;">0.138</span>  0.837    0.805    0.871 1.31      1.02 </span>
-<span class="co">## <span style="color: #BCBCBC;">4</span> Mexico  -<span style="color: #BB0000;">0.369</span>     -<span style="color: #BB0000;">0.412</span>    -<span style="color: #BB0000;">0.325</span>  0.692    0.662    0.723 2.77      2.44 </span>
-<span class="co">## <span style="color: #BCBCBC;">5</span> Poland  -<span style="color: #BB0000;">0.185</span>     -<span style="color: #BB0000;">0.229</span>    -<span style="color: #BB0000;">0.141</span>  0.831    0.795    0.869 1.37      1.04 </span>
-<span class="co">## <span style="color: #949494;"># … with 2 more variables: e65_upper &lt;dbl&gt;, method &lt;chr&gt;</span></span></code></pre>
+<code class="sourceCode R"><span><span class="co">## run gompertztrunc</span></span>
+<span><span class="co">## set truncation bounds to 1988-2005 because we are using BUNMD </span></span>
+<span><span class="va">gompertz_mle_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, </span>
+<span>                                    left_trunc <span class="op">=</span> <span class="fl">1988</span>,</span>
+<span>                                    right_trunc <span class="op">=</span> <span class="fl">2005</span>,</span>
+<span>                                    data <span class="op">=</span> <span class="va">bunmd_demo</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## convert to e65</span></span>
+<span><span class="co">## use model estimates — but can also set other defaults for Gompertz M and b. </span></span>
+<span><span class="va">mle_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">gompertz_mle_results</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## tidy up results </span></span>
+<span><span class="va">mle_results</span> <span class="op">&lt;-</span> <span class="va">mle_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>country <span class="op">=</span> <span class="va">parameter</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">country</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="http://kjhealy.github.io/socviz/reference/prefix_strip.html" class="external-link">prefix_strip</a></span><span class="op">(</span><span class="va">country</span>, <span class="st">"bpl_string"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Gompertz Parametric Estimate"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## look at results </span></span>
+<span><span class="va">mle_results</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 11</span></span></span>
+<span><span class="co">##   country   coef coef_lower coef_u…¹    hr hr_lo…² hr_up…³   e65 e65_l…⁴ e65_u…⁵</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> Cuba    -<span style="color: #BB0000;">0.229</span>     -<span style="color: #BB0000;">0.270</span>  -<span style="color: #BB0000;">0.188</span>  0.796   0.764   0.829 1.70    1.39     2.01</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> England -<span style="color: #BB0000;">0.130</span>     -<span style="color: #BB0000;">0.179</span>  -<span style="color: #BB0000;">0.081</span><span style="color: #BB0000; text-decoration: underline;">5</span> 0.878   0.836   0.922 0.960   0.597    1.33</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> Italy   -<span style="color: #BB0000;">0.178</span>     -<span style="color: #BB0000;">0.217</span>  -<span style="color: #BB0000;">0.138</span>  0.837   0.805   0.871 1.31    1.02     1.61</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> Mexico  -<span style="color: #BB0000;">0.369</span>     -<span style="color: #BB0000;">0.412</span>  -<span style="color: #BB0000;">0.325</span>  0.692   0.662   0.723 2.77    2.44     3.11</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> Poland  -<span style="color: #BB0000;">0.185</span>     -<span style="color: #BB0000;">0.229</span>  -<span style="color: #BB0000;">0.141</span>  0.831   0.795   0.869 1.37    1.04     1.70</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 1 more variable: method &lt;chr&gt;, and abbreviated variable names</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   ¹​coef_upper, ²​hr_lower, ³​hr_upper, ⁴​e65_lower, ⁵​e65_upper</span></span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ Use `colnames()` to see all variable names</span></span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="visualize-results">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results"></a>
 </h3>
 <p>Here, we compare our estimates from ‘unbiased’ Gompertz MLE method and our old ‘biased’ method, OLS regression on age of death. We can see that the OLS results are attenuated towards 0 due to truncation.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## combine results from both models </span>
-<span class="va">bpl_results</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results</span><span class="op">)</span>
-
-<span class="co">## calculate adjustment factor (i.e., how much bigger are Gompertz MLE results)</span>
-<span class="va">adjustment_factor</span> <span class="op">&lt;-</span> <span class="va">bpl_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">country</span>, <span class="va">method</span>, <span class="va">e65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">method</span>, values_from <span class="op">=</span> <span class="va">e65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>adjustment_factor <span class="op">=</span> <span class="va">`Gompertz Parametric Estimate`</span> <span class="op">/</span> <span class="va">`Regression on Age of Death`</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>adjustment_factor_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">adjustment_factor</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="co">## plot results</span>
-<span class="va">bpl_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">country</span>, <span class="va">e65</span><span class="op">)</span>, x <span class="op">=</span> <span class="va">e65</span>, xmin <span class="op">=</span> <span class="va">e65_lower</span>, xmax <span class="op">=</span> <span class="va">e65_upper</span>, color <span class="op">=</span> <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>, shape <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>
-    x <span class="op">=</span> <span class="st">"Estimate"</span>,
-    title <span class="op">=</span> <span class="st">"Foreign-Born Male Ages at Death, BUNMD 1905-1914"</span>,
-    y <span class="op">=</span> <span class="st">""</span>,
-    subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Gompertz MLE estimates are ~"</span>, <span class="va">adjustment_factor</span>, <span class="st">" times larger than regression on age of death"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>, label <span class="op">=</span> <span class="st">"Native Born Whites"</span>, x <span class="op">=</span> <span class="fl">0.1</span>, y <span class="op">=</span> <span class="fl">3</span>, angle <span class="op">=</span> <span class="fl">90</span>, size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## combine results from both models </span></span>
+<span><span class="va">bpl_results</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## calculate adjustment factor (i.e., how much bigger are Gompertz MLE results)</span></span>
+<span><span class="va">adjustment_factor</span> <span class="op">&lt;-</span> <span class="va">bpl_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">country</span>, <span class="va">method</span>, <span class="va">e65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">method</span>, values_from <span class="op">=</span> <span class="va">e65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>adjustment_factor <span class="op">=</span> <span class="va">`Gompertz Parametric Estimate`</span> <span class="op">/</span> <span class="va">`Regression on Age of Death`</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>adjustment_factor_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">adjustment_factor</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## plot results</span></span>
+<span><span class="va">bpl_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">country</span>, <span class="va">e65</span><span class="op">)</span>, x <span class="op">=</span> <span class="va">e65</span>, xmin <span class="op">=</span> <span class="va">e65_lower</span>, xmax <span class="op">=</span> <span class="va">e65_upper</span>, color <span class="op">=</span> <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>, shape <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Estimate"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Foreign-Born Male Ages at Death, BUNMD 1905-1914"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">""</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Gompertz MLE estimates are ~"</span>, <span class="va">adjustment_factor</span>, <span class="st">" times larger than regression on age of death"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>, label <span class="op">=</span> <span class="st">"Native Born Whites"</span>, x <span class="op">=</span> <span class="fl">0.1</span>, y <span class="op">=</span> <span class="fl">3</span>, angle <span class="op">=</span> <span class="fl">90</span>, size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-11-1.png" width="691.2"></p>
 </div>
 <div class="section level3">
@@ -394,34 +396,34 @@
 <p>The <code>gompertztrunc</code> package offers two different graphical methods for assessing model fit. Please note that these diagnostic plots are only designed to assess the effect of a single categorical variable within a single cohort.</p>
 <p>To illustrate, we will visually assess how well the modeled Gompertz distribution of mortality by country of origin fits empirical data. We will limit the model to the birth cohort of 1915. Additionally, to reduce the number of plots generated, we will only consider men born in the US and Mexico.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## create the dataset</span>
-<span class="va">bunmd_1915_cohort</span> <span class="op">&lt;-</span> <span class="va">bunmd_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op">==</span> <span class="fl">1915</span>, <span class="va">death_age</span> <span class="op">&gt;=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">bpl_string</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Native Born White"</span>, <span class="st">"Mexico"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## run gompertz_mle()</span>
-<span class="va">bpl_results_1915_cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, 
-                                   data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
-                                   left_trunc <span class="op">=</span> <span class="fl">1988</span>, 
-                                   right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span>
-
-<span class="co">## look at results</span>
-<span class="va">bpl_results_1915_cohort</span><span class="op">$</span><span class="va">results</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="co">##   parameter           coef coef_lower coef_upper     hr hr_lower hr_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b        0.083<span style="text-decoration: underline;">1</span>     0.071<span style="text-decoration: underline;">5</span>     0.096<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode    81.1       70.2       91.9    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> bpl_stringMexico -<span style="color: #BB0000;">0.419</span>     -<span style="color: #BB0000;">0.575</span>     -<span style="color: #BB0000;">0.263</span>   0.658    0.563    0.769</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## create the dataset</span></span>
+<span><span class="va">bunmd_1915_cohort</span> <span class="op">&lt;-</span> <span class="va">bunmd_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op">==</span> <span class="fl">1915</span>, <span class="va">death_age</span> <span class="op">&gt;=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">bpl_string</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Native Born White"</span>, <span class="st">"Mexico"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## run gompertz_mle()</span></span>
+<span><span class="va">bpl_results_1915_cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">bpl_string</span>, </span>
+<span>                                   data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,</span>
+<span>                                   left_trunc <span class="op">=</span> <span class="fl">1988</span>, </span>
+<span>                                   right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## look at results</span></span>
+<span><span class="va">bpl_results_1915_cohort</span><span class="op">$</span><span class="va">results</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
+<span><span class="co">##   parameter           coef coef_lower coef_upper     hr hr_lower hr_upper</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b        0.083<span style="text-decoration: underline;">1</span>     0.071<span style="text-decoration: underline;">5</span>     0.096<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode    81.1       70.2       91.9    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> bpl_stringMexico -<span style="color: #BB0000;">0.419</span>     -<span style="color: #BB0000;">0.575</span>     -<span style="color: #BB0000;">0.263</span>   0.658    0.563    0.769</span></span></code></pre>
 <p>The first diagnostic graph, <code><a href="../reference/diagnostic_plot.html">diagnostic_plot()</a></code>, compares the empirical distribution of deaths to the modeled distribution.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/diagnostic_plot.html">diagnostic_plot</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
-                covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/diagnostic_plot.html">diagnostic_plot</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,</span>
+<span>                covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>Additionally, we can compare modeled and “observed” hazards with the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not know the actual number of survivors to the observable death window, this value is inferred from the <em>modeled</em> Gompertz distribution. Refer to the <code><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard()</a></code> documentation for more details.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,
-                covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">65</span>,<span class="fl">95</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/diagnostic_plot_hazard.html">diagnostic_plot_hazard</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">bpl_results_1915_cohort</span>, data <span class="op">=</span> <span class="va">bunmd_1915_cohort</span>,</span>
+<span>                covar <span class="op">=</span> <span class="st">"bpl_string"</span>, death_var <span class="op">=</span> <span class="st">"death_age"</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">65</span>,<span class="fl">95</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
 </div>
@@ -434,108 +436,110 @@
 </h3>
 <p>The <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function can incorporate person-level weights via the <code>weights</code> argument. These person weights can help adjust for differential representation; the weight assigned to each person is proportional to the estimated number of persons in the target population that person represents. The vector of supplied weights must be long as the data, and all weights must be positive.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## load in file </span>
-<span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span>
-
-<span class="co">## recode categorical education variable to continuous "years of education" </span>
-<span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>educ_yrs <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span>
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"No schooling completed"</span> <span class="op">~</span> <span class="fl">0</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 1"</span> <span class="op">~</span> <span class="fl">1</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 2"</span> <span class="op">~</span> <span class="fl">2</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 3"</span> <span class="op">~</span> <span class="fl">3</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 4"</span> <span class="op">~</span> <span class="fl">4</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 5"</span> <span class="op">~</span> <span class="fl">5</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 6"</span> <span class="op">~</span> <span class="fl">6</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 7"</span> <span class="op">~</span> <span class="fl">7</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 8"</span> <span class="op">~</span> <span class="fl">8</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 9"</span> <span class="op">~</span> <span class="fl">9</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 10"</span> <span class="op">~</span> <span class="fl">10</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 11"</span> <span class="op">~</span> <span class="fl">11</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 12"</span> <span class="op">~</span> <span class="fl">12</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 12"</span> <span class="op">~</span> <span class="fl">12</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"1 year of college"</span> <span class="op">~</span> <span class="fl">13</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"2 years of college"</span> <span class="op">~</span> <span class="fl">14</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"3 years of college"</span> <span class="op">~</span> <span class="fl">15</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"4 years of college"</span> <span class="op">~</span> <span class="fl">16</span>,
-    <span class="va">educd</span> <span class="op">==</span> <span class="st">"5+ years of college"</span> <span class="op">~</span> <span class="fl">17</span>
-  <span class="op">)</span><span class="op">)</span>
-
-<span class="co">## restrict to men </span>
-<span class="va">data_numident_men</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">sex</span> <span class="op">==</span> <span class="st">"Male"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1910</span><span class="op">:</span><span class="fl">1920</span> <span class="op">&amp;</span> <span class="va">death_age</span> <span class="op">&gt;</span> <span class="fl">65</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## load in file </span></span>
+<span><span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span></span>
+<span></span>
+<span><span class="co">## recode categorical education variable to continuous "years of education" </span></span>
+<span><span class="va">numident_demo</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>educ_yrs <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"No schooling completed"</span> <span class="op">~</span> <span class="fl">0</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 1"</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 2"</span> <span class="op">~</span> <span class="fl">2</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 3"</span> <span class="op">~</span> <span class="fl">3</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 4"</span> <span class="op">~</span> <span class="fl">4</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 5"</span> <span class="op">~</span> <span class="fl">5</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 6"</span> <span class="op">~</span> <span class="fl">6</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 7"</span> <span class="op">~</span> <span class="fl">7</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 8"</span> <span class="op">~</span> <span class="fl">8</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 9"</span> <span class="op">~</span> <span class="fl">9</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 10"</span> <span class="op">~</span> <span class="fl">10</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 11"</span> <span class="op">~</span> <span class="fl">11</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 12"</span> <span class="op">~</span> <span class="fl">12</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"Grade 12"</span> <span class="op">~</span> <span class="fl">12</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"1 year of college"</span> <span class="op">~</span> <span class="fl">13</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"2 years of college"</span> <span class="op">~</span> <span class="fl">14</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"3 years of college"</span> <span class="op">~</span> <span class="fl">15</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"4 years of college"</span> <span class="op">~</span> <span class="fl">16</span>,</span>
+<span>    <span class="va">educd</span> <span class="op">==</span> <span class="st">"5+ years of college"</span> <span class="op">~</span> <span class="fl">17</span></span>
+<span>  <span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## restrict to men </span></span>
+<span><span class="va">data_numident_men</span> <span class="op">&lt;-</span> <span class="va">numident_demo</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">sex</span> <span class="op">==</span> <span class="st">"Male"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">byear</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1910</span><span class="op">:</span><span class="fl">1920</span> <span class="op">&amp;</span> <span class="va">death_age</span> <span class="op">&gt;</span> <span class="fl">65</span><span class="op">)</span></span></code></pre></div>
 <p>What’s the association between a 1-year increase in education and life expectancy at 65 (e65)? For this analysis, we’ll use the person-level weights using the <code>weights</code> argument in the <code><a href="../reference/gompertz_mle.html">gompertz_mle()</a></code> function.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## look at person-level weights </span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_numident_men</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [1] 3.399339 3.507209 4.615740 4.092312 3.655178 7.781576</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## look at person-level weights </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_numident_men</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 3.399339 3.507209 4.615740 4.092312 3.655178 7.781576</span></span></code></pre>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## run gompertz model with person weights</span>
-<span class="va">education_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span>, 
-                                   data <span class="op">=</span> <span class="va">data_numident_men</span>,
-                                   weights <span class="op">=</span> <span class="va">weight</span>, <span class="co">## specify person-level weights </span>
-                                   left_trunc <span class="op">=</span> <span class="fl">1988</span>, 
-                                   right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span>
-
-<span class="co">## look at results </span>
-<span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span> </code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="co">##   parameter        coef coef_lower coef_upper     hr hr_lower hr_upper</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b     0.079<span style="text-decoration: underline;">9</span>     0.073<span style="text-decoration: underline;">6</span>     0.086<span style="text-decoration: underline;">8</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 73.9       67.2       80.5    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span>
-<span class="co">## <span style="color: #BCBCBC;">3</span> educ_yrs      -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span>    -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">7</span>    -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span>  0.954    0.941    0.966</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## run gompertz model with person weights</span></span>
+<span><span class="va">education_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gompertz_mle.html">gompertz_mle</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span>, </span>
+<span>                                   data <span class="op">=</span> <span class="va">data_numident_men</span>,</span>
+<span>                                   weights <span class="op">=</span> <span class="va">weight</span>, <span class="co">## specify person-level weights </span></span>
+<span>                                   left_trunc <span class="op">=</span> <span class="fl">1988</span>, </span>
+<span>                                   right_trunc <span class="op">=</span> <span class="fl">2005</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## look at results </span></span>
+<span><span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span> </span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
+<span><span class="co">##   parameter        coef coef_lower coef_upper     hr hr_lower hr_upper</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b     0.079<span style="text-decoration: underline;">9</span>     0.073<span style="text-decoration: underline;">6</span>     0.086<span style="text-decoration: underline;">8</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 73.9       67.2       80.5    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> educ_yrs      -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span>    -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">7</span>    -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span>  0.954    0.941    0.966</span></span></code></pre>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## translate to e65</span>
-<span class="va">mle_results_educ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span>, age <span class="op">=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Parametric Gompertz MLE"</span><span class="op">)</span>
-
-<span class="co">## look at results</span>
-<span class="va">mle_results_educ</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #949494;"># A tibble: 1 × 11</span></span>
-<span class="co">##   parameter    coef coef_lower coef_upper    hr hr_lower hr_upper   e65</span>
-<span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">## <span style="color: #BCBCBC;">1</span> educ_yrs  -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span>    -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">7</span>    -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span> 0.954    0.941    0.966 0.330</span>
-<span class="co">## <span style="color: #949494;"># … with 3 more variables: e65_lower &lt;dbl&gt;, e65_upper &lt;dbl&gt;, method &lt;chr&gt;</span></span></code></pre>
+<code class="sourceCode R"><span><span class="co">## translate to e65</span></span>
+<span><span class="va">mle_results_educ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_hazards_to_ex.html">convert_hazards_to_ex</a></span><span class="op">(</span><span class="va">education_gradient</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">T</span>, age <span class="op">=</span> <span class="fl">65</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Parametric Gompertz MLE"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## look at results</span></span>
+<span><span class="va">mle_results_educ</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 11</span></span></span>
+<span><span class="co">##   parameter    coef coef_l…¹ coef_…²    hr hr_lo…³ hr_up…⁴   e65 e65_l…⁵ e65_u…⁶</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> educ_yrs  -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span>  -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">7</span> -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span> 0.954   0.941   0.966 0.330   0.238   0.422</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 1 more variable: method &lt;chr&gt;, and abbreviated variable names</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   ¹​coef_lower, ²​coef_upper, ³​hr_lower, ⁴​hr_upper, ⁵​e65_lower, ⁶​e65_upper</span></span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ Use `colnames()` to see all variable names</span></span></span></code></pre>
 <p>Here, for every additional year of education, the hazard ratio falls by 4.8% — which corresponds to an additional 0.33 year increase in life expectancy at age 65.</p>
 <p>Now, let’s compare to a conventional method: OLS regression on age of death. Again we can see that the OLS estimate is biased downward.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## run linear model </span>
-<span class="va">lm_bpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">byear</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_numident_men</span>, weights <span class="op">=</span> <span class="va">weight</span><span class="op">)</span>
-
-<span class="co">## extract coefficients from model </span>
-<span class="va">lm_bpl_tidy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">lm_bpl</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">term</span>, <span class="st">"educ_yrs"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## rename variables </span>
-<span class="va">ols_results</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>
-    e65 <span class="op">=</span> <span class="va">estimate</span>,
-    e65_lower <span class="op">=</span> <span class="va">estimate</span> <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span>,
-    e65_upper <span class="op">=</span> <span class="va">estimate</span> <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span>
-  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>parameter <span class="op">=</span> <span class="va">term</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Regression on Age of Death"</span><span class="op">)</span>
-
-<span class="co">## Plot results</span>
-<span class="va">education_plot</span> <span class="op">&lt;-</span> <span class="va">ols_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results_educ</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>parameter <span class="op">=</span> <span class="st">"Education (Years) Regression Coefficient"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">method</span>, y <span class="op">=</span> <span class="va">e65</span>, ymin <span class="op">=</span> <span class="va">e65_lower</span>, ymax <span class="op">=</span> <span class="va">e65_upper</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>, shape <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>
-    x <span class="op">=</span> <span class="st">""</span>,
-    title <span class="op">=</span> <span class="st">"Association Education (Years) and Longevity"</span>,
-    subtitle <span class="op">=</span> <span class="st">"Men, CenSoc-Numident 1910-1920"</span>,
-    y <span class="op">=</span> <span class="st">""</span>
-  <span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span> 
-
-<span class="va">education_plot</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## run linear model </span></span>
+<span><span class="va">lm_bpl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">death_age</span> <span class="op">~</span> <span class="va">educ_yrs</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">byear</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_numident_men</span>, weights <span class="op">=</span> <span class="va">weight</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## extract coefficients from model </span></span>
+<span><span class="va">lm_bpl_tidy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">lm_bpl</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">term</span>, <span class="st">"educ_yrs"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## rename variables </span></span>
+<span><span class="va">ols_results</span> <span class="op">&lt;-</span> <span class="va">lm_bpl_tidy</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    e65 <span class="op">=</span> <span class="va">estimate</span>,</span>
+<span>    e65_lower <span class="op">=</span> <span class="va">estimate</span> <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span>,</span>
+<span>    e65_upper <span class="op">=</span> <span class="va">estimate</span> <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> <span class="va">std.error</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>parameter <span class="op">=</span> <span class="va">term</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"Regression on Age of Death"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Plot results</span></span>
+<span><span class="va">education_plot</span> <span class="op">&lt;-</span> <span class="va">ols_results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mle_results_educ</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>parameter <span class="op">=</span> <span class="st">"Education (Years) Regression Coefficient"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">method</span>, y <span class="op">=</span> <span class="va">e65</span>, ymin <span class="op">=</span> <span class="va">e65_lower</span>, ymax <span class="op">=</span> <span class="va">e65_upper</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span>position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>, shape <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html" class="external-link">theme_cowplot</a></span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">""</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Association Education (Years) and Longevity"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Men, CenSoc-Numident 1910-1920"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">""</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">education_plot</span></span></code></pre></div>
 <p><img src="gompertztrunc_vignette_files/figure-html/unnamed-chunk-17-1.png" width="691.2"></p>
 </div>
 </div>
@@ -563,7 +567,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>
