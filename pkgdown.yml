@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   gompertztrunc_vignette: gompertztrunc_vignette.html
-last_built: 2022-08-05T21:13Z
+last_built: 2022-08-07T03:11Z
 urls:
   reference: https://caseybreen.github.io/gompertztrunc/reference
   article: https://caseybreen.github.io/gompertztrunc/articles
