@@ -19,19 +19,18 @@ The second point about references was a suggestion and did not require changes.
 ### R CMD Check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
   checking CRAN incoming feasibility ... NOTE
-  
   Maintainer: 'Maria Osborne <mariaosborne@berkeley.edu>'
+  
   New submission
 
 > On fedora-clang-devel (r-devel)
   checking HTML version of manual ... NOTE
-
   Skipping checking HTML validation: no command 'tidy' found
 
+0 errors ✓ | 0 warnings ✓ | 2 notes x
 
 ### Notes
-* The note about HTML validation only occurs on fedora-clang-devel and does not seem significant. The HTML version of the manual
-is validated when checked on the local R server.
+* The note about HTML validation only occurs on fedora-clang-devel and does not seem critical. The HTML version of the manual is able to be validated on windows-x86_64-devel.
 
 
 
