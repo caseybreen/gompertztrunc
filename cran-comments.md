@@ -3,13 +3,11 @@ The following changes have been made in response to CRAN's comments:
 
 - Reworded the description so that it does not start with "Functions for"
 
-- Changed `print()` statements to `warning()` or made sure they were encompassed by an
-`if verbose()` block
+- Write less information to the console by changing `print()` statements to `warning()` or making sure 
+they are encompassed by an `if verbose()` block. Also, `diagnostic_plot()` and `diagnostic_plot_hazard()` 
+functions were altered to produce fewer internal warnings and/or to not write internal ggplot warnings to the console.
 
-- Altered `diagnostic_plot()` and `diagnostic_plot_hazard()` functions so that they do
-not write internal ggplot warnings to the console or produce fewer internal warnings.
-
-The second point about references was a suggestion and did not require changes.
+The suggestion to add references was optional; we have not done so.
 
 ### test environments
 - R-hub windows-x86_64-devel (r-devel)
