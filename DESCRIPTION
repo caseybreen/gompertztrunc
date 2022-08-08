@@ -1,6 +1,6 @@
 Type: Package
 Package: gompertztrunc
-Title: Tools for Conducting Maximum Likelihood Estimation on Truncated
+Title: Conducting Maximum Likelihood Estimation with Truncated
     Mortality Data
 Version: 0.1.0
 Authors@R: c(
