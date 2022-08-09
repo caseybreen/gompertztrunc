@@ -3,11 +3,12 @@ The following changes have been made in response to CRAN's comments:
 
 - Reworded the description so that it does not start with "Functions for"
 
-- Write less information to the console by changing `print()` statements to `warning()` or making sure 
-they are encompassed by an `if verbose()` block. Also, `diagnostic_plot()` and `diagnostic_plot_hazard()` 
-functions were altered to produce fewer internal warnings and/or to not write internal ggplot warnings to the console.
+- Write less information to the console by changing `print()` statements to `warning()`
+or encompassing with an `if verbose()` block. Also, `diagnostic_plot()` and `diagnostic_plot_hazard()` 
+functions were altered to produce fewer internal warnings and/or to not automatically
+write internal ggplot messages to the console.
 
-The suggestion to add references was optional; we have not done so.
+The suggestion to add references was optional; we have not done so for this release.
 
 ### test environments
 - R-hub windows-x86_64-devel (r-devel)
@@ -28,7 +29,7 @@ The suggestion to add references was optional; we have not done so.
 0 errors ✓ | 0 warnings ✓ | 2 notes x
 
 ### Notes
-* The note about HTML validation only occurs on fedora-clang-devel and does not seem critical. The HTML version of the manual is able to be validated on windows-x86_64-devel.
+* The note about HTML validation only occurs on fedora-clang-devel and does not seem critical. The HTML version of the manual is able to be validated on windows-x86_64-devel and locally.
 
 
 
