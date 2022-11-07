@@ -12,7 +12,7 @@ at a given age (defaults to age 65)"><!-- mathjax --><script src="https://cdnjs.
     
     <a class="navbar-brand me-2" href="../index.html">gompertztrunc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,11 +110,11 @@ at a given age (defaults to age 65)</p>
 <span class="r-in"><span><span class="co">#convert to difference in life expectancy</span></span></span>
 <span class="r-in"><span><span class="fu">convert_hazards_to_ex</span><span class="op">(</span>df <span class="op">=</span> <span class="va">bpl</span><span class="op">$</span><span class="va">results</span>, use_model_estimates <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   parameter     coef coef_…¹ coef_…²    hr hr_lo…³ hr_up…⁴   e65 e65_l…⁵ e65_u…⁶</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> bpl_strin… -<span style="color: #BB0000;">0.015</span><span style="color: #BB0000; text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.096</span><span style="color: #BB0000; text-decoration: underline;">6</span>  0.065<span style="text-decoration: underline;">5</span> 0.985   0.908    1.07 0.130  -<span style="color: #BB0000;">0.540</span>   0.814</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​coef_lower, ²​coef_upper, ³​hr_lower,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ⁴​hr_upper, ⁵​e65_lower, ⁶​e65_upper</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   parame…¹     coef coef_…² coef_…³    hr hr_lo…⁴ hr_up…⁵    e65 e65_l…⁶ e65_u…⁷</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> bpl_str… -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">52</span> -<span style="color: #BB0000;">0.081</span><span style="color: #BB0000; text-decoration: underline;">5</span>  0.074<span style="text-decoration: underline;">5</span> 0.996   0.922    1.08 0.029<span style="text-decoration: underline;">3</span>  -<span style="color: #BB0000;">0.614</span>   0.685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​parameter, ²​coef_lower, ³​coef_upper,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ⁴​hr_lower, ⁵​hr_upper, ⁶​e65_lower, ⁷​e65_upper</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
