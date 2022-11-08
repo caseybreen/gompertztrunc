@@ -1,4 +1,7 @@
-# Second Submission to CRAN, version 0.1.0
+
+# Gompertztrunc 0.1.0
+
+## Second Submission to CRAN, version 0.1.0
 The following changes have been made in response to CRAN's comments:
 
 - Reworded the description so that it does not start with "Functions for"
@@ -10,12 +13,12 @@ write internal ggplot messages to the console.
 
 The suggestion to add references was optional; we have not done so for this release.
 
-### test environments
+#### test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-### R CMD Check results
+#### R CMD Check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
   checking CRAN incoming feasibility ... NOTE
   Maintainer: 'Maria Osborne <mariaosborne@berkeley.edu>'
@@ -28,12 +31,12 @@ The suggestion to add references was optional; we have not done so for this rele
 
 0 errors ✓ | 0 warnings ✓ | 2 notes x
 
-### Notes
+#### Notes
 * The note about HTML validation only occurs on fedora-clang-devel and does not seem critical. The HTML version of the manual is able to be validated on windows-x86_64-devel and locally.
 
 
 
-# Reply from CRAN for first submission
+## Reply from CRAN for first submission
 - Please do not start the description with "This package", package name, title or
 "Functions for".
 
@@ -56,16 +59,16 @@ Instead of print() rather use message()/warning()  or if(verbose)cat(..)
 (except for print, summary, interactive functions)
 
 
-# First Submission to CRAN, version 0.1.0
+## First Submission to CRAN, version 0.1.0
 
 The first submission of the `gompertztrunc` package
 
-### Test environments
+#### Test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-### R CMD check results
+#### R CMD check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
   checking CRAN incoming feasibility ... NOTE
   
