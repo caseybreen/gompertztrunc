@@ -1,3 +1,23 @@
+# Gompertztrunc 0.1.1
+
+
+Resubmitted because of a new note during the "HTML version of manual" check, due to a recent change to r-devel. Gompertztrunc 0.1.0 generates the following note on  r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, and r-devel-linux-x86_64-fedora-clang:
+
+> Check: HTML version of manual
+> Result: NOTE
+> Found the following HTML validation problems:
+> pipe.html:40:9 (pipe.Rd:12): Warning: <code> anchor "lhs" already defined
+> pipe.html:44:9 (pipe.Rd:14): Warning: <code> anchor "rhs" already defined
+
+pipe was refactored and its documentation fixed so that there are no duplicated \item entries in the html manual. Results from rechecking the package are below.
+
+
+#### test environments
+
+#### R CMD Check results
+
+#### Notes
+
 
 # Gompertztrunc 0.1.0
 
