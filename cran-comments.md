@@ -3,23 +3,23 @@
 
 Resubmitted by request of CRAN because of a new note during the "HTML version of manual" check, due to a recent change to r-devel. Gompertztrunc 0.1.0 generates the following note on  r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, and r-devel-linux-x86_64-fedora-clang:
 
-> Check: HTML version of manual
-Result: NOTE
-Found the following HTML validation problems:
-   pipe.html:40:9 (pipe.Rd:12): Warning: <code> anchor "lhs" already defined
-   pipe.html:44:9 (pipe.Rd:14): Warning: <code> anchor "rhs" already defined
+> Check: HTML version of manual  
+> Result: NOTE  
+> Found the following HTML validation problem:  
+>   pipe.html:40:9 (pipe.Rd:12): Warning: \<code\> anchor "lhs" already defined  
+>   pipe.html:44:9 (pipe.Rd:14): Warning: \<code\> anchor "rhs" already defined 
 
-pipe was refactored and its documentation fixed so that there are no duplicated `\`item entries in the html manual. Results from rechecking the package are below.
+pipe was refactored and its documentation fixed so that there are no duplicated \item entries in the html manual. Results from rechecking the package are below.
 
 
-#### test environments
+### test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-#### R CMD Check results
+### R CMD Check results
 
-#### Notes
+### Notes
 
 
 # Gompertztrunc 0.1.0
@@ -36,12 +36,12 @@ write internal ggplot messages to the console.
 
 The suggestion to add references was optional; we have not done so for this release.
 
-#### test environments
+### test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-#### R CMD Check results
+### R CMD Check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
   checking CRAN incoming feasibility ... NOTE
   Maintainer: 'Maria Osborne <mariaosborne@berkeley.edu>'
@@ -54,7 +54,7 @@ The suggestion to add references was optional; we have not done so for this rele
 
 0 errors ✓ | 0 warnings ✓ | 2 notes x
 
-#### Notes
+### Notes
 * The note about HTML validation only occurs on fedora-clang-devel and does not seem critical. The HTML version of the manual is able to be validated on windows-x86_64-devel and locally.
 
 
@@ -86,12 +86,12 @@ Instead of print() rather use message()/warning()  or if(verbose)cat(..)
 
 The first submission of the `gompertztrunc` package
 
-#### Test environments
+### Test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-#### R CMD check results
+### R CMD check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
   checking CRAN incoming feasibility ... NOTE
   
