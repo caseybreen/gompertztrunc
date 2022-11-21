@@ -2,7 +2,7 @@ Type: Package
 Package: gompertztrunc
 Title: Conducting Maximum Likelihood Estimation with Truncated
     Mortality Data
-Version: 0.1.0.9000
+Version: 0.1.1
 Authors@R: c(
     person("Casey", "Breen", , "caseybreen@berkeley.edu", role = "aut",
            comment = c(ORCID = "https://orcid.org/0000-0001-9114-981X")),
