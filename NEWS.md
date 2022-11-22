@@ -1,7 +1,7 @@
 
-## gompertztrunc 0.1.1
+# gompertztrunc 0.1.1
 
-Patched a small issue in documentation as requested by CRAN. 
+Patch release to resolve a minor documentation issue uncovered by new CRAN package checks.
 
 # gompertztrunc 0.1.0
 
