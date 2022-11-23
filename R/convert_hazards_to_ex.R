@@ -17,7 +17,7 @@
 #' @examples
 #' #model hazards as function of birthplace using bunmd_demo data
 #' demo_dataset <- dplyr::filter(bunmd_demo, bpl_string %in% c("Poland", "England")) %>%
-#' dplyr::sample_frac(0.5)
+#' dplyr::sample_frac(0.3)
 #'
 #' #run gompertz_mle()
 #' bpl <- gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988,
