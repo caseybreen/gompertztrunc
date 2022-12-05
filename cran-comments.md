@@ -1,6 +1,6 @@
 # Gompertztrunc 0.1.1
 
-Resubmitted by request of CRAN because of a new note during the "HTML version of manual" check, due to a recent change to r-devel. Gompertztrunc 0.1.0 generates the following note on  r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, and r-devel-linux-x86_64-fedora-clang:
+First submission of a patch release. Requested by CRAN because of a new note during the "HTML version of manual" check, due to a recent change to r-devel. Gompertztrunc 0.1.0 generates the following note on  r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, and r-devel-linux-x86_64-fedora-clang:
 
 > Check: HTML version of manual  
 > Result: NOTE  
