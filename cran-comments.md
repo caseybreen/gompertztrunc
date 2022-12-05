@@ -1,6 +1,5 @@
 # Gompertztrunc 0.1.1
 
-
 Resubmitted by request of CRAN because of a new note during the "HTML version of manual" check, due to a recent change to r-devel. Gompertztrunc 0.1.0 generates the following note on  r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, and r-devel-linux-x86_64-fedora-clang:
 
 > Check: HTML version of manual  
@@ -9,17 +8,30 @@ Resubmitted by request of CRAN because of a new note during the "HTML version of
 >   pipe.html:40:9 (pipe.Rd:12): Warning: \<code\> anchor "lhs" already defined  
 >   pipe.html:44:9 (pipe.Rd:14): Warning: \<code\> anchor "rhs" already defined 
 
-pipe was refactored and its documentation fixed so that there are no duplicated \item entries in the html manual. Results from rechecking the package are below.
+The imported pipe function was refactored and its documentation fixed so that there are no duplicated \item entries in the html manual. Results from rechecking the package are below.
 
 
-### test environments
+## Test environments
 - R-hub windows-x86_64-devel (r-devel)
 - R-hub ubuntu-gcc-release (r-release)
 - R-hub fedora-clang-devel (r-devel)
 
-### R CMD Check results
+## R CMD check results
+❯ On ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
+  checking examples ... [10s/20s] NOTE
+  Examples with CPU (user + system) or elapsed time > 5s
+                        user system elapsed
+  convert_hazards_to_ex 3.07  0.136   6.459
 
-### Notes
+❯ On fedora-clang-devel (r-devel)
+  checking HTML version of manual ... NOTE
+  Skipping checking HTML validation: no command 'tidy' found
+
+0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+
+## Notes
+The example with elapsed time > 5s only happens in some test environments, and the elapsed time of 6.5 seconds is not excessive. The HTML version of the manual is able to validated locally and in environments other than fedora-clang-devel.
+
 
 
 # Gompertztrunc 0.1.0
