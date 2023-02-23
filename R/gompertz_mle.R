@@ -206,8 +206,6 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
   ## tidy up fit object
   hr_lower <- hr_upper <- hr <-  NULL
   fit <- fit %>%
-    dplyr::mutate(parameter = stringr::str_replace_all(.data$parameter, "log.", "")) %>%
-    dplyr::mutate(parameter = stringr::str_replace_all(.data$parameter, "of.", "")) %>%
     dplyr::select(-.data$std.error) %>%
     dplyr::mutate(hr = dplyr::if_else(.data$parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(.data$value)),
            hr_lower = dplyr::if_else(.data$parameter %in% c("gompertz_mode", "gompertz_b"), NA_real_, exp(.data$lower)),
