@@ -306,9 +306,9 @@ diagnostic_plot_hazard(object = bpl_results_1915_cohort, data = bunmd_1915_cohor
 ```
 
 
-## Case Study III: Education and longevity analysis with person-weights 
+## Case Study III: Education and longevity analysis with person-weights   
 
-In our third case study, we look at the association between education and longevity. We'll use a pre-linked “demo” version of the CenSoc-Numident file, which contains 63 thousand mortality records and 20 mortality covariates from the 1940 census (~1% of the complete CenSoc-Numident dataset). We'll also incorporate person-level weights into our analysis. 
+In our third case study, we look at the association between education and longevity. We'll use a pre-linked “demo” version of the CenSoc-Numident file, which contains 63 thousand mortality records and 20 mortality covariates from the 1940 census (~1% of the complete CenSoc-Numident dataset). We will also incorporate person-level weights into our analysis. 
 
 ### Person-weights 
 
