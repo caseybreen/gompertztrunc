@@ -1,3 +1,78 @@
+# Gompertztrunc 0.1.2
+
+First submission of a patch release. Features of this release include:
+
+- Reference added to description.
+
+- Fixed a problem with computation of standard errors in `gompertz_mle()`.  
+
+- Other small bug fixes in `gompertz_mle()` and package vignette.
+
+## Test environments
+- R-hub windows-x86_64-devel (r-devel)
+- R-hub ubuntu-gcc-release (r-release)
+- R-hub fedora-clang-devel (r-devel)
+
+## R CMD check results
+❯ On windows-x86_64-devel (r-devel)
+  checking CRAN incoming feasibility ... [16s] NOTE
+  Maintainer: 'Maria Osborne <mariaosborne@berkeley.edu>'
+  
+  Possibly misspelled words in DESCRIPTION:
+    Goldstein (15:18)
+    al (15:31)
+    et (15:28)
+
+❯ On windows-x86_64-devel (r-devel)
+  checking for non-standard things in the check directory ... NOTE
+  Found the following files/directories:
+    ''NULL''
+
+❯ On windows-x86_64-devel (r-devel)
+  checking for detritus in the temp directory ... NOTE
+  Found the following files/directories:
+    'lastMiKTeXException'
+
+❯ On ubuntu-gcc-release (r-release)
+  checking CRAN incoming feasibility ... [8s/24s] NOTE
+  Maintainer: ‘Maria Osborne <mariaosborne@berkeley.edu>’
+  
+  Possibly misspelled words in DESCRIPTION:
+    al (15:31)
+    et (15:28)
+    Goldstein (15:18)
+
+❯ On ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
+  checking examples ... [7s/19s] NOTE
+  Examples with CPU (user + system) or elapsed time > 5s
+                         user system elapsed
+  convert_hazards_to_ex 2.699   0.12   7.357
+
+❯ On ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)
+  checking HTML version of manual ... NOTE
+  Skipping checking HTML validation: no command 'tidy' found
+
+❯ On fedora-clang-devel (r-devel)
+  checking CRAN incoming feasibility ... [9s/34s] NOTE
+  Maintainer: ‘Maria Osborne <mariaosborne@berkeley.edu>’
+  
+  Possibly misspelled words in DESCRIPTION:
+    Goldstein (15:18)
+    al (15:31)
+    et (15:28)
+
+0 errors ✔ | 0 warnings ✔ | 7 notes ✖
+
+## Notes
+No notes received seem critical:
+- Names and emails in DESCIPTION are not misspelled. These 3 notes can be disregarded.
+- NULL file/directory note is likely an rhub issue that can be ignored [according to rhub maintainers](https://github.com/r-hub/rhub/issues/560)
+- The 'lastMiKTeXException' note may be due to a MikTeX bug; we have ignored this note for past releases without issue.
+- The example with elapsed time > 5s only happens in some test environments, and the elapsed time of 7.4 seconds is not excessive. 
+- The HTML version of the manual is able to be validated locally and in environments other than fedora-clang-devel.
+
+
+
 # Gompertztrunc 0.1.1
 
 First submission of a patch release. Requested by CRAN because of a new note during the "HTML version of manual" check, due to a recent change to r-devel. Gompertztrunc 0.1.0 generates the following note on  r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, and r-devel-linux-x86_64-fedora-clang:

@@ -1,3 +1,6 @@
+# gompertztrunc 0.1.2
+
+Improved calculation of standard errors and other minor bug fixes in `gompertz_mle()`
 
 # gompertztrunc 0.1.1
 

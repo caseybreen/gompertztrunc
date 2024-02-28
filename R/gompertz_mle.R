@@ -40,12 +40,11 @@
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' #model hazards as function of birthplace using bunmd_demo file
-#' demo_dataset <- dplyr::filter(bunmd_demo, bpl_string %in% c("Cuba", "England"))
-#'
 #' gompertz_mle(formula = death_age ~ bpl_string, left_trunc = 1988, right_trunc = 2005,
-#' data = demo_dataset)
-#'
+#' data = bunmd_demo)
+#' }
 #' @export gompertz_mle
 
 gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, byear = byear, dyear=dyear, lower_age_bound = NULL,
@@ -181,14 +180,35 @@ gompertz_mle <- function(formula, left_trunc = 1975, right_trunc = 2005, data, b
     )
 
   ## calculate mode
+
+  # Use delta method for estimating Var(M), a transformation of a and b
+  # First we have to get Var(a) and Var(b) in the non-log scale
+  log_a_hat <- optim_fit$par[2]
+  a_hat <- exp(log_a_hat)
+  log_b_hat <- optim_fit$par[1]
+  b_hat <- exp(log_b_hat)
+  var_covar_mat_log <- solve(optim_fit$hessian)
+  sigma_vec_log <- sqrt(diag(solve(optim_fit$hessian)))[1:2]
+  names(sigma_vec_log) <- c("log.b", "log.a")
+  var_a_hat <- sigma_vec_log["log.a"]^2 * exp(2*log_a_hat) # Var(exp(Y)) = Var(Y)*exp(2*E[Y])
+  var_b_hat <- sigma_vec_log["log.b"]^2 * exp(2*log_b_hat)
+
+  covar_a_b_log <- var_covar_mat_log[1,2] # Cov(log(a), log(b))
+  cov_a_b_hat <- exp(log_a_hat + log_b_hat)*covar_a_b_log
+
+  # Var(M) = [dM/da, dM/db] %*% Cov(a,b) %*% [dM/da, dM/db]^T
+  var_M_hat <- (1/(b_hat*a_hat)^2)*var_a_hat + ((log(a_hat/b_hat) + 1)/(b_hat^2))^2*var_b_hat -
+    2*( (log(a_hat/b_hat) + 1)/(b_hat^3 * a_hat) )*cov_a_b_hat
+  se_M_hat <- sqrt(var_M_hat)
+
   parameter <- NULL
   mode <- fit %>%
     dplyr::filter(parameter == "b0.start") %>%
     dplyr::mutate(parameter = "gompertz_mode",
-           value = ab2M(exp(.data$value), b = exp(fit$value[1])),
-           lower = ab2M(exp(.data$lower), b = exp(fit$value[1])),
-           upper = ab2M(exp(.data$upper), b = exp(fit$value[1]))) %>%
-    dplyr::rename(upper = lower, lower = upper)
+                  std.error = se_M_hat,
+                  value = ab2M(exp(log_a_hat), b = exp(log_b_hat)),
+                  lower = .data$value - 1.96*se_M_hat,
+                  upper = .data$value + 1.96*se_M_hat)
 
   ## calculate b
   b <- fit %>%
