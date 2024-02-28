@@ -65,7 +65,7 @@ First submission of a patch release. Features of this release include:
 
 ## Notes
 No notes received seem critical:
-- Names and emails in DESCIPTION are not misspelled. These 3 notes can be disregarded.
+- Names and references in DESCRIPTION are not misspelled. These 3 notes can be disregarded.
 - NULL file/directory note is likely an rhub issue that can be ignored [according to rhub maintainers](https://github.com/r-hub/rhub/issues/560)
 - The 'lastMiKTeXException' note may be due to a MikTeX bug; we have ignored this note for past releases without issue.
 - The example with elapsed time > 5s only happens in some test environments, and the elapsed time of 7.4 seconds is not excessive. 
