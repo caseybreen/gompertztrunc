@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gompertztrunc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -275,7 +275,7 @@ make sure the model has converged.</p>
 <span><span class="co">##   parameter             coef coef_lower coef_upper     hr hr_lower hr_upper</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b           0.103     0.096<span style="text-decoration: underline;">4</span>      0.110 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode       69.4      64.4        74.3   <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode       69.4      68.2        70.6   <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">3</span> temp                 0.207     0.194       0.219  1.23     1.21     1.25 </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">4</span> as.factor(sex)1     -<span style="color: #BB0000;">0.530</span>    -<span style="color: #BB0000;">0.590</span>      -<span style="color: #BB0000;">0.470</span>  0.589    0.554    0.625</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">5</span> as.factor(isSouth)1  0.598     0.536       0.661  1.82     1.71     1.94</span></span></code></pre>
@@ -488,7 +488,7 @@ the US and Mexico.</p>
 <span><span class="co">##   parameter           coef coef_lower coef_upper     hr hr_lower hr_upper</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b        0.083<span style="text-decoration: underline;">1</span>     0.071<span style="text-decoration: underline;">5</span>     0.096<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode    81.1       70.2       91.9    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode    81.1       80.2       81.9    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">3</span> bpl_stringMexico -<span style="color: #BB0000;">0.419</span>     -<span style="color: #BB0000;">0.575</span>     -<span style="color: #BB0000;">0.263</span>   0.658    0.563    0.769</span></span></code></pre>
 <p>The first diagnostic graph, <code><a href="../reference/diagnostic_plot.html">diagnostic_plot()</a></code>, compares
 the empirical distribution of deaths to the modeled distribution.</p>
@@ -585,7 +585,7 @@ person-level weights using the <code>weights</code> argument in the
 <span><span class="co">##   parameter        coef coef_lower coef_upper     hr hr_lower hr_upper</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> gompertz_b     0.079<span style="text-decoration: underline;">9</span>     0.073<span style="text-decoration: underline;">6</span>     0.086<span style="text-decoration: underline;">8</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 73.9       67.2       80.5    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> gompertz_mode 73.9       71.7       76.0    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">3</span> educ_yrs      -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span>    -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">7</span>    -<span style="color: #BB0000;">0.034</span><span style="color: #BB0000; text-decoration: underline;">4</span>  0.954    0.941    0.966</span></span></code></pre>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## translate to e65</span></span>
